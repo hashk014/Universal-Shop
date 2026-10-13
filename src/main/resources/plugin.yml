@@ -1,0 +1,28 @@
+name: UniversalShop
+version: 1.0.0
+api-version: '1.13'
+main: fr.hash014.universalshop.UniversalShop
+author: hash014
+description: Flexible survival shops, rotating deals, dynamic prices and player trading.
+website: https://github.com/hashk014/Universal-Shop
+softdepend: [Vault]
+commands:
+  shop:
+    description: Open the shop or manage UniversalShop.
+    aliases: [ushop, universalshop]
+    usage: /shop help
+permissions:
+  universalshop.use:
+    default: true
+  universalshop.buy:
+    default: true
+  universalshop.sell:
+    default: true
+  universalshop.market:
+    default: true
+  universalshop.pay:
+    default: true
+  universalshop.admin:
+    default: op
+  universalshop.vip:
+    default: false

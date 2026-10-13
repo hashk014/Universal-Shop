@@ -1,0 +1,27 @@
+{
+  "version": "1.0.0",
+  "tested_at": "2026-10-13T18:57:07.912169+00:00",
+  "paper_versions": 55,
+  "vault_versions": [
+    "1.21.11",
+    "26.3"
+  ],
+  "artifacts": {
+    "UniversalShop-1.0.0-Evidence.zip": {
+      "bytes": 150774,
+      "sha256": "9d01dd524ee0f3401e2cf8517a8a93b5b0221c3fe5308b47219e60c2a1d98cc8"
+    },
+    "UniversalShop-1.0.0-Install.zip": {
+      "bytes": 86487,
+      "sha256": "99f53668b92fdb4337f4aa8ef954e18b269be45b5a404c3bbada359b8839409b"
+    },
+    "UniversalShop-1.0.0-sources.jar": {
+      "bytes": 33211,
+      "sha256": "3e8ba861efac31c48f23c0dedecc088c83685c9059a0b6b3b4fd8f21cb3e6ea4"
+    },
+    "UniversalShop-1.0.0.jar": {
+      "bytes": 72113,
+      "sha256": "847db755bfe73359a7a0a31c6537fe41fed01146e4a3e1561270bd33c3acf5e5"
+    }
+  }
+}

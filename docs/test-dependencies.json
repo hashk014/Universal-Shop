@@ -1,0 +1,16 @@
+{
+  "vault": {
+    "source": "https://github.com/MilkBowl/Vault/releases/tag/1.7.3",
+    "sha256": "a6b5ed97f43a5cf5bbaf00a7c8cd23c5afc9bd003f849875af8b36e6cf77d01d",
+    "version": "1.7.3"
+  },
+  "essentials": {
+    "source": "https://github.com/EssentialsX/Essentials/releases/tag/2.22.0",
+    "sha256": "bda4685105977fca2e209820a9f0ad24275bd103390a03236f38e59bfdac58e6",
+    "version": "2.22.0"
+  },
+  "client": {
+    "minecraft-protocol": "1.68.0",
+    "minecraft-data": "3.117.0"
+  }
+}

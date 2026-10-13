@@ -1,0 +1,33 @@
+# All amounts are decimal currency units (two decimal places).
+economy: INTERNAL # INTERNAL or VAULT; VAULT fails closed if no provider is available.
+starting-balance: 100.00
+currency: '$'
+max-transaction-items: 2304
+cooldown-milliseconds: 350
+disabled-worlds: []
+buy-tax-percent: 0
+sell-tax-percent: 0
+# A buy discount never lowers a unit below its matching sell price.
+permission-discounts:
+  universalshop.vip: 5
+rotation:
+  enabled: true
+  period-hours: 168
+  count: 3
+  seed: survival-market
+  discount-percent: 15
+# Optional time-limited sale; UTC ISO-8601, blank dates mean disabled.
+promotion:
+  starts: ''
+  ends: ''
+  discount-percent: 10
+market:
+  enabled: true
+  max-listings-per-player: 10
+  tax-percent: 2
+  listing-hours: 168
+messages:
+  prefix: '&8[&6UniversalShop&8] &r'
+  success: '&aTransaction complete: {quantity} x {product} for {price}.'
+  error: '&c{reason}'
+  balance: '&eBalance: {balance}'

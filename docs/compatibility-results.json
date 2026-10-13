@@ -1,0 +1,886 @@
+{
+  "tested_at": "2026-10-13T18:57:07.912169+00:00",
+  "jar_sha256": "847db755bfe73359a7a0a31c6537fe41fed01146e4a3e1561270bd33c3acf5e5",
+  "results": [
+    {
+      "version": "1.7.10",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 11.5,
+      "java": 8,
+      "paper_build": 2025,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.7.10/universalshop-test.log"
+    },
+    {
+      "version": "1.8.8",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 10.0,
+      "java": 8,
+      "paper_build": 445,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.8.8/universalshop-test.log"
+    },
+    {
+      "version": "1.9.4",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 10.2,
+      "java": 8,
+      "paper_build": 775,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.9.4/universalshop-test.log"
+    },
+    {
+      "version": "1.10.2",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 10.0,
+      "java": 8,
+      "paper_build": 918,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.10.2/universalshop-test.log"
+    },
+    {
+      "version": "1.11.2",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 10.1,
+      "java": 8,
+      "paper_build": 1106,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.11.2/universalshop-test.log"
+    },
+    {
+      "version": "1.12",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 40.8,
+      "java": 8,
+      "paper_build": 1169,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.12/universalshop-test.log"
+    },
+    {
+      "version": "1.12.1",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 11.3,
+      "java": 8,
+      "paper_build": 1204,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.12.1/universalshop-test.log"
+    },
+    {
+      "version": "1.12.2",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 12.6,
+      "java": 8,
+      "paper_build": 1620,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.12.2/universalshop-test.log"
+    },
+    {
+      "version": "1.13",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 17.9,
+      "java": 8,
+      "paper_build": 173,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.13/universalshop-test.log"
+    },
+    {
+      "version": "1.13.1",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 18.4,
+      "java": 8,
+      "paper_build": 386,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.13.1/universalshop-test.log"
+    },
+    {
+      "version": "1.13.2",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 18.7,
+      "java": 8,
+      "paper_build": 657,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.13.2/universalshop-test.log"
+    },
+    {
+      "version": "1.14",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 24.1,
+      "java": 8,
+      "paper_build": 17,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.14/universalshop-test.log"
+    },
+    {
+      "version": "1.14.1",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 22.9,
+      "java": 8,
+      "paper_build": 50,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.14.1/universalshop-test.log"
+    },
+    {
+      "version": "1.14.2",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 25.6,
+      "java": 8,
+      "paper_build": 107,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.14.2/universalshop-test.log"
+    },
+    {
+      "version": "1.14.3",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 23.8,
+      "java": 8,
+      "paper_build": 134,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.14.3/universalshop-test.log"
+    },
+    {
+      "version": "1.14.4",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 23.4,
+      "java": 8,
+      "paper_build": 245,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.14.4/universalshop-test.log"
+    },
+    {
+      "version": "1.15",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 24.8,
+      "java": 8,
+      "paper_build": 21,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.15/universalshop-test.log"
+    },
+    {
+      "version": "1.15.1",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 25.1,
+      "java": 8,
+      "paper_build": 62,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.15.1/universalshop-test.log"
+    },
+    {
+      "version": "1.15.2",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 35.4,
+      "java": 8,
+      "paper_build": 393,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.15.2/universalshop-test.log"
+    },
+    {
+      "version": "1.16.1",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 18.2,
+      "java": 8,
+      "paper_build": 138,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.16.1/universalshop-test.log"
+    },
+    {
+      "version": "1.16.2",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 18.9,
+      "java": 8,
+      "paper_build": 189,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.16.2/universalshop-test.log"
+    },
+    {
+      "version": "1.16.3",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 17.5,
+      "java": 8,
+      "paper_build": 253,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.16.3/universalshop-test.log"
+    },
+    {
+      "version": "1.16.4",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 17.4,
+      "java": 8,
+      "paper_build": 416,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.16.4/universalshop-test.log"
+    },
+    {
+      "version": "1.16.5",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 16.8,
+      "java": 8,
+      "paper_build": 794,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.16.5/universalshop-test.log"
+    },
+    {
+      "version": "1.17",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 17.4,
+      "java": 16,
+      "paper_build": 79,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.17/universalshop-test.log"
+    },
+    {
+      "version": "1.17.1",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 18.4,
+      "java": 17,
+      "paper_build": 411,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.17.1/universalshop-test.log"
+    },
+    {
+      "version": "1.18",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 19.5,
+      "java": 17,
+      "paper_build": 66,
+      "paper_channel": "ALPHA",
+      "errors": [],
+      "log": "test-servers/1.18/universalshop-test.log"
+    },
+    {
+      "version": "1.18.1",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 19.0,
+      "java": 17,
+      "paper_build": 216,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.18.1/universalshop-test.log"
+    },
+    {
+      "version": "1.18.2",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 19.7,
+      "java": 17,
+      "paper_build": 388,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.18.2/universalshop-test.log"
+    },
+    {
+      "version": "1.19",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 20.2,
+      "java": 17,
+      "paper_build": 81,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.19/universalshop-test.log"
+    },
+    {
+      "version": "1.19.1",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 21.5,
+      "java": 17,
+      "paper_build": 111,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.19.1/universalshop-test.log"
+    },
+    {
+      "version": "1.19.2",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 21.2,
+      "java": 17,
+      "paper_build": 307,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.19.2/universalshop-test.log"
+    },
+    {
+      "version": "1.19.3",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 22.6,
+      "java": 17,
+      "paper_build": 448,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.19.3/universalshop-test.log"
+    },
+    {
+      "version": "1.19.4",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 22.3,
+      "java": 17,
+      "paper_build": 550,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.19.4/universalshop-test.log"
+    },
+    {
+      "version": "1.20",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 23.9,
+      "java": 17,
+      "paper_build": 17,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.20/universalshop-test.log"
+    },
+    {
+      "version": "1.20.1",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 21.0,
+      "java": 17,
+      "paper_build": 196,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.20.1/universalshop-test.log"
+    },
+    {
+      "version": "1.20.2",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 20.3,
+      "java": 17,
+      "paper_build": 318,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.20.2/universalshop-test.log"
+    },
+    {
+      "version": "1.20.4",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 22.7,
+      "java": 17,
+      "paper_build": 499,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.20.4/universalshop-test.log"
+    },
+    {
+      "version": "1.20.5",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 23.4,
+      "java": 21,
+      "paper_build": 22,
+      "paper_channel": "ALPHA",
+      "errors": [],
+      "log": "test-servers/1.20.5/universalshop-test.log"
+    },
+    {
+      "version": "1.20.6",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 24.0,
+      "java": 21,
+      "paper_build": 151,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.20.6/universalshop-test.log"
+    },
+    {
+      "version": "1.21",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 23.9,
+      "java": 21,
+      "paper_build": 130,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.21/universalshop-test.log"
+    },
+    {
+      "version": "1.21.1",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 23.8,
+      "java": 21,
+      "paper_build": 133,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.21.1/universalshop-test.log"
+    },
+    {
+      "version": "1.21.3",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 23.5,
+      "java": 21,
+      "paper_build": 83,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.21.3/universalshop-test.log"
+    },
+    {
+      "version": "1.21.4",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 25.0,
+      "java": 21,
+      "paper_build": 232,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.21.4/universalshop-test.log"
+    },
+    {
+      "version": "1.21.5",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 25.0,
+      "java": 21,
+      "paper_build": 114,
+      "paper_channel": "ALPHA",
+      "errors": [],
+      "log": "test-servers/1.21.5/universalshop-test.log"
+    },
+    {
+      "version": "1.21.6",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 25.7,
+      "java": 21,
+      "paper_build": 48,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.21.6/universalshop-test.log"
+    },
+    {
+      "version": "1.21.7",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 27.6,
+      "java": 21,
+      "paper_build": 32,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.21.7/universalshop-test.log"
+    },
+    {
+      "version": "1.21.8",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 26.7,
+      "java": 21,
+      "paper_build": 60,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.21.8/universalshop-test.log"
+    },
+    {
+      "version": "1.21.9",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 26.5,
+      "java": 21,
+      "paper_build": 59,
+      "paper_channel": "ALPHA",
+      "errors": [],
+      "log": "test-servers/1.21.9/universalshop-test.log"
+    },
+    {
+      "version": "1.21.10",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 27.4,
+      "java": 21,
+      "paper_build": 130,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.21.10/universalshop-test.log"
+    },
+    {
+      "version": "1.21.11",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 27.4,
+      "java": 21,
+      "paper_build": 132,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/1.21.11/universalshop-test.log"
+    },
+    {
+      "version": "26.1.1",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 24.6,
+      "java": 25,
+      "paper_build": 29,
+      "paper_channel": "ALPHA",
+      "errors": [],
+      "log": "test-servers/26.1.1/universalshop-test.log"
+    },
+    {
+      "version": "26.1.2",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 24.6,
+      "java": 25,
+      "paper_build": 74,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/26.1.2/universalshop-test.log"
+    },
+    {
+      "version": "26.2",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 21.9,
+      "java": 25,
+      "paper_build": 133,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/26.2/universalshop-test.log"
+    },
+    {
+      "version": "26.3",
+      "economy": "INTERNAL",
+      "status": "passed",
+      "checks": {
+        "self": 10,
+        "player": 43,
+        "restart": 5
+      },
+      "seconds": 22.2,
+      "java": 25,
+      "paper_build": 181,
+      "paper_channel": "STABLE",
+      "errors": [],
+      "log": "test-servers/26.3/universalshop-test.log"
+    }
+  ]
+}

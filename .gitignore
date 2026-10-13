@@ -1,0 +1,10 @@
+target/
+.tools/
+test-servers/
+*.log
+.idea/
+*.iml
+release/*.zip
+release/*.jar
+__pycache__/
+*.pyc

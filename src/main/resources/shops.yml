@@ -1,0 +1,153 @@
+# IDs: lowercase letters, digits, _ and -. Prices are PER ITEM.
+# -1 disables buying/selling. stock: -1 = unlimited.
+# Exact item metadata is required when selling; named/enchanted items are safe.
+# Unsupported materials are skipped with a warning, never silently substituted.
+products:
+  stone:
+    name: Stone
+    category: Building
+    material: STONE
+    buy: 2
+    sell: 0.5
+  cobblestone:
+    name: Cobblestone
+    category: Building
+    material: COBBLESTONE
+    buy: 1
+    sell: 0.2
+  oak_planks:
+    name: Oak Planks
+    category: Building
+    material: OAK_PLANKS|WOOD
+    buy: 2
+    sell: 0.4
+  glass:
+    name: Glass
+    category: Building
+    material: GLASS
+    buy: 4
+    sell: 1
+  sand:
+    name: Sand
+    category: Building
+    material: SAND
+    buy: 2
+    sell: 0.4
+  dirt:
+    name: Dirt
+    category: Building
+    material: DIRT
+    buy: 1
+    sell: 0.1
+  torch:
+    name: Torch
+    category: Building
+    material: TORCH
+    buy: 2
+    sell: 0.4
+  bread:
+    name: Bread
+    category: Farming
+    material: BREAD
+    buy: 6
+    sell: 1.5
+  wheat:
+    name: Wheat
+    category: Farming
+    material: WHEAT
+    buy: 3
+    sell: 1
+  carrot:
+    name: Carrot
+    category: Farming
+    material: CARROT|CARROT_ITEM
+    buy: 3
+    sell: 1
+  potato:
+    name: Potato
+    category: Farming
+    material: POTATO|POTATO_ITEM
+    buy: 3
+    sell: 1
+  sugar_cane:
+    name: Sugar Cane
+    category: Farming
+    material: SUGAR_CANE
+    buy: 3
+    sell: 0.8
+  cooked_beef:
+    name: Steak
+    category: Farming
+    material: COOKED_BEEF
+    buy: 8
+    sell: 2
+  iron:
+    name: Iron Ingot
+    category: Resources
+    material: IRON_INGOT
+    buy: 24
+    sell: 8
+    dynamic: {enabled: true, step: 0.005, min: 0.5, max: 2.0}
+    stock: 2048
+    restock-hours: 24
+    daily-buy-limit: 256
+    daily-sell-limit: 512
+    rotating: true
+  gold:
+    name: Gold Ingot
+    category: Resources
+    material: GOLD_INGOT
+    buy: 48
+    sell: 16
+    rotating: true
+  diamond:
+    name: Diamond
+    category: Resources
+    material: DIAMOND
+    buy: 200
+    sell: 65
+    stock: 256
+    restock-hours: 168
+    daily-buy-limit: 32
+    dynamic: {enabled: true, step: 0.01, min: 0.6, max: 2.5}
+    rotating: true
+  emerald:
+    name: Emerald
+    category: Resources
+    material: EMERALD
+    buy: 150
+    sell: 35
+    rotating: true
+  coal:
+    name: Coal
+    category: Resources
+    material: COAL
+    buy: 8
+    sell: 2
+    rotating: true
+  redstone:
+    name: Redstone
+    category: Resources
+    material: REDSTONE
+    buy: 8
+    sell: 2
+  ender_pearl:
+    name: Ender Pearl
+    category: Adventure
+    material: ENDER_PEARL
+    buy: 80
+    sell: 20
+    rotating: true
+  iron_pickaxe:
+    name: Iron Pickaxe
+    category: Adventure
+    material: IRON_PICKAXE
+    buy: 100
+    sell: 20
+  netherite:
+    name: Netherite Ingot
+    category: Resources
+    material: NETHERITE_INGOT
+    buy: 2500
+    sell: 700
+    rotating: true
