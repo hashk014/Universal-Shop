@@ -51,6 +51,9 @@ final class ServerTests {
         Product stone = p.product("stone");
         String phase = args[2];
         if (phase.equals("start")) {
+          p.getConfig().set("management.personal.enabled", true);
+          p.getConfig().set("management.analytics.enabled", true);
+          p.management = new ShopManagement(p);
           player.getInventory().clear();
           p.onCommand(
               Bukkit.getConsoleSender(),
@@ -63,6 +66,13 @@ final class ServerTests {
               Inventories.count(Inventories.snapshot(player), stone.item) == 1,
               "Bedrock purchase delivered once");
           check(p.service.balance(player) == 9800, "Bedrock purchase charged once");
+          check(p.management.catalog(player, "@favorites").size() == 1, "Bedrock favorite saved");
+          check(
+              p.management.catalog(player, "@recent").get(0).id.equals("stone"),
+              "Bedrock recent purchase");
+          check(
+              p.store.state().getLong("management.stats.products.stone.bought") == 1,
+              "Bedrock purchase analytics");
           p.menus.confirm(player, stone, 1, false);
         } else if (phase.equals("sold")) {
           check(
@@ -83,6 +93,13 @@ final class ServerTests {
               p.getCommand("shop"),
               "shop",
               new String[] {"admin", "command", "enable", "buy"});
+          player.setOp(true);
+          p.menus.adminPanel(player);
+        } else if (phase.equals("panel")) {
+          check(
+              !p.management.enabled("analytics"),
+              "Bedrock administrator toggled module through native form");
+          player.setOp(false);
         } else throw new IllegalArgumentException("Unknown Bedrock phase");
         p.getLogger().info("BEDROCK PASS phase=" + phase + " checks=" + checks);
         return;
@@ -171,6 +188,7 @@ final class ServerTests {
     buyer.getInventory().clear();
     p.service.setBalance(player.getUniqueId(), 10000000);
     p.service.setBalance(buyer.getUniqueId(), 10000000);
+    management(player, buyer);
     final Product stone = p.product("stone");
     p.onCommand(
         Bukkit.getConsoleSender(),
@@ -362,8 +380,7 @@ final class ServerTests {
                       Inventories.count(Inventories.snapshot(player), stone.item)
                           == itemsBefore + 1,
                       "Double confirm delivers once");
-                  fixture(player);
-                  p.getLogger().info("PLAYERTEST PASS checks=" + checks);
+                  panel(player);
                 } catch (Throwable e) {
                   p.getLogger().log(java.util.logging.Level.SEVERE, "TEST FAIL", e);
                 }
@@ -382,6 +399,200 @@ final class ServerTests {
     p.store.save(next, "TEST restart fixture");
   }
 
+  private void panel(Player player) throws Exception {
+    p.menus.adminPanel(player);
+    check(player.getOpenInventory().getTopInventory().getSize() == 54, "Java management dashboard");
+    InventoryClickEvent click =
+        new InventoryClickEvent(
+            player.getOpenInventory(),
+            InventoryType.SlotType.CONTAINER,
+            10,
+            ClickType.LEFT,
+            InventoryAction.PICKUP_ALL);
+    p.menus.click(click);
+    Bukkit.getScheduler()
+        .runTaskLater(
+            p,
+            () -> {
+              try {
+                check(
+                    p.management.enabled("access"),
+                    "Java dashboard toggles module through a click");
+                p.management.admin(
+                    Bukkit.getConsoleSender(),
+                    new String[] {"admin", "manage", "disable", "access"});
+                fixture(player);
+                p.getLogger().info("PLAYERTEST PASS checks=" + checks);
+              } catch (Throwable error) {
+                p.getLogger().log(java.util.logging.Level.SEVERE, "TEST FAIL", error);
+              }
+            },
+            4);
+  }
+
+  private void management(Player player, Player buyer) throws Exception {
+    String original = p.getConfig().saveToString();
+    long wallet = p.service.balance(player), buyerWallet = p.service.balance(buyer);
+    try {
+      Product stone = p.product("stone");
+      p.getConfig().set("management.analytics.enabled", true);
+      p.getConfig().set("management.personal.enabled", true);
+      p.getConfig().set("management.budgets.enabled", true);
+      p.getConfig().set("management.budgets.daily-spend", 2);
+      p.management = new ShopManagement(p);
+      org.bukkit.permissions.PermissionAttachment permission = player.addAttachment(p);
+      permission.setPermission("universalshop.admin", false);
+      rejects(() -> p.menus.adminPanel(player), "Non-admin cannot open management dashboard");
+      player.removeAttachment(permission);
+      p.service.trade(player, stone, 1, true, null);
+      String stats = "management.stats.products.stone";
+      check(
+          p.store.state().getLong(stats + ".spent") == 200, "Management records committed revenue");
+      check(
+          p.management.catalog(player, "@recent").get(0).id.equals("stone"),
+          "Recent trades filter");
+      p.management.personal(player, new String[] {"favorite", "stone"});
+      check(
+          p.management.catalog(player, "@favorites").size() == 1,
+          "Favorites use persistent ledger");
+      long balance = p.service.balance(player), lines = p.store.state().getLong(stats + ".trades");
+      rejects(() -> p.service.trade(player, stone, 1, true, null), "Daily spend cap");
+      check(
+          p.service.balance(player) == balance
+              && p.store.state().getLong(stats + ".trades") == lines,
+          "Rejected management trade changes no money or statistics");
+      p.getConfig().set("management.budgets.daily-earn", .55);
+      p.management = new ShopManagement(p);
+      player.getInventory().clear();
+      player.getInventory().setItem(0, new ItemStack(Material.STONE, 1));
+      player.getInventory().setItem(1, new ItemStack(Material.DIRT, 1));
+      Map<String, Integer> basket = p.service.sellBasket(player);
+      long total = p.service.basketQuote(player, basket);
+      rejects(
+          () -> p.service.sellAll(player, basket, total),
+          "Bulk sale aggregates budget across products");
+      check(
+          p.service.balance(player) == balance
+              && Inventories.count(Inventories.snapshot(player), stone.item) == 1,
+          "Rejected bulk sale is atomic");
+      p.getConfig().set("management.budgets.enabled", false);
+      p.getConfig().set("management.access.enabled", true);
+      p.getConfig().set("management.access.maintenance", true);
+      p.management = new ShopManagement(p);
+      rejects(
+          () -> p.service.trade(player, stone, 1, true, null),
+          "Maintenance prevents stale confirmation");
+      p.getConfig().set("management.access.maintenance", false);
+      p.getConfig().set("management.product-rules.enabled", true);
+      p.getConfig().set("management.product-rules.entries.stone.global-daily-buy", 1);
+      p.management = new ShopManagement(p);
+      player.getInventory().clear();
+      p.service.trade(player, stone, 1, true, null);
+      rejects(
+          () -> p.service.trade(buyer, stone, 1, true, null),
+          "Server quota shared by two connected players");
+      p.getConfig().set("management.product-rules.entries.stone.global-daily-buy", 0);
+      p.getConfig().set("management.product-rules.entries.stone.cooldown-seconds", 60);
+      p.management = new ShopManagement(p);
+      p.service.trade(player, stone, 1, true, null);
+      rejects(() -> p.service.trade(player, stone, 1, true, null), "Product cooldown");
+      p.getConfig().set("management.product-rules.enabled", false);
+      p.getConfig().set("management.sale-protection.enabled", true);
+      p.getConfig().set("management.sale-protection.materials", Arrays.asList("STONE"));
+      p.management = new ShopManagement(p);
+      rejects(() -> p.service.trade(player, stone, 1, false, null), "Protected direct sale");
+      check(
+          !p.service.sellBasket(player).containsKey("stone"),
+          "Protected items omitted from bulk sale");
+      p.getConfig().set("management.sale-protection.enabled", false);
+      p.getConfig().set("management.campaigns.enabled", true);
+      String campaign = "management.campaigns.entries.test.";
+      p.getConfig().set(campaign + "products", Arrays.asList("stone"));
+      p.getConfig().set(campaign + "starts", "2020-01-01T00:00:00Z");
+      p.getConfig().set(campaign + "ends", "2099-01-01T00:00:00Z");
+      p.getConfig().set(campaign + "discount-percent", 50);
+      p.management = new ShopManagement(p);
+      check(p.service.quote(player, stone, 1, true) == 100, "Targeted campaign quote");
+      rejects(
+          () -> p.service.trade(player, stone, 1, true, 200L),
+          "Changed campaign invalidates previous price");
+      p.getConfig().set(campaign + "discount-percent", 100);
+      p.management = new ShopManagement(p);
+      check(
+          p.service.quote(player, stone, 1, true) >= p.service.quote(player, stone, 1, false),
+          "Campaign cannot bypass resale floor");
+      p.management.admin(Bukkit.getConsoleSender(), new String[] {"admin", "manage", "report"});
+      try (java.util.stream.Stream<Path> files =
+          Files.list(p.getDataFolder().toPath().resolve("exports"))) {
+        check(
+            files.anyMatch(f -> f.getFileName().toString().endsWith(".csv")), "Sales CSV exported");
+      }
+      p.onCommand(
+          Bukkit.getConsoleSender(),
+          p.getCommand("shop"),
+          "shop",
+          new String[] {"admin", "duplicate", "diamond", "test_copy"});
+      check(
+          p.product("test_copy").step == p.product("diamond").step
+              && p.product("test_copy").stock == p.product("diamond").stock,
+          "Duplicate retains nested pricing and stock configuration");
+      p.onCommand(
+          Bukkit.getConsoleSender(),
+          p.getCommand("shop"),
+          "shop",
+          new String[] {"admin", "rename", "test_copy", "Test", "Copy"});
+      check(p.product("test_copy").name.equals("Test Copy"), "Rename product");
+      p.onCommand(
+          Bukkit.getConsoleSender(),
+          p.getCommand("shop"),
+          "shop",
+          new String[] {"admin", "category", "test_copy", "Test", "Category"});
+      check(p.product("test_copy").category.equals("Test Category"), "Move product category");
+      p.onCommand(
+          Bukkit.getConsoleSender(),
+          p.getCommand("shop"),
+          "shop",
+          new String[] {"admin", "remove", "test_copy"});
+      // Command saves are tested too; finally restores the fixture's config file.
+      p.management.admin(Bukkit.getConsoleSender(), new String[] {"admin", "manage", "close"});
+      check(
+          !p.management.policy.open(java.time.Instant.now()),
+          "Maintenance persisted by management command");
+      p.management.admin(Bukkit.getConsoleSender(), new String[] {"admin", "manage", "open"});
+      p.management.admin(
+          Bukkit.getConsoleSender(), new String[] {"admin", "manage", "pause", "stone"});
+      rejects(
+          () -> p.service.trade(player, p.product("stone"), 1, true, null),
+          "Pause command enforced");
+      p.management.admin(
+          Bukkit.getConsoleSender(), new String[] {"admin", "manage", "resume", "stone"});
+      Product diamond = p.product("diamond");
+      YamlConfiguration stock = p.store.copy();
+      stock.set("products.diamond.stock", 0L);
+      stock.set(
+          "products.diamond.restock",
+          System.currentTimeMillis() / (diamond.restockHours * 3600000L));
+      stock.set("products.diamond.demand", 123L);
+      p.store.save(stock, "TEST management stock");
+      p.management.admin(
+          Bukkit.getConsoleSender(), new String[] {"admin", "manage", "restock", "diamond"});
+      check(p.service.stock(diamond) == diamond.stock, "Manual restock restores capacity");
+      p.management.admin(
+          Bukkit.getConsoleSender(), new String[] {"admin", "manage", "reset-demand", "diamond"});
+      check(
+          p.store.state().getLong("products.diamond.demand") == 0,
+          "Demand reset preserves configured prices");
+    } finally {
+      p.getConfig().loadFromString(original);
+      AtomicFiles.write(p.getDataFolder().toPath().resolve("config.yml"), original);
+      p.management = new ShopManagement(p);
+      p.service.setBalance(player.getUniqueId(), wallet);
+      p.service.setBalance(buyer.getUniqueId(), buyerWallet);
+      player.getInventory().clear();
+      buyer.getInventory().clear();
+    }
+  }
+
   private void restart(Player player) throws Exception {
     if (p.service.economy.external()) {
       long actual = p.service.balance(player);
@@ -398,6 +609,15 @@ final class ServerTests {
         Inventories.count(Inventories.snapshot(player), new ItemStack(Material.EMERALD)) == 7,
         "Inventory survives restart");
     check(!p.store.blocked(), "Clean restart does not lock trading");
+    check(
+        p.store.state().getLong("management.stats.products.stone.bought") == 3,
+        "Optional analytics survive restart");
+    check(
+        p.store
+            .state()
+            .getStringList("management.personal." + player.getUniqueId() + ".favorites")
+            .contains("stone"),
+        "Favorites survive restart");
   }
 
   private void vault(Player player) throws Exception {
@@ -424,6 +644,21 @@ final class ServerTests {
         !p.service.economy.change(player, Money.MAX, false),
         "Provider declines insufficient funds");
     check(!p.store.blocked(), "Successful Vault trades clear journal");
+    p.getConfig().set("management.budgets.enabled", true);
+    p.getConfig().set("management.budgets.daily-spend", 1);
+    p.getConfig().set("management.analytics.enabled", true);
+    p.management = new ShopManagement(p);
+    long managedBalance = p.service.balance(player);
+    rejects(
+        () -> p.service.trade(player, stone, 1, true, null), "Vault management budget rejection");
+    check(p.service.balance(player) == managedBalance, "Rejected budget does not call Vault debit");
+    p.getConfig().set("management.budgets.daily-spend", 3);
+    p.management = new ShopManagement(p);
+    p.service.trade(player, stone, 1, true, null);
+    check(p.service.balance(player) == managedBalance - 200, "Vault managed purchase debit");
+    check(
+        p.store.state().getLong("management.stats.products.stone.spent") == 200,
+        "Vault managed purchase statistics");
     rejects(() -> p.service.list(player, 1, 100), "Internal-only market unavailable in Vault mode");
     long balance = p.service.balance(player);
     check(p.service.economy.change(player, balance, false), "Provider drain");

@@ -23,7 +23,7 @@ Apply file edits with `/shop admin reload`. Alternatively, administrators can pe
 /shop admin command disable market.list
 ```
 
-These are UniversalShop commands, not a server-wide command blocker. Paths are case-insensitive. Valid roots are `shop`, `help`, `buy`, `sell`, `sellhand`, `sellall`, `balance`, `pay`, `search`, `category`, `deals`, `market`, and `admin`. Market children are `market.list`, `market.buy`, `market.cancel`. Admin children are `admin.add`, `admin.remove`, `admin.price`, `admin.stock`, `admin.balance`, `admin.history`, `admin.reload`, `admin.recovery`, `admin.export`, `admin.command`.
+These are UniversalShop commands, not a server-wide command blocker. Paths are case-insensitive. Valid roots are `shop`, `help`, `buy`, `sell`, `sellhand`, `sellall`, `balance`, `pay`, `search`, `category`, `deals`, `market`, `favorite`, `favorites`, `recent`, `sort`, `stats`, and `admin`. Market children are `market.list`, `market.buy`, `market.cancel`. Admin children are `admin.add`, `admin.remove`, `admin.price`, `admin.stock`, `admin.balance`, `admin.history`, `admin.reload`, `admin.recovery`, `admin.export`, `admin.command`, `admin.manage`, `admin.panel`, `admin.duplicate`, `admin.rename`, `admin.category`.
 
 Disabling `market` disables every market subcommand. Disabling `shop` disables all player access, including signs and menus. A disabled parent must be enabled before an enabled child can be used. Unknown paths fail validation to catch configuration typos.
 
@@ -44,10 +44,12 @@ Geyser's own [supported versions and runtime requirements](https://geysermc.org/
 
 Forms provide paginated browsing, categories, featured deals, separate Buy/Sell actions, quantity selection, bulk-sale confirmation and player-market purchase/reclaim confirmation. Creating marketplace listings still uses `/shop market list <amount> <total price>` with the item held. Search uses `/shop search <text>`. Custom products, permissions, stock, prices, economy rules and limits use the same service as Java players.
 
+With the optional `personal` module enabled, forms also provide favorites and recent trades. Administrators can use `/shop admin panel` for a native module dashboard. See [management modules](MANAGEMENT.md).
+
 Callbacks return to the server thread. Responses have one-use tokens, quotes expire after 30 seconds, and reloads, disconnects and policy changes invalidate open form sessions. An unavailable/incompatible form API falls back to the inventory interface and logs a warning. Set `bedrock.enabled: false` to deliberately use inventory menus for all players.
 
 ## Validation scope
 
-See [the Bedrock test report](bedrock-results.json). The automated fixture connects a real offline Bedrock protocol client through Geyser on Paper 26.2, receives forms over the network and submits actual button responses. It checks purchase/sale balances and inventory, duplicate submission, disabled purchase rejection and the hidden Buy button. Geyser forwards the offline test identity through Floodgate, exercising Floodgate's detection and form API without Microsoft authentication.
+See [the Bedrock test report](bedrock-results.json). The automated fixture connects a real offline Bedrock protocol client through Geyser on Paper 26.2, receives forms over the network and submits actual button responses. It checks purchase/sale balances and inventory, duplicate submission, disabled purchase rejection, the hidden Buy button, favorite persistence/filtering and a module toggle from the administrator dashboard. Geyser forwards the offline test identity through Floodgate, exercising Floodgate's detection and form API without Microsoft authentication.
 
 Microsoft/Xbox login, authenticated Floodgate account linking, proxy forwarding and rendered mobile/console UI were not exercised. The test-only authentication bypass is restricted to disposable loopback servers and must never be copied into deployment configuration.

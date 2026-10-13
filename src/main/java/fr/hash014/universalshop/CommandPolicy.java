@@ -22,6 +22,11 @@ public final class CommandPolicy {
               "market.list",
               "market.buy",
               "market.cancel",
+              "favorite",
+              "favorites",
+              "recent",
+              "sort",
+              "stats",
               "admin",
               "admin.add",
               "admin.remove",
@@ -32,7 +37,12 @@ public final class CommandPolicy {
               "admin.reload",
               "admin.recovery",
               "admin.export",
-              "admin.command"));
+              "admin.command",
+              "admin.manage",
+              "admin.panel",
+              "admin.duplicate",
+              "admin.rename",
+              "admin.category"));
   private final Set<String> disabled = new HashSet<String>();
 
   public CommandPolicy(Collection<String> values) {

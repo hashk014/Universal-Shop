@@ -4,6 +4,8 @@ The generated `config.yml` controls the economy, taxes, rotation, promotion and 
 
 See [command switches and Bedrock setup](BEDROCK-AND-COMMANDS.md) for `disabled-commands`, `/shop admin command`, and `bedrock.enabled`. Upgrading from 1.0.0 preserves existing files; omitted new options use their defaults (no disabled commands, native Bedrock forms enabled).
 
+See [optional management modules](MANAGEMENT.md) for the `management` section introduced in 1.2.0: all nine modules are off by default, and `/shop admin panel` provides module toggles. Examples cover schedules, product quotas, budgets, targeted campaigns, loyalty, protected sales and personal preferences.
+
 ## A complete product
 
 ```yaml

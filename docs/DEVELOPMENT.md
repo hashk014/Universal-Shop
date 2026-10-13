@@ -41,6 +41,8 @@ python tools/matrix.py 1.21.11 26.3 --vault-fixtures .tools/vault --report docs/
 
 These cases use separate `1.21.11-vault` / `26.3-vault` folders. Command policy tests additionally cover aliases, completion filtering, blocked transactions and console recovery. JUnit tests cover policy hierarchy, invalid paths, form expiration, stale sessions and duplicate callbacks.
 
+The management suite additionally checks schedule boundaries/timezones, shared global quotas, product cooldowns, daily budgets, campaign eligibility, loyalty progression, analytics and retained upgrade defaults. Each internal-economy server case exercises committed statistics, rejected buy/bulk accounting, two-player quotas, sale protection, catalog duplication/rename/category changes, restock/demand reset, dashboard permissions and a server-driven dashboard click. Restart checks include statistics and favorites. Vault cases verify budget rejection before provider debit and successful managed-transaction accounting.
+
 For the Bedrock suite, first cache Paper 26.2 with the main harness. Download official Geyser-Spigot and Floodgate-Spigot JARs into `.tools/bedrock`, named `Geyser-Spigot.jar` and `floodgate-spigot.jar`. Tested bridge SHA-256 values are recorded in `bedrock-results.json`.
 
 ```sh
@@ -48,7 +50,7 @@ npm install --prefix .tools/bedrock/client bedrock-protocol@3.60.1
 python tools/bedrock_matrix.py --runtimes .tools --fixtures .tools/bedrock
 ```
 
-The Bedrock client uses `raknet-native` (a compatible prebuilt binary or its native build prerequisites are required), sends real network form responses, and deliberately duplicates buy/sell confirmation responses. The fixture uses the Floodgate identity `.ShopBedrock` with Xbox validation disabled on **loopback only**. It does not test Microsoft authentication. No production authentication configuration is changed. Native protocol version 1.26.51 corresponds to the 26.51 client release.
+The Bedrock client uses `raknet-native` (a compatible prebuilt binary or its native build prerequisites are required), sends real network form responses, and deliberately duplicates buy/sell confirmation responses. It also toggles a favorite, browses the favorites filter and changes a module from the administrator form. The fixture uses the Floodgate identity `.ShopBedrock` with Xbox validation disabled on **loopback only**. It does not test Microsoft authentication. No production authentication configuration is changed. Native protocol version 1.26.51 corresponds to the 26.51 client release.
 
 Once all suites pass against the same JAR, run `python tools/render_report.py` and `python tools/package_release.py` to generate the readable matrix and release bundles. Packaging refuses mismatched hashes or incomplete results.
 

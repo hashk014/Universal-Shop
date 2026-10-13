@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>fr.hash014</groupId><artifactId>universal-shop</artifactId><version>1.1.0</version>
+  <groupId>fr.hash014</groupId><artifactId>universal-shop</artifactId><version>1.2.0</version>
   <name>UniversalShop</name><description>A survival economy shop with legacy and modern Bukkit support.</description>
   <url>https://github.com/hashk014/Universal-Shop</url>
   <properties><maven.compiler.release>8</maven.compiler.release><project.build.sourceEncoding>UTF-8</project.build.sourceEncoding></properties>

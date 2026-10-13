@@ -121,7 +121,7 @@ public final class ShopService {
       if (!now.isBefore(Instant.parse(start)) && now.isBefore(Instant.parse(end)))
         percent = Math.max(percent, plugin.percent("promotion.discount-percent") * 100);
     }
-    return percent / 100.0;
+    return Math.max(percent / 100.0, plugin.management.discount(p, product));
   }
 
   public long quote(Player p, Product product, int quantity, boolean buying) {
@@ -161,6 +161,7 @@ public final class ShopService {
     if (buying && available >= 0 && available < quantity)
       throw new IllegalArgumentException("This product is out of stock.");
     YamlConfiguration next = store.copy();
+    plugin.management.record(next, p, product, quantity, total, buying);
     String day = java.time.LocalDate.now(java.time.ZoneOffset.UTC).toString();
     String limitPath = "limits." + p.getUniqueId();
     if (!day.equals(next.getString(limitPath + ".day"))) {
@@ -216,6 +217,7 @@ public final class ShopService {
     } finally {
       busy = false;
     }
+    plugin.management.afterTrade(product);
     plugin.message(
         p,
         "success",
@@ -386,7 +388,10 @@ public final class ShopService {
     ItemStack[] remaining = Inventories.snapshot(p);
     Map<String, Integer> basket = new LinkedHashMap<String, Integer>();
     for (Product product : plugin.products.values())
-      if (product.sell >= 0 && visible(p, product) && product.commands.isEmpty()) {
+      if (product.sell >= 0
+          && visible(p, product)
+          && product.commands.isEmpty()
+          && plugin.management.sellable(product)) {
         int count =
             Math.min(
                 Inventories.count(remaining, product.item),
@@ -440,6 +445,7 @@ public final class ShopService {
       for (Map.Entry<String, Integer> entry : basket.entrySet()) {
         Product product = plugin.product(entry.getKey());
         int count = entry.getValue();
+        plugin.management.record(next, p, product, count, quote(p, product, count, false), false);
         ShopTradeEvent event =
             new ShopTradeEvent(p, product.id, count, false, quote(p, product, count, false));
         Bukkit.getPluginManager().callEvent(event);
@@ -478,5 +484,6 @@ public final class ShopService {
       busy = false;
     }
     plugin.tell(p, "&aInventory sale complete: " + plugin.money(total));
+    for (String id : basket.keySet()) plugin.management.afterTrade(plugin.product(id));
   }
 }

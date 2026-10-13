@@ -21,17 +21,22 @@ A configurable survival shop for Minecraft Java servers, built by **hash014**. O
 - Prepared transaction journal, atomic state-file replacement and explicit recovery for ambiguous inventory or third-party effects.
 - Disable individual commands or entire command groups, including their aliases and corresponding trading actions.
 - Bedrock-native forms through Geyser/Floodgate, with separate Buy/Sell buttons, quantity selection, categories, deals and player-market confirmations.
+- Nine opt-in management modules: opening hours/maintenance, product rules, daily budgets, targeted campaigns, loyalty tiers, sale protection, analytics, personal tools and low-stock alerts.
+- A Java/Bedrock administrator dashboard, product duplication/renaming/category changes, manual restock, demand reset and CSV sales reports.
+- Optional persistent favorites, recent trades and sorting. **Every new management module defaults to OFF.**
 
 ## Install
 
 1. Stop your Bukkit-compatible Minecraft Java server.
-2. Put `UniversalShop-1.1.0.jar` in `plugins/` and start the server with the Java version required by that server.
+2. Put `UniversalShop-1.2.0.jar` in `plugins/` and start the server with the Java version required by that server.
 3. Run `/shop`. The internal economy starts each player with `$100.00` by default.
 4. Edit `plugins/UniversalShop/config.yml` and `shops.yml`, then run `/shop admin reload`.
 
 No resource pack, client mod, database server or Vault installation is required for internal mode. The default catalog includes building blocks, food, farming supplies, ores and tools. Materials absent from an older Minecraft version are skipped and logged.
 
 All prices, messages, menus and documentation ship in English. The default prices are examples: balance farming, crafting, mob drops and other plugins against your server's economy before a public launch.
+
+For optional features, open `/shop admin panel` and enable only the modules you need. A small SMP can start with `personal` for favorites and `analytics` for sales reports. The [management guide](docs/MANAGEMENT.md) documents every switch and provides configuration examples. Upgrades retain your existing catalog, configuration and ledger.
 
 ## Quick commands
 
@@ -60,6 +65,13 @@ All prices, messages, menus and documentation ship in English. The default price
 | `/shop admin history 20` | Show recent transactions |
 | `/shop admin export` | Save a timestamped ledger snapshot |
 | `/shop admin reload` | Validate and reload configuration/catalog |
+| `/shop admin panel` | Open the optional-module dashboard |
+| `/shop admin manage enable analytics` | Start recording shop statistics |
+| `/shop admin manage close` | Put the server shop into maintenance |
+| `/shop admin manage restock all` | Refill finite stock |
+| `/shop admin manage report` | Export tracked sales to CSV |
+| `/shop admin duplicate diamond rare_diamond` | Copy a catalog product to a new ID |
+| `/shop favorite diamond` | Toggle a favorite when `personal` is enabled |
 | `/shop admin command disable pay` | Disable player payments |
 | `/shop admin command enable pay` | Enable player payments again |
 | `/shop admin command disable market.list` | Disable new listings while retaining buying/cancellation |
@@ -72,6 +84,7 @@ An administrator can place a sign with `[ushop]` on line one and an optional pro
 ## Documentation
 
 - [Configuration and product examples](docs/CONFIGURATION.md)
+- [Optional management modules and dashboard](docs/MANAGEMENT.md)
 - [Command switches and Bedrock setup](docs/BEDROCK-AND-COMMANDS.md)
 - [Recovery, persistence and operational limits](docs/OPERATIONS.md)
 - [Compatibility evidence and test scope](docs/COMPATIBILITY.md)

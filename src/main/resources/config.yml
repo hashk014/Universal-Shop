@@ -32,6 +32,53 @@ market:
   max-listings-per-player: 10
   tax-percent: 2
   listing-hours: 168
+# Optional management modules. Every new module is OFF by default.
+# These rules apply to the server shop, not player-market escrow or /shop pay.
+management:
+  access:
+    enabled: false
+    maintenance: false
+    message: 'The server shop is currently closed. Please come back later.'
+    schedule-enabled: false
+    timezone: UTC
+    days: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY]
+    opens: '00:00'
+    closes: '00:00' # Equal times = all day. Overnight windows belong to their opening day.
+  product-rules:
+    enabled: false
+    paused-categories: []
+    entries: {} # Per-ID paused, buy-enabled, sell-enabled, min-order, max-order,
+                # cooldown-seconds, global-daily-buy, global-daily-sell. See MANAGEMENT.md.
+  budgets:
+    enabled: false
+    daily-spend: 0 # Currency units, per player; 0 = unlimited. Days reset at midnight UTC.
+    daily-earn: 0
+  campaigns:
+    enabled: false
+    entries: {} # Named, timed promotions targeting product IDs/categories/permissions.
+  loyalty:
+    enabled: false
+    tiers:
+      - spent: 1000
+        discount-percent: 2
+      - spent: 10000
+        discount-percent: 5
+  sale-protection:
+    enabled: false
+    named: true
+    lore: true
+    enchanted: true
+    damaged: true
+    materials: [] # Exact Material enum names on this server, e.g. [DIAMOND, NETHER_STAR].
+  analytics:
+    enabled: false
+  personal:
+    enabled: false
+    max-favorites: 24
+  stock-alerts:
+    enabled: false
+    threshold-percent: 20
+    cooldown-seconds: 300 # Console alerts only after a successful stock-changing trade.
 messages:
   prefix: '&8[&6UniversalShop&8] &r'
   success: '&aTransaction complete: {quantity} x {product} for {price}.'

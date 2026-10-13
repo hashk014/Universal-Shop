@@ -144,17 +144,7 @@ final class BedrockForms {
 
   boolean browse(Player p, String filter, int requested) throws Exception {
     if (!available(p)) return false;
-    List<Product> products = new ArrayList<Product>();
-    Set<String> deals = plugin.service.deals();
-    String term = filter.toLowerCase(Locale.ROOT);
-    for (Product item : plugin.products.values())
-      if (plugin.service.visible(p, item)
-          && (term.isEmpty()
-              || (term.equals("deals")
-                  ? deals.contains(item.id)
-                  : (item.name + " " + item.id + " " + item.category)
-                      .toLowerCase(Locale.ROOT)
-                      .contains(term)))) products.add(item);
+    List<Product> products = plugin.management.catalog(p, filter);
     int page = Math.max(0, Math.min(requested, Math.max(0, (products.size() - 1) / 12)));
     List<String> labels = new ArrayList<String>();
     List<Action> actions = new ArrayList<Action>();
@@ -182,6 +172,22 @@ final class BedrockForms {
         "search",
         "Search (use /shop search <text>)",
         () -> plugin.tell(p, "&eUse /shop search <text>."));
+    if (plugin.management.enabled("personal")) {
+      add(
+          p,
+          labels,
+          actions,
+          "favorites",
+          "Favorites",
+          () -> plugin.menus.browse(p, "@favorites", 0));
+      add(
+          p,
+          labels,
+          actions,
+          "recent",
+          "Recently traded",
+          () -> plugin.menus.browse(p, "@recent", 0));
+    }
     labels.add("Close");
     actions.add(() -> {});
     String balance =
@@ -217,12 +223,64 @@ final class BedrockForms {
           "sell",
           "Sell - " + plugin.money(plugin.service.quote(p, item, 1, false)),
           () -> plugin.menus.confirm(p, item, 1, false));
+    if (plugin.management.enabled("personal"))
+      add(
+          p,
+          labels,
+          actions,
+          "favorite",
+          "Toggle favorite",
+          () -> {
+            plugin.management.personal(p, new String[] {"favorite", item.id});
+            select(p, item);
+          });
     labels.add("Back");
     actions.add(() -> plugin.menus.browse(p, "", 0));
     send(
         p,
         item.name,
         "Stock: " + (plugin.service.stock(item) < 0 ? "Unlimited" : plugin.service.stock(item)),
+        labels,
+        actions);
+  }
+
+  boolean adminPanel(Player p) {
+    if (!available(p)) return false;
+    List<String> labels = new ArrayList<String>();
+    List<Action> actions = new ArrayList<Action>();
+    for (String module : ManagementPolicy.MODULES) {
+      boolean enabled = plugin.management.enabled(module);
+      add(
+          p,
+          labels,
+          actions,
+          "admin.manage",
+          module + ": " + (enabled ? "ON" : "OFF"),
+          () -> {
+            plugin.onCommand(
+                p,
+                plugin.getCommand("shop"),
+                "shop",
+                new String[] {"admin", "manage", enabled ? "disable" : "enable", module});
+            plugin.menus.adminPanel(p);
+          });
+    }
+    for (String action : Arrays.asList("open", "close", "stock", "stats", "report"))
+      add(
+          p,
+          labels,
+          actions,
+          "admin.manage",
+          "Shop: " + action,
+          () -> {
+            plugin.onCommand(
+                p, plugin.getCommand("shop"), "shop", new String[] {"admin", "manage", action});
+            plugin.menus.adminPanel(p);
+          });
+    return send(
+        p,
+        "UniversalShop | Management",
+        "Enable only the modules you need. Stock, statistics and report results appear in chat.",
         labels,
         actions);
   }

@@ -51,17 +51,27 @@ def run(args):
                 if 'TEST FAIL' in line:status='failed';break
                 if 'BEDROCK PASS' in line:
                     checks+=int(line.split('checks=')[1].strip())
-                    if 'phase=finish' in line:status='passed';break
+                    if 'phase=panel' in line:status='passed';break
             elif line.startswith('FORM '):
                 packet=json.loads(line[5:]);forms+=1
                 if stage=='browse':click(packet,'Stone');stage='select'
-                elif stage=='select':click(packet,'Buy');stage='buy'
+                elif stage=='select':click(packet,'Toggle favorite');stage='favorite-select'
+                elif stage=='favorite-select':click(packet,'Back');stage='home'
+                elif stage=='home':click(packet,'Favorites');stage='favorites'
+                elif stage=='favorites':
+                    assert sum(b['text'].endswith('\nBuilding') for b in packet['form']['buttons'])==1, 'Favorites filter contains unrelated products'
+                    checks+=1;click(packet,'Stone');stage='favorite-product'
+                elif stage=='favorite-product':click(packet,'Buy');stage='buy'
                 elif stage=='buy':click(packet,'Confirm purchase',True);stage='sell';pending=(time.monotonic()+2,'bought')
                 elif stage=='sell':click(packet,'Confirm sale',True);stage='disabled-browse';pending=(time.monotonic()+2,'sold')
                 elif stage=='disabled-browse':click(packet,'Stone');stage='disabled-select'
                 elif stage=='disabled-select':
                     assert not any(b['text'].startswith('Buy') for b in packet['form']['buttons']), 'Disabled buy button visible'
-                    checks+=1;pending=(time.monotonic()+1,'finish');stage='done'
+                    checks+=1;pending=(time.monotonic()+1,'finish');stage='admin'
+                elif stage=='admin':click(packet,'analytics: ON');stage='admin-updated'
+                elif stage=='admin-updated':
+                    assert any(b['text']=='analytics: OFF' for b in packet['form']['buttons']), 'Module toggle was not reflected in form'
+                    checks+=1;pending=(time.monotonic()+1,'panel');stage='done'
     except Exception as error:
         status='failed';errors.append(repr(error))
     finally:
@@ -72,7 +82,7 @@ def run(args):
             except subprocess.TimeoutExpired:server.kill();server.wait()
         (folder/'universalshop-test.log').write_text(''.join(logs),encoding='utf-8')
         (folder/'bedrock-client.log').write_text(''.join(clientlogs),encoding='utf-8')
-    report={'tested_at':datetime.now(timezone.utc).isoformat(),'jar_sha256':hashlib.sha256(JAR.read_bytes()).hexdigest(),'status':status,'errors':errors,'paper':'26.2','bedrock_protocol':'1.26.51','client':'bedrock-protocol 3.60.1','checks':checks,'forms_received':forms,'bridge_sha256':{n:hashlib.sha256((fixtures/n).read_bytes()).hexdigest() for n in ('Geyser-Spigot.jar','floodgate-spigot.jar')},'scope':'Real offline loopback Bedrock protocol client via Geyser and Floodgate (offline identity); native form responses including duplicate submission, buy/sell delivery and balances, disabled buy rejection and hidden button. No Microsoft authentication or rendered mobile/console UI test.','log':'test-servers/26.2-bedrock/universalshop-test.log','client_log':'test-servers/26.2-bedrock/bedrock-client.log'}
+    report={'tested_at':datetime.now(timezone.utc).isoformat(),'jar_sha256':hashlib.sha256(JAR.read_bytes()).hexdigest(),'status':status,'errors':errors,'paper':'26.2','bedrock_protocol':'1.26.51','client':'bedrock-protocol 3.60.1','checks':checks,'forms_received':forms,'bridge_sha256':{n:hashlib.sha256((fixtures/n).read_bytes()).hexdigest() for n in ('Geyser-Spigot.jar','floodgate-spigot.jar')},'scope':'Real offline loopback Bedrock protocol client via Geyser and Floodgate (offline identity); native form responses including duplicate submission, buy/sell delivery and balances, disabled buy rejection, hidden button, favorite persistence/filtering, recent trades, analytics and administrator module toggle. No Microsoft authentication or rendered mobile/console UI test.','log':'test-servers/26.2-bedrock/universalshop-test.log','client_log':'test-servers/26.2-bedrock/bedrock-client.log'}
     (ROOT/'docs/bedrock-results.json').write_text(json.dumps(report,indent=2));print(json.dumps(report),flush=True)
     return status=='passed'
 

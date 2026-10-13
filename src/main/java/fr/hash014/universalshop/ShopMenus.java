@@ -15,6 +15,34 @@ public final class ShopMenus implements Listener {
     this.plugin = plugin;
   }
 
+  public void adminPanel(Player player) throws Exception {
+    plugin.service.allowed(player);
+    plugin.requireAction(player, "admin.panel");
+    if (!player.hasPermission("universalshop.admin"))
+      throw new IllegalArgumentException("Administrator permission required.");
+    if (plugin.bedrock.adminPanel(player)) return;
+    Menu menu = new Menu(player);
+    menu.inventory = Bukkit.createInventory(menu, 54, "UniversalShop | Management");
+    int slot = 10;
+    for (String module : ManagementPolicy.MODULES) {
+      boolean enabled = plugin.management.enabled(module);
+      button(
+          menu,
+          slot++,
+          enabled ? Material.EMERALD : Material.REDSTONE,
+          (enabled ? "&a" : "&c") + module + ": " + (enabled ? "ON" : "OFF"),
+          "admin:manage:" + (enabled ? "disable:" : "enable:") + module,
+          "&7Click to toggle this optional module.");
+    }
+    button(menu, 45, Material.CHEST, "&eStock overview", "admin:manage:stock");
+    button(menu, 46, Material.BOOK, "&eSales statistics", "admin:manage:stats");
+    button(menu, 47, Material.PAPER, "&eExport sales CSV", "admin:manage:report");
+    button(menu, 49, Material.EMERALD, "&aOpen shop (clear maintenance)", "admin:manage:open");
+    button(menu, 51, Material.REDSTONE, "&cClose shop (maintenance)", "admin:manage:close");
+    button(menu, 53, Material.ARROW, "&eClose dashboard", "close");
+    player.openInventory(menu.inventory);
+  }
+
   static final class Menu implements InventoryHolder {
     Inventory inventory;
     final UUID owner;
@@ -57,6 +85,7 @@ public final class ShopMenus implements Listener {
                 : action.startsWith("cancel-listing:")
                     ? "market.cancel"
                     : action.equals("switch") ? (menu.buying ? "sell" : "buy") : action;
+    if (action.startsWith("admin:")) policy = "admin.manage";
     if (owner != null && !plugin.actionEnabled(owner, policy)) return;
     menu.inventory.setItem(slot, icon(material, label, lore));
     menu.actions.put(slot, action);
@@ -68,18 +97,8 @@ public final class ShopMenus implements Listener {
     if (plugin.bedrock.browse(p, filter, page)) return;
     Menu menu = new Menu(p);
     menu.filter = filter;
-    List<Product> matches = new ArrayList<Product>();
+    List<Product> matches = plugin.management.catalog(p, filter);
     Set<String> deals = plugin.service.deals();
-    for (Product product : plugin.products.values()) {
-      String term = filter.toLowerCase(Locale.ROOT);
-      if (plugin.service.visible(p, product)
-          && (term.isEmpty()
-              || (term.equals("deals")
-                  ? deals.contains(product.id)
-                  : (product.name + " " + product.id + " " + product.category)
-                      .toLowerCase(Locale.ROOT)
-                      .contains(term)))) matches.add(product);
-    }
     menu.page = Math.max(0, Math.min(page, Math.max(0, (matches.size() - 1) / 45)));
     menu.inventory =
         Bukkit.createInventory(
@@ -104,7 +123,9 @@ public final class ShopMenus implements Listener {
                 "&eSell: "
                     + plugin.money(plugin.service.quote(p, product, 1, false))
                     + " &7Right click"));
-      lore.add(UniversalShop.color("&7Shift click: stack | Middle: 1"));
+      lore.add(UniversalShop.color("&7Shift click: stack"));
+      if (plugin.management.enabled("personal") && plugin.actionEnabled(p, "favorite"))
+        lore.add(UniversalShop.color("&bMiddle click: toggle favorite | /shop favorites"));
       lore.add(
           UniversalShop.color(
               "&7Stock: "
@@ -298,7 +319,9 @@ public final class ShopMenus implements Listener {
         && type != ClickType.SHIFT_LEFT
         && type != ClickType.SHIFT_RIGHT
         && type != ClickType.MIDDLE) return;
-    final boolean right = e.isRightClick(), shift = e.isShiftClick();
+    final boolean right = e.isRightClick(),
+        shift = e.isShiftClick(),
+        middle = type == ClickType.MIDDLE;
     menu.actions
         .clear(); // Consume this view immediately, before a second packet can confirm again.
     Bukkit.getScheduler()
@@ -314,8 +337,16 @@ public final class ShopMenus implements Listener {
                   if (action.equals("search") || action.equals("balance"))
                     plugin.requireAction(p, action);
                   if (action.startsWith("listing:")) plugin.requireAction(p, "market");
-                  if (action.startsWith("product:")) {
+                  if (action.startsWith("admin:")) {
+                    plugin.onCommand(p, plugin.getCommand("shop"), "shop", action.split(":"));
+                    adminPanel(p);
+                  } else if (action.startsWith("product:")) {
                     Product product = plugin.product(action.substring(8));
+                    if (middle && plugin.management.enabled("personal")) {
+                      plugin.management.personal(p, new String[] {"favorite", product.id});
+                      browse(p, menu.filter, menu.page);
+                      return;
+                    }
                     confirm(
                         p,
                         product,

@@ -1,70 +1,70 @@
 # Compatibility and validation
 
-Tested on 2026-10-13T19:18:18.293987+00:00. **55/55 Paper versions passed** the internal-economy suite.
+Tested on 2026-10-13T19:38:57.152377+00:00. **55/55 Paper versions passed** the internal-economy suite.
 
-Exact tested plugin SHA-256: `52f0144a0b4cc0744c122f4b494afe34e1bf63135ef38a251caf4683c98760f1`.
+Exact tested plugin SHA-256: `6d0942fa344854e599359295e51995218532b497e3f5bcb089c43f8fca92df8a`.
 
-Every passing version completed server startup, durable-store checks, two real loopback client logins, player transactions, server-driven GUI event checks, a full server restart, both client reconnections and inventory/wallet persistence checks. The release has also passed 26 JUnit tests.
+Every passing version completed server startup, durable-store checks, two real loopback client logins, player transactions, server-driven GUI event checks, a full server restart, both client reconnections and inventory/wallet persistence checks. The release has also passed 43 JUnit tests.
 
 ## Tested versions
 
 | Minecraft | Paper build | Channel | Java | Store / player / restart checks | Result |
 | --- | --- | --- | --- | --- | --- |
-| 1.7.10 | 2025 | STABLE | 8 | 10 / 47 / 5 | passed |
-| 1.8.8 | 445 | STABLE | 8 | 10 / 47 / 5 | passed |
-| 1.9.4 | 775 | STABLE | 8 | 10 / 47 / 5 | passed |
-| 1.10.2 | 918 | STABLE | 8 | 10 / 47 / 5 | passed |
-| 1.11.2 | 1106 | STABLE | 8 | 10 / 47 / 5 | passed |
-| 1.12 | 1169 | STABLE | 8 | 10 / 47 / 5 | passed |
-| 1.12.1 | 1204 | STABLE | 8 | 10 / 47 / 5 | passed |
-| 1.12.2 | 1620 | STABLE | 8 | 10 / 47 / 5 | passed |
-| 1.13 | 173 | STABLE | 8 | 10 / 47 / 5 | passed |
-| 1.13.1 | 386 | STABLE | 8 | 10 / 47 / 5 | passed |
-| 1.13.2 | 657 | STABLE | 8 | 10 / 47 / 5 | passed |
-| 1.14 | 17 | STABLE | 8 | 10 / 47 / 5 | passed |
-| 1.14.1 | 50 | STABLE | 8 | 10 / 47 / 5 | passed |
-| 1.14.2 | 107 | STABLE | 8 | 10 / 47 / 5 | passed |
-| 1.14.3 | 134 | STABLE | 8 | 10 / 47 / 5 | passed |
-| 1.14.4 | 245 | STABLE | 8 | 10 / 47 / 5 | passed |
-| 1.15 | 21 | STABLE | 8 | 10 / 47 / 5 | passed |
-| 1.15.1 | 62 | STABLE | 8 | 10 / 47 / 5 | passed |
-| 1.15.2 | 393 | STABLE | 8 | 10 / 47 / 5 | passed |
-| 1.16.1 | 138 | STABLE | 8 | 10 / 47 / 5 | passed |
-| 1.16.2 | 189 | STABLE | 8 | 10 / 47 / 5 | passed |
-| 1.16.3 | 253 | STABLE | 8 | 10 / 47 / 5 | passed |
-| 1.16.4 | 416 | STABLE | 8 | 10 / 47 / 5 | passed |
-| 1.16.5 | 794 | STABLE | 8 | 10 / 47 / 5 | passed |
-| 1.17 | 79 | STABLE | 16 | 10 / 47 / 5 | passed |
-| 1.17.1 | 411 | STABLE | 17 | 10 / 47 / 5 | passed |
-| 1.18 | 66 | ALPHA | 17 | 10 / 47 / 5 | passed |
-| 1.18.1 | 216 | STABLE | 17 | 10 / 47 / 5 | passed |
-| 1.18.2 | 388 | STABLE | 17 | 10 / 47 / 5 | passed |
-| 1.19 | 81 | STABLE | 17 | 10 / 47 / 5 | passed |
-| 1.19.1 | 111 | STABLE | 17 | 10 / 47 / 5 | passed |
-| 1.19.2 | 307 | STABLE | 17 | 10 / 47 / 5 | passed |
-| 1.19.3 | 448 | STABLE | 17 | 10 / 47 / 5 | passed |
-| 1.19.4 | 550 | STABLE | 17 | 10 / 47 / 5 | passed |
-| 1.20 | 17 | STABLE | 17 | 10 / 47 / 5 | passed |
-| 1.20.1 | 196 | STABLE | 17 | 10 / 47 / 5 | passed |
-| 1.20.2 | 318 | STABLE | 17 | 10 / 47 / 5 | passed |
-| 1.20.4 | 499 | STABLE | 17 | 10 / 47 / 5 | passed |
-| 1.20.5 | 22 | ALPHA | 21 | 10 / 47 / 5 | passed |
-| 1.20.6 | 151 | STABLE | 21 | 10 / 47 / 5 | passed |
-| 1.21 | 130 | STABLE | 21 | 10 / 47 / 5 | passed |
-| 1.21.1 | 133 | STABLE | 21 | 10 / 47 / 5 | passed |
-| 1.21.3 | 83 | STABLE | 21 | 10 / 47 / 5 | passed |
-| 1.21.4 | 232 | STABLE | 21 | 10 / 47 / 5 | passed |
-| 1.21.5 | 114 | ALPHA | 21 | 10 / 47 / 5 | passed |
-| 1.21.6 | 48 | STABLE | 21 | 10 / 47 / 5 | passed |
-| 1.21.7 | 32 | STABLE | 21 | 10 / 47 / 5 | passed |
-| 1.21.8 | 60 | STABLE | 21 | 10 / 47 / 5 | passed |
-| 1.21.9 | 59 | ALPHA | 21 | 10 / 47 / 5 | passed |
-| 1.21.10 | 130 | STABLE | 21 | 10 / 47 / 5 | passed |
-| 1.21.11 | 132 | STABLE | 21 | 10 / 47 / 5 | passed |
-| 26.1.1 | 29 | ALPHA | 25 | 10 / 47 / 5 | passed |
-| 26.1.2 | 74 | STABLE | 25 | 10 / 47 / 5 | passed |
-| 26.2 | 133 | STABLE | 25 | 10 / 47 / 5 | passed |
-| 26.3 | 181 | STABLE | 25 | 10 / 47 / 5 | passed |
+| 1.7.10 | 2025 | STABLE | 8 | 10 / 73 / 7 | passed |
+| 1.8.8 | 445 | STABLE | 8 | 10 / 73 / 7 | passed |
+| 1.9.4 | 775 | STABLE | 8 | 10 / 73 / 7 | passed |
+| 1.10.2 | 918 | STABLE | 8 | 10 / 73 / 7 | passed |
+| 1.11.2 | 1106 | STABLE | 8 | 10 / 73 / 7 | passed |
+| 1.12 | 1169 | STABLE | 8 | 10 / 73 / 7 | passed |
+| 1.12.1 | 1204 | STABLE | 8 | 10 / 73 / 7 | passed |
+| 1.12.2 | 1620 | STABLE | 8 | 10 / 73 / 7 | passed |
+| 1.13 | 173 | STABLE | 8 | 10 / 73 / 7 | passed |
+| 1.13.1 | 386 | STABLE | 8 | 10 / 73 / 7 | passed |
+| 1.13.2 | 657 | STABLE | 8 | 10 / 73 / 7 | passed |
+| 1.14 | 17 | STABLE | 8 | 10 / 73 / 7 | passed |
+| 1.14.1 | 50 | STABLE | 8 | 10 / 73 / 7 | passed |
+| 1.14.2 | 107 | STABLE | 8 | 10 / 73 / 7 | passed |
+| 1.14.3 | 134 | STABLE | 8 | 10 / 73 / 7 | passed |
+| 1.14.4 | 245 | STABLE | 8 | 10 / 73 / 7 | passed |
+| 1.15 | 21 | STABLE | 8 | 10 / 73 / 7 | passed |
+| 1.15.1 | 62 | STABLE | 8 | 10 / 73 / 7 | passed |
+| 1.15.2 | 393 | STABLE | 8 | 10 / 73 / 7 | passed |
+| 1.16.1 | 138 | STABLE | 8 | 10 / 73 / 7 | passed |
+| 1.16.2 | 189 | STABLE | 8 | 10 / 73 / 7 | passed |
+| 1.16.3 | 253 | STABLE | 8 | 10 / 73 / 7 | passed |
+| 1.16.4 | 416 | STABLE | 8 | 10 / 73 / 7 | passed |
+| 1.16.5 | 794 | STABLE | 8 | 10 / 73 / 7 | passed |
+| 1.17 | 79 | STABLE | 16 | 10 / 73 / 7 | passed |
+| 1.17.1 | 411 | STABLE | 17 | 10 / 73 / 7 | passed |
+| 1.18 | 66 | ALPHA | 17 | 10 / 73 / 7 | passed |
+| 1.18.1 | 216 | STABLE | 17 | 10 / 73 / 7 | passed |
+| 1.18.2 | 388 | STABLE | 17 | 10 / 73 / 7 | passed |
+| 1.19 | 81 | STABLE | 17 | 10 / 73 / 7 | passed |
+| 1.19.1 | 111 | STABLE | 17 | 10 / 73 / 7 | passed |
+| 1.19.2 | 307 | STABLE | 17 | 10 / 73 / 7 | passed |
+| 1.19.3 | 448 | STABLE | 17 | 10 / 73 / 7 | passed |
+| 1.19.4 | 550 | STABLE | 17 | 10 / 73 / 7 | passed |
+| 1.20 | 17 | STABLE | 17 | 10 / 73 / 7 | passed |
+| 1.20.1 | 196 | STABLE | 17 | 10 / 73 / 7 | passed |
+| 1.20.2 | 318 | STABLE | 17 | 10 / 73 / 7 | passed |
+| 1.20.4 | 499 | STABLE | 17 | 10 / 73 / 7 | passed |
+| 1.20.5 | 22 | ALPHA | 21 | 10 / 73 / 7 | passed |
+| 1.20.6 | 151 | STABLE | 21 | 10 / 73 / 7 | passed |
+| 1.21 | 130 | STABLE | 21 | 10 / 73 / 7 | passed |
+| 1.21.1 | 133 | STABLE | 21 | 10 / 73 / 7 | passed |
+| 1.21.3 | 83 | STABLE | 21 | 10 / 73 / 7 | passed |
+| 1.21.4 | 232 | STABLE | 21 | 10 / 73 / 7 | passed |
+| 1.21.5 | 114 | ALPHA | 21 | 10 / 73 / 7 | passed |
+| 1.21.6 | 48 | STABLE | 21 | 10 / 73 / 7 | passed |
+| 1.21.7 | 32 | STABLE | 21 | 10 / 73 / 7 | passed |
+| 1.21.8 | 60 | STABLE | 21 | 10 / 73 / 7 | passed |
+| 1.21.9 | 59 | ALPHA | 21 | 10 / 73 / 7 | passed |
+| 1.21.10 | 130 | STABLE | 21 | 10 / 73 / 7 | passed |
+| 1.21.11 | 132 | STABLE | 21 | 10 / 73 / 7 | passed |
+| 26.1.1 | 29 | ALPHA | 25 | 10 / 73 / 7 | passed |
+| 26.1.2 | 74 | STABLE | 25 | 10 / 73 / 7 | passed |
+| 26.2 | 133 | STABLE | 25 | 10 / 73 / 7 | passed |
+| 26.3 | 181 | STABLE | 25 | 10 / 73 / 7 | passed |
 
 ## Vault integration
 
@@ -72,12 +72,12 @@ Tested with [Vault 1.7.3](https://github.com/MilkBowl/Vault/releases/tag/1.7.3) 
 
 | Minecraft | Result | Checks (store / player / restart) |
 | --- | --- | --- |
-| 1.21.11 | passed | 10 / 13 / 4 |
-| 26.3 | passed | 10 / 13 / 4 |
+| 1.21.11 | passed | 10 / 17 / 4 |
+| 26.3 | passed | 10 / 17 / 4 |
 
 ## Bedrock integration
 
-Paper 26.2 with Geyser and Floodgate, Bedrock protocol 1.26.51: **passed**, 15 checks and 6 native forms received over the network. Real offline loopback Bedrock protocol client via Geyser and Floodgate (offline identity); native form responses including duplicate submission, buy/sell delivery and balances, disabled buy rejection and hidden button. No Microsoft authentication or rendered mobile/console UI test.
+Paper 26.2 with Geyser and Floodgate, Bedrock protocol 1.26.51: **passed**, 23 checks and 12 native forms received over the network. Real offline loopback Bedrock protocol client via Geyser and Floodgate (offline identity); native form responses including duplicate submission, buy/sell delivery and balances, disabled buy rejection, hidden button, favorite persistence/filtering, recent trades, analytics and administrator module toggle. No Microsoft authentication or rendered mobile/console UI test.
 
 See [Bedrock setup and limits](BEDROCK-AND-COMMANDS.md) and the [machine-readable results](bedrock-results.json).
 

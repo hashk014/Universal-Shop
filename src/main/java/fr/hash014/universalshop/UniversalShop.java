@@ -22,6 +22,7 @@ public final class UniversalShop extends JavaPlugin
   ShopService service;
   ShopMenus menus;
   BedrockForms bedrock;
+  ShopManagement management;
   private CommandPolicy commandPolicy = new CommandPolicy(Collections.<String>emptyList());
   long startingBalance;
   private long catalogRevision;
@@ -93,7 +94,7 @@ public final class UniversalShop extends JavaPlugin
     if (bedrock != null) bedrock.sessions.clear();
   }
 
-  private void validateConfig() {
+  private void validateConfig() throws Exception {
     commandPolicy = new CommandPolicy(getConfig().getStringList("disabled-commands"));
     startingBalance = Money.parse(String.valueOf(getConfig().get("starting-balance", 100)));
     for (String field :
@@ -129,6 +130,7 @@ public final class UniversalShop extends JavaPlugin
           if (!Double.isFinite(d) || d < 0 || d > 100)
             throw new IllegalArgumentException("Invalid permission discount.");
         }
+    management = new ShopManagement(this);
   }
 
   double percent(String path) {
@@ -273,6 +275,8 @@ public final class UniversalShop extends JavaPlugin
         menus.browse(player(sender), join(args, 1), 0);
       } else if (sub.equals("deals")) {
         menus.browse(player(sender), "deals", 0);
+      } else if (Arrays.asList("favorite", "favorites", "recent", "sort", "stats").contains(sub)) {
+        management.personal(player(sender), args);
       } else if (sub.equals("sellall")) {
         Player p = player(sender);
         if (args.length == 1) previewSellAll(p);
@@ -344,6 +348,14 @@ public final class UniversalShop extends JavaPlugin
         args.length >= 2,
         "/shop admin <add|remove|price|stock|balance|history|reload|recovery|export>");
     String action = args[1].toLowerCase(Locale.ROOT);
+    if (action.equals("panel")) {
+      menus.adminPanel(player(sender));
+      return;
+    }
+    if (action.equals("manage")) {
+      management.admin(sender, args);
+      return;
+    }
     if (action.equals("command")) {
       if (args.length == 2) {
         tell(sender, "&eDisabled commands: " + getConfig().getStringList("disabled-commands"));
@@ -422,6 +434,7 @@ public final class UniversalShop extends JavaPlugin
         getConfig().loadFromString(previous);
         startingBalance = previousBalance;
         commandPolicy = new CommandPolicy(getConfig().getStringList("disabled-commands"));
+        management = new ShopManagement(this);
         throw e;
       }
       for (Player p : onlinePlayers())
@@ -492,6 +505,22 @@ public final class UniversalShop extends JavaPlugin
       catalog.set("products." + args[2] + ".buy", args[3]);
       catalog.set("products." + args[2] + ".sell", args[4]);
       new Product(args[2], catalog.getConfigurationSection("products." + args[2]));
+    } else if (action.equals("duplicate")) {
+      usage(args.length == 4, "/shop admin duplicate <source> <new-id>");
+      Product source = product(args[2]);
+      ManagementPolicy.id(args[3]);
+      if (catalog.contains("products." + args[3]))
+        throw new IllegalArgumentException("This ID already exists.");
+      ConfigurationSection original = catalog.getConfigurationSection("products." + source.id);
+      ConfigurationSection copy = catalog.createSection("products." + args[3]);
+      for (String key : original.getKeys(true))
+        if (!original.isConfigurationSection(key)) copy.set(key, original.get(key));
+    } else if (action.equals("rename") || action.equals("category")) {
+      usage(args.length >= 4, "/shop admin " + action + " <id> <text>");
+      Product source = product(args[2]);
+      catalog.set(
+          "products." + source.id + (action.equals("rename") ? ".name" : ".category"),
+          join(args, 3));
     } else throw new IllegalArgumentException("Unknown admin command. Use /shop help.");
     parseCatalog(catalog);
     AtomicFiles.write(
@@ -541,6 +570,11 @@ public final class UniversalShop extends JavaPlugin
               "category",
               "deals",
               "market"));
+    if (args.length == 1) {
+      if (management.enabled("personal"))
+        values.addAll(Arrays.asList("favorite", "favorites", "recent", "sort"));
+      if (management.enabled("analytics")) values.add("stats");
+    }
     if (args.length == 1 && sender.hasPermission("universalshop.admin")) values.add("admin");
     if (args.length == 2 && (args[0].equalsIgnoreCase("buy") || args[0].equalsIgnoreCase("sell")))
       values.addAll(products.keySet());
@@ -558,7 +592,45 @@ public final class UniversalShop extends JavaPlugin
               "reload",
               "recovery",
               "export",
-              "command"));
+              "command",
+              "manage",
+              "panel",
+              "duplicate",
+              "rename",
+              "category"));
+    if (args.length == 3
+        && args[0].equalsIgnoreCase("admin")
+        && args[1].equalsIgnoreCase("manage")
+        && sender.hasPermission("universalshop.admin"))
+      values.addAll(
+          Arrays.asList(
+              "status",
+              "enable",
+              "disable",
+              "open",
+              "close",
+              "pause",
+              "resume",
+              "category-pause",
+              "category-resume",
+              "stock",
+              "restock",
+              "reset-demand",
+              "stats",
+              "report"));
+    if (args.length == 4
+        && args[0].equalsIgnoreCase("admin")
+        && args[1].equalsIgnoreCase("manage")
+        && sender.hasPermission("universalshop.admin")) {
+      if (args[2].equalsIgnoreCase("enable") || args[2].equalsIgnoreCase("disable"))
+        values.addAll(ManagementPolicy.MODULES);
+      if (Arrays.asList("pause", "resume", "restock", "reset-demand", "stats")
+          .contains(args[2].toLowerCase(Locale.ROOT))) values.addAll(products.keySet());
+    }
+    if (args.length == 2 && args[0].equalsIgnoreCase("favorite") && management.enabled("personal"))
+      values.addAll(products.keySet());
+    if (args.length == 2 && args[0].equalsIgnoreCase("sort") && management.enabled("personal"))
+      values.addAll(Arrays.asList("catalog", "name", "price"));
     if (args.length == 2 && args[0].equalsIgnoreCase("market"))
       values.addAll(Arrays.asList("list", "buy", "cancel"));
     String prefix = args[args.length - 1].toLowerCase(Locale.ROOT);
@@ -594,6 +666,15 @@ public final class UniversalShop extends JavaPlugin
     return catalogRevision;
   }
 
+  void invalidateViews() {
+    catalogRevision++;
+    baskets.clear();
+    if (bedrock != null) bedrock.sessions.clear();
+    for (Player player : onlinePlayers())
+      if (player.getOpenInventory().getTopInventory().getHolder() instanceof ShopMenus.Menu)
+        player.closeInventory();
+  }
+
   private void showHelp(CommandSender sender) {
     String[][] entries = {
       {"shop", "/shop - browse"},
@@ -611,6 +692,11 @@ public final class UniversalShop extends JavaPlugin
       {"market.buy", "/shop market buy <id> confirm"},
       {"market.cancel", "/shop market cancel <id> confirm"},
       {"admin.command", "/shop admin command [enable|disable <path>]"},
+      {"admin.manage", "/shop admin manage [action] - optional management modules"},
+      {"admin.panel", "/shop admin panel - management dashboard"},
+      {"admin.duplicate", "/shop admin duplicate <source> <new-id>"},
+      {"admin.rename", "/shop admin rename <id> <name>"},
+      {"admin.category", "/shop admin category <id> <category>"},
       {"admin.reload", "/shop admin reload"},
       {"admin.add", "/shop admin add <id> <buy> <sell> [category]"},
       {"admin.remove", "/shop admin remove <id>"},
@@ -625,6 +711,18 @@ public final class UniversalShop extends JavaPlugin
       if (actionEnabled(sender, entry[0])
           && (!entry[0].startsWith("admin.") || sender.hasPermission("universalshop.admin")))
         tell(sender, "&e" + entry[1]);
+    if (management.enabled("personal"))
+      for (String action : Arrays.asList("favorite", "favorites", "recent", "sort"))
+        if (actionEnabled(sender, action))
+          tell(
+              sender,
+              "&e/shop "
+                  + action
+                  + (action.equals("favorite")
+                      ? " <product>"
+                      : action.equals("sort") ? " <catalog|name|price>" : ""));
+    if (management.enabled("analytics") && actionEnabled(sender, "stats"))
+      tell(sender, "&e/shop stats");
   }
 
   @EventHandler(ignoreCancelled = true)
