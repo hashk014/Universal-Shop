@@ -1,6 +1,6 @@
 {
-  "tested_at": "2026-10-13T18:57:07.912169+00:00",
-  "jar_sha256": "847db755bfe73359a7a0a31c6537fe41fed01146e4a3e1561270bd33c3acf5e5",
+  "tested_at": "2026-10-13T19:18:18.293987+00:00",
+  "jar_sha256": "52f0144a0b4cc0744c122f4b494afe34e1bf63135ef38a251caf4683c98760f1",
   "results": [
     {
       "version": "1.7.10",
@@ -8,7 +8,7 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
       "seconds": 11.5,
@@ -24,10 +24,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 10.0,
+      "seconds": 10.1,
       "java": 8,
       "paper_build": 445,
       "paper_channel": "STABLE",
@@ -40,10 +40,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 10.2,
+      "seconds": 9.7,
       "java": 8,
       "paper_build": 775,
       "paper_channel": "STABLE",
@@ -56,10 +56,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 10.0,
+      "seconds": 10.4,
       "java": 8,
       "paper_build": 918,
       "paper_channel": "STABLE",
@@ -72,10 +72,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 10.1,
+      "seconds": 10.4,
       "java": 8,
       "paper_build": 1106,
       "paper_channel": "STABLE",
@@ -88,10 +88,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 40.8,
+      "seconds": 40.9,
       "java": 8,
       "paper_build": 1169,
       "paper_channel": "STABLE",
@@ -104,10 +104,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 11.3,
+      "seconds": 11.6,
       "java": 8,
       "paper_build": 1204,
       "paper_channel": "STABLE",
@@ -120,10 +120,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 12.6,
+      "seconds": 12.7,
       "java": 8,
       "paper_build": 1620,
       "paper_channel": "STABLE",
@@ -136,10 +136,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 17.9,
+      "seconds": 16.2,
       "java": 8,
       "paper_build": 173,
       "paper_channel": "STABLE",
@@ -152,10 +152,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 18.4,
+      "seconds": 17.9,
       "java": 8,
       "paper_build": 386,
       "paper_channel": "STABLE",
@@ -168,10 +168,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 18.7,
+      "seconds": 18.2,
       "java": 8,
       "paper_build": 657,
       "paper_channel": "STABLE",
@@ -184,10 +184,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 24.1,
+      "seconds": 25.1,
       "java": 8,
       "paper_build": 17,
       "paper_channel": "STABLE",
@@ -200,10 +200,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 22.9,
+      "seconds": 22.0,
       "java": 8,
       "paper_build": 50,
       "paper_channel": "STABLE",
@@ -216,10 +216,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 25.6,
+      "seconds": 29.2,
       "java": 8,
       "paper_build": 107,
       "paper_channel": "STABLE",
@@ -232,10 +232,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 23.8,
+      "seconds": 24.5,
       "java": 8,
       "paper_build": 134,
       "paper_channel": "STABLE",
@@ -248,10 +248,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 23.4,
+      "seconds": 23.3,
       "java": 8,
       "paper_build": 245,
       "paper_channel": "STABLE",
@@ -264,10 +264,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 24.8,
+      "seconds": 25.8,
       "java": 8,
       "paper_build": 21,
       "paper_channel": "STABLE",
@@ -280,10 +280,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 25.1,
+      "seconds": 24.6,
       "java": 8,
       "paper_build": 62,
       "paper_channel": "STABLE",
@@ -296,10 +296,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 35.4,
+      "seconds": 35.6,
       "java": 8,
       "paper_build": 393,
       "paper_channel": "STABLE",
@@ -312,10 +312,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 18.2,
+      "seconds": 19.3,
       "java": 8,
       "paper_build": 138,
       "paper_channel": "STABLE",
@@ -328,10 +328,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 18.9,
+      "seconds": 19.9,
       "java": 8,
       "paper_build": 189,
       "paper_channel": "STABLE",
@@ -344,10 +344,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 17.5,
+      "seconds": 18.5,
       "java": 8,
       "paper_build": 253,
       "paper_channel": "STABLE",
@@ -360,10 +360,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 17.4,
+      "seconds": 18.5,
       "java": 8,
       "paper_build": 416,
       "paper_channel": "STABLE",
@@ -376,10 +376,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 16.8,
+      "seconds": 17.0,
       "java": 8,
       "paper_build": 794,
       "paper_channel": "STABLE",
@@ -392,10 +392,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 17.4,
+      "seconds": 18.0,
       "java": 16,
       "paper_build": 79,
       "paper_channel": "STABLE",
@@ -408,10 +408,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 18.4,
+      "seconds": 18.7,
       "java": 17,
       "paper_build": 411,
       "paper_channel": "STABLE",
@@ -424,10 +424,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 19.5,
+      "seconds": 19.7,
       "java": 17,
       "paper_build": 66,
       "paper_channel": "ALPHA",
@@ -440,10 +440,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 19.0,
+      "seconds": 19.5,
       "java": 17,
       "paper_build": 216,
       "paper_channel": "STABLE",
@@ -456,10 +456,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 19.7,
+      "seconds": 20.1,
       "java": 17,
       "paper_build": 388,
       "paper_channel": "STABLE",
@@ -472,10 +472,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 20.2,
+      "seconds": 20.8,
       "java": 17,
       "paper_build": 81,
       "paper_channel": "STABLE",
@@ -488,10 +488,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 21.5,
+      "seconds": 22.4,
       "java": 17,
       "paper_build": 111,
       "paper_channel": "STABLE",
@@ -504,10 +504,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 21.2,
+      "seconds": 24.5,
       "java": 17,
       "paper_build": 307,
       "paper_channel": "STABLE",
@@ -520,10 +520,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 22.6,
+      "seconds": 26.5,
       "java": 17,
       "paper_build": 448,
       "paper_channel": "STABLE",
@@ -536,10 +536,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 22.3,
+      "seconds": 25.8,
       "java": 17,
       "paper_build": 550,
       "paper_channel": "STABLE",
@@ -552,10 +552,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 23.9,
+      "seconds": 27.7,
       "java": 17,
       "paper_build": 17,
       "paper_channel": "STABLE",
@@ -568,10 +568,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 21.0,
+      "seconds": 24.2,
       "java": 17,
       "paper_build": 196,
       "paper_channel": "STABLE",
@@ -584,10 +584,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 20.3,
+      "seconds": 23.0,
       "java": 17,
       "paper_build": 318,
       "paper_channel": "STABLE",
@@ -600,10 +600,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 22.7,
+      "seconds": 22.1,
       "java": 17,
       "paper_build": 499,
       "paper_channel": "STABLE",
@@ -616,10 +616,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 23.4,
+      "seconds": 23.1,
       "java": 21,
       "paper_build": 22,
       "paper_channel": "ALPHA",
@@ -632,10 +632,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 24.0,
+      "seconds": 23.4,
       "java": 21,
       "paper_build": 151,
       "paper_channel": "STABLE",
@@ -648,10 +648,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 23.9,
+      "seconds": 23.7,
       "java": 21,
       "paper_build": 130,
       "paper_channel": "STABLE",
@@ -664,10 +664,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 23.8,
+      "seconds": 23.7,
       "java": 21,
       "paper_build": 133,
       "paper_channel": "STABLE",
@@ -680,10 +680,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 23.5,
+      "seconds": 23.6,
       "java": 21,
       "paper_build": 83,
       "paper_channel": "STABLE",
@@ -696,10 +696,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 25.0,
+      "seconds": 24.5,
       "java": 21,
       "paper_build": 232,
       "paper_channel": "STABLE",
@@ -712,10 +712,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 25.0,
+      "seconds": 24.5,
       "java": 21,
       "paper_build": 114,
       "paper_channel": "ALPHA",
@@ -728,10 +728,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 25.7,
+      "seconds": 24.8,
       "java": 21,
       "paper_build": 48,
       "paper_channel": "STABLE",
@@ -744,10 +744,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 27.6,
+      "seconds": 26.6,
       "java": 21,
       "paper_build": 32,
       "paper_channel": "STABLE",
@@ -760,10 +760,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 26.7,
+      "seconds": 25.0,
       "java": 21,
       "paper_build": 60,
       "paper_channel": "STABLE",
@@ -776,10 +776,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 26.5,
+      "seconds": 26.1,
       "java": 21,
       "paper_build": 59,
       "paper_channel": "ALPHA",
@@ -792,7 +792,7 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
       "seconds": 27.4,
@@ -808,10 +808,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 27.4,
+      "seconds": 27.5,
       "java": 21,
       "paper_build": 132,
       "paper_channel": "STABLE",
@@ -824,10 +824,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 24.6,
+      "seconds": 24.3,
       "java": 25,
       "paper_build": 29,
       "paper_channel": "ALPHA",
@@ -840,10 +840,10 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
-      "seconds": 24.6,
+      "seconds": 24.2,
       "java": 25,
       "paper_build": 74,
       "paper_channel": "STABLE",
@@ -856,7 +856,7 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
       "seconds": 21.9,
@@ -872,7 +872,7 @@
       "status": "passed",
       "checks": {
         "self": 10,
-        "player": 43,
+        "player": 47,
         "restart": 5
       },
       "seconds": 22.2,

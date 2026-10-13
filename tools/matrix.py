@@ -5,7 +5,9 @@ import argparse, concurrent.futures, hashlib, json, os, pathlib, queue, re, shut
 from datetime import datetime, timezone
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-JAR = ROOT/'target/UniversalShop-1.0.0.jar'
+import xml.etree.ElementTree as ET
+VERSION=ET.parse(ROOT/'pom.xml').getroot().find('{http://maven.apache.org/POM/4.0.0}version').text
+JAR = ROOT/f'target/UniversalShop-{VERSION}.jar'
 
 def java_version(version):
     if version.startswith('26.'): return 25
@@ -45,6 +47,8 @@ def scenario(version,args):
     folder,metadata=prepare(version,args)
     plugins=folder/'plugins'
     plugins.mkdir(exist_ok=True)
+    for previous in plugins.glob('UniversalShop-*.jar'):
+        if previous.name!=JAR.name:previous.unlink()
     shutil.copy2(JAR,plugins/JAR.name)
     if args.vault_fixtures:
         for jar in pathlib.Path(args.vault_fixtures).glob('*.jar'):shutil.copy2(jar,plugins/jar.name)

@@ -19,11 +19,13 @@ A configurable survival shop for Minecraft Java servers, built by **hash014**. O
 - Player marketplace with item escrow, offline seller credits, listing expiry, sale tax and safe cancellation. Uses the internal economy.
 - Clickable shop signs, command completion, reload validation, catalog backups, ledger exports and a cancellable API event.
 - Prepared transaction journal, atomic state-file replacement and explicit recovery for ambiguous inventory or third-party effects.
+- Disable individual commands or entire command groups, including their aliases and corresponding trading actions.
+- Bedrock-native forms through Geyser/Floodgate, with separate Buy/Sell buttons, quantity selection, categories, deals and player-market confirmations.
 
 ## Install
 
 1. Stop your Bukkit-compatible Minecraft Java server.
-2. Put `UniversalShop-1.0.0.jar` in `plugins/` and start the server with the Java version required by that server.
+2. Put `UniversalShop-1.1.0.jar` in `plugins/` and start the server with the Java version required by that server.
 3. Run `/shop`. The internal economy starts each player with `$100.00` by default.
 4. Edit `plugins/UniversalShop/config.yml` and `shops.yml`, then run `/shop admin reload`.
 
@@ -58,6 +60,9 @@ All prices, messages, menus and documentation ship in English. The default price
 | `/shop admin history 20` | Show recent transactions |
 | `/shop admin export` | Save a timestamped ledger snapshot |
 | `/shop admin reload` | Validate and reload configuration/catalog |
+| `/shop admin command disable pay` | Disable player payments |
+| `/shop admin command enable pay` | Enable player payments again |
+| `/shop admin command disable market.list` | Disable new listings while retaining buying/cancellation |
 | `/shop admin recovery` | Inspect a pending transaction |
 
 In the shop, left click buys and right click sells. Shift click selects a stack. Every normal shop purchase/sale opens a confirmation screen; changing quantities recalculates its quote. Quotes expire after 30 seconds, and a changed price requires a fresh confirmation.
@@ -67,13 +72,14 @@ An administrator can place a sign with `[ushop]` on line one and an optional pro
 ## Documentation
 
 - [Configuration and product examples](docs/CONFIGURATION.md)
+- [Command switches and Bedrock setup](docs/BEDROCK-AND-COMMANDS.md)
 - [Recovery, persistence and operational limits](docs/OPERATIONS.md)
 - [Compatibility evidence and test scope](docs/COMPATIBILITY.md)
 - [Development and test harness](docs/DEVELOPMENT.md)
 
 ## Scope
 
-UniversalShop targets Bukkit/Spigot/Paper-style Java servers. It is not a Bedrock, Forge, Fabric, Folia, Velocity or BungeeCord plugin. The matrix distinguishes actual Paper integration tests from API compatibility assumptions. It does not claim to cover every economy add-on or replace auctions, land protection, banks, rentals or a network-wide database.
+UniversalShop targets Bukkit/Spigot/Paper-style Java servers. Bedrock players can use it through Geyser/Floodgate; UniversalShop installs on the Java backend, not Bedrock Dedicated Server or a proxy. Forge, Fabric and Folia are unsupported. The matrix distinguishes actual Paper integration tests from API compatibility assumptions. It does not claim to cover every economy add-on or replace auctions, land protection, banks, rentals or a network-wide database.
 
 Player marketplace trades and `/shop pay` require `INTERNAL` mode. Vault users should use their economy provider's payment command. Arbitrary command deliveries cannot be made atomic with another plugin: uncertain effects lock trading for an administrator to reconcile.
 

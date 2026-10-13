@@ -37,6 +37,7 @@ public final class ShopService {
   }
 
   public void allowed(Player p) {
+    plugin.requireAction(p, "shop");
     if (!Bukkit.isPrimaryThread())
       throw new IllegalStateException("Shop operations must run on the main server thread.");
     if (busy) throw new IllegalStateException("Another transaction is in progress.");
@@ -143,6 +144,7 @@ public final class ShopService {
 
   public void trade(Player p, Product product, int quantity, boolean buying, Long expected)
       throws Exception {
+    plugin.requireAction(p, buying ? "buy" : "sell");
     allowed(p);
     cooldown(p);
     if (!p.hasPermission(buying ? "universalshop.buy" : "universalshop.sell"))
@@ -255,6 +257,7 @@ public final class ShopService {
   }
 
   public void pay(Player sender, Player recipient, long amount) throws Exception {
+    plugin.requireAction(sender, "pay");
     allowed(sender);
     cooldown(sender);
     if (economy.external())
@@ -293,6 +296,7 @@ public final class ShopService {
   }
 
   public String list(Player p, int quantity, long total) throws Exception {
+    plugin.requireAction(p, "market.list");
     marketAllowed(p);
     if (quantity < 1 || quantity > 2304 || total < 1 || total > Money.MAX)
       throw new IllegalArgumentException("Invalid quantity or listing price.");
@@ -337,6 +341,7 @@ public final class ShopService {
   }
 
   public void marketTake(Player p, String id, boolean cancel) throws Exception {
+    plugin.requireAction(p, cancel ? "market.cancel" : "market.buy");
     marketAllowed(p);
     if (!id.matches("[a-f0-9]{8}")) throw new IllegalArgumentException("Invalid listing ID.");
     YamlConfiguration next = store.copy();
@@ -411,6 +416,8 @@ public final class ShopService {
   }
 
   public void sellAll(Player p, Map<String, Integer> basket, long expected) throws Exception {
+    plugin.requireAction(p, "sellall");
+    plugin.requireAction(p, "sell");
     allowed(p);
     cooldown(p);
     if (!p.hasPermission("universalshop.sell"))

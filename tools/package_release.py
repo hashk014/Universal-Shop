@@ -1,33 +1,38 @@
 """Package the exact tested JAR, documentation and compact integration evidence."""
 import hashlib, json, pathlib, shutil, zipfile
+import xml.etree.ElementTree as ET
 
 root=pathlib.Path(__file__).resolve().parent.parent
-jar=root/'target/UniversalShop-1.0.0.jar'
+version=ET.parse(root/'pom.xml').getroot().find('{http://maven.apache.org/POM/4.0.0}version').text
+jar=root/f'target/UniversalShop-{version}.jar'
 digest=hashlib.sha256(jar.read_bytes()).hexdigest()
 report=json.loads((root/'docs/compatibility-results.json').read_text())
 vault=json.loads((root/'docs/vault-results.json').read_text())
-assert report['jar_sha256']==digest and vault['jar_sha256']==digest,'Evidence must match the release JAR'
+bedrock=json.loads((root/'docs/bedrock-results.json').read_text())
+assert report['jar_sha256']==digest and vault['jar_sha256']==digest and bedrock['jar_sha256']==digest,'Evidence must match the release JAR'
+assert bedrock['status']=='passed','Incomplete Bedrock test'
 assert len(report['results'])>=55 and all(r['status']=='passed' for r in report['results']),'Incomplete Paper matrix'
 assert all(r['status']=='passed' for r in vault['results']),'Incomplete Vault matrix'
 release=root/'release';release.mkdir(exist_ok=True)
 shutil.copy2(jar,release/jar.name)
-shutil.copy2(root/'target/UniversalShop-1.0.0-sources.jar',release/'UniversalShop-1.0.0-sources.jar')
-with zipfile.ZipFile(release/'UniversalShop-1.0.0-Evidence.zip','w',zipfile.ZIP_DEFLATED) as archive:
+shutil.copy2(root/f'target/UniversalShop-{version}-sources.jar',release/f'UniversalShop-{version}-sources.jar')
+with zipfile.ZipFile(release/f'UniversalShop-{version}-Evidence.zip','w',zipfile.ZIP_DEFLATED) as archive:
+    for key in ('log','client_log'):archive.write(root/bedrock[key],bedrock[key])
     for suite in (report,vault):
         for case in suite['results']:
             log=root/case['log'];archive.write(log,case['log'])
     for path in (root/'docs').glob('*'):
         if path.is_file():archive.write(path,str(path.relative_to(root)))
     for path in (root/'target/surefire-reports').glob('*.xml'):archive.write(path,'unit-tests/'+path.name)
-with zipfile.ZipFile(release/'UniversalShop-1.0.0-Install.zip','w',zipfile.ZIP_DEFLATED) as archive:
+with zipfile.ZipFile(release/f'UniversalShop-{version}-Install.zip','w',zipfile.ZIP_DEFLATED) as archive:
     archive.write(jar,'plugins/'+jar.name)
     for name in ('README.md','LICENSE'):archive.write(root/name,name)
     for path in (root/'docs').glob('*.md'):archive.write(path,'docs/'+path.name)
     for path in (root/'src/main/resources').glob('*.yml'):
         if path.name!='plugin.yml':archive.write(path,'example-config/'+path.name)
-manifest={'version':'1.0.0','tested_at':report['tested_at'],'paper_versions':len(report['results']),'vault_versions':[r['version'] for r in vault['results']],'artifacts':{}}
+manifest={'version':version,'tested_at':report['tested_at'],'paper_versions':len(report['results']),'vault_versions':[r['version'] for r in vault['results']],'bedrock':{'paper':bedrock['paper'],'protocol':bedrock['bedrock_protocol'],'status':bedrock['status']},'artifacts':{}}
 for path in sorted(release.iterdir()):
-    if path.suffix in ('.jar','.zip'):manifest['artifacts'][path.name]={'bytes':path.stat().st_size,'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
+    if path.name.startswith(f'UniversalShop-{version}') and path.suffix in ('.jar','.zip'):manifest['artifacts'][path.name]={'bytes':path.stat().st_size,'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
 (release/'SHA256SUMS.txt').write_text(''.join(v['sha256']+'  '+k+'\n' for k,v in manifest['artifacts'].items()))
 (release/'manifest.json').write_text(json.dumps(manifest,indent=2))
 print(json.dumps(manifest,indent=2))

@@ -17,6 +17,5 @@ jobs:
         with:
           name: UniversalShop
           path: |
-            target/UniversalShop-1.0.0.jar
-            target/UniversalShop-1.0.0-sources.jar
+            target/UniversalShop-*.jar
             target/surefire-reports/

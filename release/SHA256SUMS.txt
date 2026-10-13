@@ -1,4 +1,4 @@
-9d01dd524ee0f3401e2cf8517a8a93b5b0221c3fe5308b47219e60c2a1d98cc8  UniversalShop-1.0.0-Evidence.zip
-99f53668b92fdb4337f4aa8ef954e18b269be45b5a404c3bbada359b8839409b  UniversalShop-1.0.0-Install.zip
-3e8ba861efac31c48f23c0dedecc088c83685c9059a0b6b3b4fd8f21cb3e6ea4  UniversalShop-1.0.0-sources.jar
-847db755bfe73359a7a0a31c6537fe41fed01146e4a3e1561270bd33c3acf5e5  UniversalShop-1.0.0.jar
+b647d5dd41f5b17006ff1fb97a8e186bf943a8a2cc5005976b5f7a302a4e3422  UniversalShop-1.1.0-Evidence.zip
+f97da39e323daea1235f8be3cf9bd704949f84821e0b860657446ee741b9b5e2  UniversalShop-1.1.0-Install.zip
+fbf2b6150520cde92451df70764872999af203dc81ed6f1a808c63c1ac4bbc22  UniversalShop-1.1.0-sources.jar
+52f0144a0b4cc0744c122f4b494afe34e1bf63135ef38a251caf4683c98760f1  UniversalShop-1.1.0.jar

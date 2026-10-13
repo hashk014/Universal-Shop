@@ -2,6 +2,8 @@
 
 The generated `config.yml` controls the economy, taxes, rotation, promotion and marketplace. `shops.yml` holds all products. Validate changes with `/shop admin reload`; invalid reloads preserve the last working configuration in memory. Admin item/price edits validate the catalog and save `shops.yml.bak` before replacing the file.
 
+See [command switches and Bedrock setup](BEDROCK-AND-COMMANDS.md) for `disabled-commands`, `/shop admin command`, and `bedrock.enabled`. Upgrading from 1.0.0 preserves existing files; omitted new options use their defaults (no disabled commands, native Bedrock forms enabled).
+
 ## A complete product
 
 ```yaml

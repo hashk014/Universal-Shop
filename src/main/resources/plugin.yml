@@ -1,11 +1,11 @@
 name: UniversalShop
-version: 1.0.0
+version: 1.1.0
 api-version: '1.13'
 main: fr.hash014.universalshop.UniversalShop
 author: hash014
 description: Flexible survival shops, rotating deals, dynamic prices and player trading.
 website: https://github.com/hashk014/Universal-Shop
-softdepend: [Vault]
+softdepend: [Vault, floodgate, Geyser-Spigot]
 commands:
   shop:
     description: Open the shop or manage UniversalShop.

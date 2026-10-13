@@ -1,4 +1,14 @@
 -------------------------------------------------------------------------------
+Test set: fr.hash014.universalshop.CommandPolicyTest
+-------------------------------------------------------------------------------
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.023 s -- in fr.hash014.universalshop.CommandPolicyTest
+
+-------------------------------------------------------------------------------
 Test set: fr.hash014.universalshop.CoreTest
 -------------------------------------------------------------------------------
-Tests run: 18, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.129 s -- in fr.hash014.universalshop.CoreTest
+Tests run: 18, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.082 s -- in fr.hash014.universalshop.CoreTest
+
+-------------------------------------------------------------------------------
+Test set: fr.hash014.universalshop.FormSessionsTest
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in fr.hash014.universalshop.FormSessionsTest

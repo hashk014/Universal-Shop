@@ -1,24 +1,31 @@
-# UniversalShop 1.0.0
+# UniversalShop 1.1.0
 
-An English survival shop for Minecraft Java with a single legacy/modern plugin JAR.
+Administrators can now disable individual UniversalShop commands or entire groups. Bedrock players connecting through Geyser/Floodgate receive native forms with separate Buy/Sell buttons and confirmation screens. All plugin messages and documentation remain in English.
 
-Features include GUI purchases and sales with confirmation, exact custom-item templates, bulk selling, command services, an internal economy, optional Vault, dynamic prices, finite stock and timed restocking, daily limits, weekly/daily featured items, timed promotions, permission discounts, taxes, a player marketplace with escrow, shop signs, catalog editing, backups, history and transaction recovery.
+## New features
+
+- `disabled-commands` configuration with parent/child rules such as `pay`, `buy`, `market.list` or `admin.add`.
+- `/shop admin command disable <path>` and `/shop admin command enable <path>` persist changes immediately. The console remains able to restore access, even when `shop` or `admin` is disabled.
+- Shared enforcement across aliases, namespaced commands, signs, Java menus and Bedrock transactions; disabled options are filtered from help/completion and relevant buttons.
+- Optional Geyser/Floodgate integration without mandatory runtime dependencies. Bedrock forms support product/category/deal browsing, quantities, buy/sell confirmation, bulk sales and player-market purchase/reclaim confirmation.
+- One-use form tokens, expired quote rejection and invalidation on reload, disconnect or policy change. Missing form APIs fall back to the inventory interface.
 
 ## Validation
 
-- 18 unit tests passed.
-- 55 Paper versions from 1.7.10 through 26.3 passed the internal-economy integration suite with two connected protocol clients, server-side GUI checks and a full restart.
-- Vault 1.7.3 with EssentialsX 2.22.0 passed real debit/deposit and restart checks on Paper 1.21.11 and 26.3.
-- The compatibility JSON records the exact tested JAR hash, server builds, channels and check counts. Full logs are provided in the evidence archive.
+- 26 JUnit tests passed.
+- 55 Paper versions from 1.7.10 through 26.3 passed with two connected Java protocol clients and a full server restart.
+- Vault 1.7.3 with EssentialsX 2.22.0 passed on Paper 1.21.11 and 26.3.
+- A Bedrock 26.51 protocol client connected through real Geyser/Floodgate on Paper 26.2: 6 native forms received, 15 checks passed, including purchase/sale accounting, duplicate responses, disabled purchase rejection and hidden Buy button.
+- All reports identify the exact release JAR SHA-256. Logs and unit reports are bundled in the evidence ZIP.
 
-Spigot/CraftBukkit/Purpur are intended API targets but were not directly boot-tested. Folia, Forge, Fabric, Bedrock and proxy servers are not plugin targets. No rendered-client visual or high-concurrency load test is claimed. Review the compatibility and operations documents for precise limits, including ambiguous third-party delivery recovery.
+The Bedrock fixture uses an offline loopback identity. Microsoft/Xbox authentication, account linking, proxy forwarding and rendered mobile/console UI were not tested. The Java compatibility matrix does not imply Geyser supports every listed backend. UniversalShop runs on the Java backend; native Bedrock Dedicated Server, Folia, Fabric and Forge are unsupported. Spigot/CraftBukkit/Purpur are intended API targets but were not directly boot-tested.
 
-## Downloads
+## Upgrade and download
 
-- `UniversalShop-1.0.0.jar`: install in your server's `plugins/` folder.
-- `UniversalShop-1.0.0-Install.zip`: JAR, example configuration and English documentation.
-- `UniversalShop-1.0.0-sources.jar`: plugin source archive.
-- `UniversalShop-1.0.0-Evidence.zip`: full per-version integration logs and test reports.
+Stop the server, back up the UniversalShop folder, replace the previous JAR with `UniversalShop-1.1.0.jar`, and restart. Existing configuration/catalog/ledger files are retained. New switches default to no disabled commands and Bedrock forms enabled. See [setup and command examples](https://github.com/hashk014/Universal-Shop/blob/codex/universal-shop/docs/BEDROCK-AND-COMMANDS.md).
+
+- `UniversalShop-1.1.0.jar`: plugin to install in `plugins/`.
+- `UniversalShop-1.1.0-Install.zip`: JAR, example configuration and English documentation.
+- `UniversalShop-1.1.0-sources.jar`: source archive.
+- `UniversalShop-1.1.0-Evidence.zip`: integration logs and test reports.
 - `SHA256SUMS.txt` and `manifest.json`: artifact checksums and release metadata.
-
-Start the server and run `/shop`. Internal mode requires no dependencies. The player marketplace and `/shop pay` use internal wallets; Vault mode delegates balances to the installed provider.

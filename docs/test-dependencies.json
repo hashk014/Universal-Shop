@@ -12,5 +12,23 @@
   "client": {
     "minecraft-protocol": "1.68.0",
     "minecraft-data": "3.117.0"
+  },
+  "geyser": {
+    "metadata_url": "https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest",
+    "version": "2.11.3",
+    "build": 1251,
+    "sha256": "0bd00484f688c49e45f84f7c8bf9326f52d48a4c697d72a28526f2fe3f55dc36"
+  },
+  "floodgate": {
+    "metadata_url": "https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest",
+    "version": "2.2.5",
+    "build": 141,
+    "sha256": "21570aff9ce17d6983928e8552777760e1ede5050026b04c686b0ae112e6fd7e"
+  },
+  "bedrock-client": {
+    "bedrock-protocol": "3.60.1",
+    "protocol": "1.26.51",
+    "raknet-backend": "raknet-native",
+    "authentication": "offline loopback fixture only"
   }
 }

@@ -44,6 +44,49 @@ final class ServerTests {
       throw new IllegalArgumentException("Tests require the console.");
     try {
       if (args.length < 2) throw new IllegalArgumentException("Test phase required.");
+      if (args[1].equals("bedrock")) {
+        Player player = Bukkit.getPlayerExact(".ShopBedrock");
+        check(player != null, "Bedrock network client logged in");
+        check(p.bedrock.available(player), "Real Geyser API detects Bedrock connection");
+        Product stone = p.product("stone");
+        String phase = args[2];
+        if (phase.equals("start")) {
+          player.getInventory().clear();
+          p.onCommand(
+              Bukkit.getConsoleSender(),
+              p.getCommand("shop"),
+              "shop",
+              new String[] {"admin", "balance", player.getName(), "100"});
+          p.menus.browse(player, "stone", 0);
+        } else if (phase.equals("bought")) {
+          check(
+              Inventories.count(Inventories.snapshot(player), stone.item) == 1,
+              "Bedrock purchase delivered once");
+          check(p.service.balance(player) == 9800, "Bedrock purchase charged once");
+          p.menus.confirm(player, stone, 1, false);
+        } else if (phase.equals("sold")) {
+          check(
+              Inventories.count(Inventories.snapshot(player), stone.item) == 0,
+              "Bedrock sale removed item");
+          check(p.service.balance(player) == 9850, "Bedrock sale credited once");
+          p.onCommand(
+              Bukkit.getConsoleSender(),
+              p.getCommand("shop"),
+              "shop",
+              new String[] {"admin", "command", "disable", "buy"});
+          rejects(() -> p.menus.confirm(player, stone, 1, true), "Disabled Bedrock buy");
+          p.menus.browse(player, "stone", 0);
+        } else if (phase.equals("finish")) {
+          check(p.service.balance(player) == 9850, "Disabled action leaves balance unchanged");
+          p.onCommand(
+              Bukkit.getConsoleSender(),
+              p.getCommand("shop"),
+              "shop",
+              new String[] {"admin", "command", "enable", "buy"});
+        } else throw new IllegalArgumentException("Unknown Bedrock phase");
+        p.getLogger().info("BEDROCK PASS phase=" + phase + " checks=" + checks);
+        return;
+      }
       if (args[1].equals("protocol")) {
         protocol();
         return;
@@ -129,6 +172,27 @@ final class ServerTests {
     p.service.setBalance(player.getUniqueId(), 10000000);
     p.service.setBalance(buyer.getUniqueId(), 10000000);
     final Product stone = p.product("stone");
+    p.onCommand(
+        Bukkit.getConsoleSender(),
+        p.getCommand("shop"),
+        "shop",
+        new String[] {"admin", "command", "disable", "buy"});
+    rejects(
+        () -> p.service.trade(player, stone, 1, true, null),
+        "Disabled buy action blocks GUI/service");
+    check(
+        !p.onTabComplete(player, p.getCommand("shop"), "ushop", new String[] {"b"}).contains("buy"),
+        "Disabled command hidden from alias completion");
+    p.onCommand(player, p.getCommand("shop"), "universalshop:shop", new String[] {"buy", "stone"});
+    check(
+        !(player.getOpenInventory().getTopInventory().getHolder() instanceof ShopMenus.Menu),
+        "Namespaced command cannot bypass policy");
+    p.onCommand(
+        Bukkit.getConsoleSender(),
+        p.getCommand("shop"),
+        "shop",
+        new String[] {"admin", "command", "enable", "buy"});
+    check(p.actionEnabled(player, "buy"), "Console re-enables command");
     long initial = p.service.balance(player), cost = p.service.quote(player, stone, 64, true);
     p.service.trade(player, stone, 64, true, cost);
     check(Inventories.count(Inventories.snapshot(player), stone.item) == 64, "Purchase delivery");

@@ -1,0 +1,18 @@
+{
+  "tested_at": "2026-10-13T19:17:07.702560+00:00",
+  "jar_sha256": "52f0144a0b4cc0744c122f4b494afe34e1bf63135ef38a251caf4683c98760f1",
+  "status": "passed",
+  "errors": [],
+  "paper": "26.2",
+  "bedrock_protocol": "1.26.51",
+  "client": "bedrock-protocol 3.60.1",
+  "checks": 15,
+  "forms_received": 6,
+  "bridge_sha256": {
+    "Geyser-Spigot.jar": "0bd00484f688c49e45f84f7c8bf9326f52d48a4c697d72a28526f2fe3f55dc36",
+    "floodgate-spigot.jar": "21570aff9ce17d6983928e8552777760e1ede5050026b04c686b0ae112e6fd7e"
+  },
+  "scope": "Real offline loopback Bedrock protocol client via Geyser and Floodgate (offline identity); native form responses including duplicate submission, buy/sell delivery and balances, disabled buy rejection and hidden button. No Microsoft authentication or rendered mobile/console UI test.",
+  "log": "test-servers/26.2-bedrock/universalshop-test.log",
+  "client_log": "test-servers/26.2-bedrock/bedrock-client.log"
+}

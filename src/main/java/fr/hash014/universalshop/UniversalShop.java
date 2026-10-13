@@ -21,6 +21,8 @@ public final class UniversalShop extends JavaPlugin
   Store store;
   ShopService service;
   ShopMenus menus;
+  BedrockForms bedrock;
+  private CommandPolicy commandPolicy = new CommandPolicy(Collections.<String>emptyList());
   long startingBalance;
   private long catalogRevision;
   private final Map<UUID, Basket> baskets = new HashMap<UUID, Basket>();
@@ -59,6 +61,7 @@ public final class UniversalShop extends JavaPlugin
       }
       service = new ShopService(this, store, economy);
       menus = new ShopMenus(this);
+      bedrock = new BedrockForms(this);
       getCommand("shop").setExecutor(this);
       getCommand("shop").setTabCompleter(this);
       getServer().getPluginManager().registerEvents(this, this);
@@ -87,9 +90,11 @@ public final class UniversalShop extends JavaPlugin
       if (p.getOpenInventory().getTopInventory().getHolder() instanceof ShopMenus.Menu)
         p.closeInventory();
     baskets.clear();
+    if (bedrock != null) bedrock.sessions.clear();
   }
 
   private void validateConfig() {
+    commandPolicy = new CommandPolicy(getConfig().getStringList("disabled-commands"));
     startingBalance = Money.parse(String.valueOf(getConfig().get("starting-balance", 100)));
     for (String field :
         Arrays.asList(
@@ -215,11 +220,14 @@ public final class UniversalShop extends JavaPlugin
   }
 
   public void previewSellAll(Player p) throws Exception {
+    requireAction(p, "sellall");
+    requireAction(p, "sell");
     service.allowed(p);
     Map<String, Integer> items = service.sellBasket(p);
     if (items.isEmpty())
       throw new IllegalArgumentException("No sellable items were found in your storage slots.");
     long total = service.basketQuote(p, items);
+    if (bedrock.sellAll(p, items, total)) return;
     baskets.put(p.getUniqueId(), new Basket(items, total, catalogRevision));
     tell(p, "&eInventory sale: " + items + ". Total: " + money(total));
     tell(
@@ -231,6 +239,7 @@ public final class UniversalShop extends JavaPlugin
   @Override
   public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
     try {
+      requireAction(sender, CommandPolicy.path(args));
       if (args.length == 0) {
         menus.browse(player(sender), "", 0);
         return true;
@@ -242,23 +251,9 @@ public final class UniversalShop extends JavaPlugin
         return true;
       }
       if (sub.equals("help")) {
-        tell(
-            sender,
-            "&6/shop &7- browse | /shop search <text> | /shop category <name> | /shop deals");
-        tell(sender, "&e/shop buy|sell <id> [amount] &7- review and confirm");
-        tell(sender, "&e/shop sellhand [amount] | /shop sellall [confirm] | /shop balance");
-        tell(sender, "&e/shop pay <online player> <amount> | /shop market [page]");
-        tell(sender, "&e/shop market list <amount> <total price> | buy|cancel <id> confirm");
-        if (sender.hasPermission("universalshop.admin")) {
-          tell(sender, "&c/shop admin add <id> <buy|-1> <sell|-1> [category] (held item)");
-          tell(
-              sender,
-              "&c/shop admin remove <id> | price <id> <buy> <sell> | stock <id> <quantity>");
-          tell(
-              sender,
-              "&c/shop admin balance <online player|uuid> <amount> | history [lines] | reload");
-          tell(sender, "&c/shop admin recovery [commit|abort] confirm | export");
-        }
+        showHelp(sender);
+        return true;
+
       } else if (sub.equals("admin")) {
         admin(sender);
         adminCommand(sender, args);
@@ -349,6 +344,32 @@ public final class UniversalShop extends JavaPlugin
         args.length >= 2,
         "/shop admin <add|remove|price|stock|balance|history|reload|recovery|export>");
     String action = args[1].toLowerCase(Locale.ROOT);
+    if (action.equals("command")) {
+      if (args.length == 2) {
+        tell(sender, "&eDisabled commands: " + getConfig().getStringList("disabled-commands"));
+        return;
+      }
+      usage(
+          args.length == 4
+              && (args[2].equalsIgnoreCase("enable") || args[2].equalsIgnoreCase("disable")),
+          "/shop admin command enable|disable <path>");
+      String path = CommandPolicy.normalize(args[3]);
+      new CommandPolicy(Collections.singletonList(path));
+      List<String> disabled = new ArrayList<String>();
+      for (String value : getConfig().getStringList("disabled-commands"))
+        disabled.add(CommandPolicy.normalize(value));
+      if (args[2].equalsIgnoreCase("enable")) disabled.removeAll(Collections.singleton(path));
+      else if (!disabled.contains(path)) disabled.add(path);
+      YamlConfiguration next = new YamlConfiguration();
+      next.loadFromString(getConfig().saveToString());
+      next.set("disabled-commands", disabled);
+      AtomicFiles.write(getDataFolder().toPath().resolve("config.yml"), next.saveToString());
+      getConfig().set("disabled-commands", disabled);
+      commandPolicy = new CommandPolicy(disabled);
+      bedrock.sessions.clear();
+      tell(sender, "&aDisabled commands: " + disabled);
+      return;
+    }
     if (action.equals("recovery")) {
       if (args.length == 2) {
         tell(sender, "&e" + store.pendingInfo());
@@ -400,12 +421,14 @@ public final class UniversalShop extends JavaPlugin
       } catch (Exception e) {
         getConfig().loadFromString(previous);
         startingBalance = previousBalance;
+        commandPolicy = new CommandPolicy(getConfig().getStringList("disabled-commands"));
         throw e;
       }
       for (Player p : onlinePlayers())
         if (p.getOpenInventory().getTopInventory().getHolder() instanceof ShopMenus.Menu)
           p.closeInventory();
       tell(sender, "&aConfiguration and catalog reloaded.");
+      bedrock.sessions.clear();
       return;
     }
     if (action.equals("balance")) {
@@ -534,19 +557,74 @@ public final class UniversalShop extends JavaPlugin
               "history",
               "reload",
               "recovery",
-              "export"));
+              "export",
+              "command"));
     if (args.length == 2 && args[0].equalsIgnoreCase("market"))
       values.addAll(Arrays.asList("list", "buy", "cancel"));
     String prefix = args[args.length - 1].toLowerCase(Locale.ROOT);
     Iterator<String> it = values.iterator();
-    while (it.hasNext()) if (!it.next().toLowerCase(Locale.ROOT).startsWith(prefix)) it.remove();
+    while (it.hasNext()) {
+      String value = it.next();
+      String[] completed = args.clone();
+      completed[completed.length - 1] = value;
+      if (!value.toLowerCase(Locale.ROOT).startsWith(prefix)
+          || !actionEnabled(sender, CommandPolicy.path(completed))) it.remove();
+    }
     return values;
   }
 
   @EventHandler
   public void quit(PlayerQuitEvent e) {
+    bedrock.sessions.close(e.getPlayer().getUniqueId());
     baskets.remove(e.getPlayer().getUniqueId());
     service.forget(e.getPlayer().getUniqueId());
+  }
+
+  boolean actionEnabled(CommandSender sender, String action) {
+    return sender instanceof ConsoleCommandSender || commandPolicy.enabled(action);
+  }
+
+  void requireAction(CommandSender sender, String action) {
+    if (!actionEnabled(sender, action))
+      throw new IllegalArgumentException(
+          "This command/action is disabled by the server administrator: " + action);
+  }
+
+  long catalogRevision() {
+    return catalogRevision;
+  }
+
+  private void showHelp(CommandSender sender) {
+    String[][] entries = {
+      {"shop", "/shop - browse"},
+      {"search", "/shop search <text>"},
+      {"category", "/shop category <name>"},
+      {"deals", "/shop deals"},
+      {"buy", "/shop buy <id> [amount]"},
+      {"sell", "/shop sell <id> [amount]"},
+      {"sellhand", "/shop sellhand [amount]"},
+      {"sellall", "/shop sellall [confirm]"},
+      {"balance", "/shop balance"},
+      {"pay", "/shop pay <online player> <amount>"},
+      {"market", "/shop market [page]"},
+      {"market.list", "/shop market list <amount> <total price>"},
+      {"market.buy", "/shop market buy <id> confirm"},
+      {"market.cancel", "/shop market cancel <id> confirm"},
+      {"admin.command", "/shop admin command [enable|disable <path>]"},
+      {"admin.reload", "/shop admin reload"},
+      {"admin.add", "/shop admin add <id> <buy> <sell> [category]"},
+      {"admin.remove", "/shop admin remove <id>"},
+      {"admin.price", "/shop admin price <id> <buy> <sell>"},
+      {"admin.stock", "/shop admin stock <id> <quantity>"},
+      {"admin.balance", "/shop admin balance <online player|uuid> <amount>"},
+      {"admin.history", "/shop admin history [lines]"},
+      {"admin.export", "/shop admin export"},
+      {"admin.recovery", "/shop admin recovery [commit|abort] confirm"}
+    };
+    for (String[] entry : entries)
+      if (actionEnabled(sender, entry[0])
+          && (!entry[0].startsWith("admin.") || sender.hasPermission("universalshop.admin")))
+        tell(sender, "&e" + entry[1]);
   }
 
   @EventHandler(ignoreCancelled = true)

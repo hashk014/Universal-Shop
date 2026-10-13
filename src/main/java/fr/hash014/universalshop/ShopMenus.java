@@ -48,12 +48,24 @@ public final class ShopMenus implements Listener {
 
   private void button(
       Menu menu, int slot, Material material, String label, String action, String... lore) {
+    Player owner = Bukkit.getPlayer(menu.owner);
+    String policy =
+        action.equals("categories")
+            ? "category"
+            : action.startsWith("buy-listing:")
+                ? "market.buy"
+                : action.startsWith("cancel-listing:")
+                    ? "market.cancel"
+                    : action.equals("switch") ? (menu.buying ? "sell" : "buy") : action;
+    if (owner != null && !plugin.actionEnabled(owner, policy)) return;
     menu.inventory.setItem(slot, icon(material, label, lore));
     menu.actions.put(slot, action);
   }
 
   public void browse(Player p, String filter, int page) throws Exception {
     plugin.service.allowed(p);
+    if (filter.equalsIgnoreCase("deals")) plugin.requireAction(p, "deals");
+    if (plugin.bedrock.browse(p, filter, page)) return;
     Menu menu = new Menu(p);
     menu.filter = filter;
     List<Product> matches = new ArrayList<Product>();
@@ -151,7 +163,9 @@ public final class ShopMenus implements Listener {
   }
 
   public void categories(Player p, int page) throws Exception {
+    plugin.requireAction(p, "category");
     plugin.service.allowed(p);
+    if (plugin.bedrock.categories(p, page)) return;
     Menu menu = new Menu(p);
     menu.page = Math.max(0, page);
     menu.inventory = Bukkit.createInventory(menu, 54, "UniversalShop | Categories");
@@ -171,9 +185,11 @@ public final class ShopMenus implements Listener {
   }
 
   public void confirm(Player p, Product product, int quantity, boolean buying) throws Exception {
+    plugin.requireAction(p, buying ? "buy" : "sell");
     plugin.service.allowed(p);
     if (!plugin.service.visible(p, product))
       throw new IllegalArgumentException("This product is unavailable.");
+    if (plugin.bedrock.confirm(p, product, quantity, buying)) return;
     Menu menu = new Menu(p);
     menu.product = product;
     menu.quantity = quantity;
@@ -202,7 +218,9 @@ public final class ShopMenus implements Listener {
   }
 
   public void market(Player p, int page) throws Exception {
+    plugin.requireAction(p, "market");
     plugin.service.allowed(p);
+    if (plugin.bedrock.market(p, page)) return;
     Menu menu = new Menu(p);
     menu.page = Math.max(0, page);
     menu.inventory = Bukkit.createInventory(menu, 54, "UniversalShop | Player Market");
@@ -291,6 +309,11 @@ public final class ShopMenus implements Listener {
                 if (!p.isOnline() || p.getOpenInventory().getTopInventory().getHolder() != menu)
                   return;
                 try {
+                  plugin.service.allowed(p);
+                  if (action.startsWith("category:")) plugin.requireAction(p, "category");
+                  if (action.equals("search") || action.equals("balance"))
+                    plugin.requireAction(p, action);
+                  if (action.startsWith("listing:")) plugin.requireAction(p, "market");
                   if (action.startsWith("product:")) {
                     Product product = plugin.product(action.substring(8));
                     confirm(

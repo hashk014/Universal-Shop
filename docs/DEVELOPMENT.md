@@ -39,7 +39,18 @@ For the optional Vault suite, put the official Vault 1.7.3 and EssentialsX 2.22.
 python tools/matrix.py 1.21.11 26.3 --vault-fixtures .tools/vault --report docs/vault-results.json
 ```
 
-These cases use separate `1.21.11-vault` / `26.3-vault` folders. Once both matrices pass against the same JAR, run `python tools/render_report.py` and `python tools/package_release.py` to generate the readable matrix and release bundles. Packaging refuses mismatched hashes or incomplete results.
+These cases use separate `1.21.11-vault` / `26.3-vault` folders. Command policy tests additionally cover aliases, completion filtering, blocked transactions and console recovery. JUnit tests cover policy hierarchy, invalid paths, form expiration, stale sessions and duplicate callbacks.
+
+For the Bedrock suite, first cache Paper 26.2 with the main harness. Download official Geyser-Spigot and Floodgate-Spigot JARs into `.tools/bedrock`, named `Geyser-Spigot.jar` and `floodgate-spigot.jar`. Tested bridge SHA-256 values are recorded in `bedrock-results.json`.
+
+```sh
+npm install --prefix .tools/bedrock/client bedrock-protocol@3.60.1
+python tools/bedrock_matrix.py --runtimes .tools --fixtures .tools/bedrock
+```
+
+The Bedrock client uses `raknet-native` (a compatible prebuilt binary or its native build prerequisites are required), sends real network form responses, and deliberately duplicates buy/sell confirmation responses. The fixture uses the Floodgate identity `.ShopBedrock` with Xbox validation disabled on **loopback only**. It does not test Microsoft authentication. No production authentication configuration is changed. Native protocol version 1.26.51 corresponds to the 26.51 client release.
+
+Once all suites pass against the same JAR, run `python tools/render_report.py` and `python tools/package_release.py` to generate the readable matrix and release bundles. Packaging refuses mismatched hashes or incomplete results.
 
 Running the harness accepts Minecraft's EULA for its disposable test servers by writing `eula=true`. It removes only the named test world/plugin-data directories beneath this checkout's `test-servers` folder. Do not point real server data at that location.
 

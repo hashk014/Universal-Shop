@@ -5,6 +5,12 @@ currency: '$'
 max-transaction-items: 2304
 cooldown-milliseconds: 350
 disabled-worlds: []
+# UniversalShop actions only. Applies to aliases, commands and their GUI/form actions.
+# Examples: [pay, sellall, market.list, admin.add]. Use shop to disable all player access.
+# The server console remains able to recover and re-enable commands.
+disabled-commands: []
+bedrock:
+  enabled: true # Native forms when the Floodgate or local Geyser API detects a Bedrock player.
 buy-tax-percent: 0
 sell-tax-percent: 0
 # A buy discount never lowers a unit below its matching sell price.
