@@ -291,7 +291,7 @@ final class ShopManagement {
       return;
     }
     YamlConfiguration next = new YamlConfiguration();
-    next.loadFromString(plugin.getConfig().saveToString());
+    next.loadFromString(SafeYaml.write(plugin.getConfig()));
     if (plugin.getConfig().getDefaults() != null)
       next.setDefaults(plugin.getConfig().getDefaults());
     if (action.equals("enable") || action.equals("disable")) {
@@ -322,8 +322,8 @@ final class ShopManagement {
       next.set("management.product-rules.paused-categories", categories);
     } else throw new IllegalArgumentException("Unknown management action. Use /shop admin manage.");
     ManagementPolicy candidate = new ManagementPolicy(next);
-    AtomicFiles.write(plugin.getDataFolder().toPath().resolve("config.yml"), next.saveToString());
-    plugin.getConfig().loadFromString(next.saveToString());
+    AtomicFiles.write(plugin.getDataFolder().toPath().resolve("config.yml"), SafeYaml.write(next));
+    plugin.getConfig().loadFromString(SafeYaml.write(next));
     policy = candidate;
     plugin.invalidateViews();
     plugin.tell(

@@ -1,0 +1,460 @@
+# Conserver les variables entre accolades. Les clés manquantes utilisent les valeurs fournies.
+messages:
+  success: '&aTransaction terminée : {quantity} x {product} pour {price}.'
+  error: '&c{reason}'
+  balance: '&eSolde : {balance}'
+errors:
+  safe-failure: 'L''opération n''a pas pu se terminer correctement. Contactez un administrateur.'
+language:
+  changed: '&aLangue : {language}'
+market:
+  claimed: '&a{count} piles d''objets et les gains disponibles ont été récupérés.'
+  no-notices: '&7Aucune nouvelle notification du marché.'
+  notifications: '&eVous avez {count} notifications du marché. /shop market notices'
+editor:
+  list-title: '&8Éditeur de boutique | {page}'
+  edit-title: '&8Modifier : {id}'
+  list-prices: '&7Achat : {buy} / Vente : {sell}'
+  list-edit: '&eCliquez pour modifier ce produit.'
+  previous: '&ePage précédente'
+  next: '&ePage suivante'
+  search: '&eRechercher des produits'
+  create: '&aCréer depuis l''objet en main'
+  create-lore: '&7Tenez l''objet fini avant d''ouvrir ce menu.'
+  diagnose: '&eDiagnostic du catalogue'
+  dashboard: '&ePanneau d''administration'
+  disabled: 'désactivé'
+  default: 'par défaut'
+  value: '&fValeur actuelle : {value}'
+  replace: '&eRemplacer par l''objet en main'
+  replace-lore: '&7Conserve toutes les données de l''objet en main.'
+  preview: '&ePrévisualiser le produit'
+  duplicate: '&eDupliquer ce brouillon'
+  stock-now: '&eRégler le stock actuel'
+  back: '&eRetour au catalogue'
+  delete: '&cSupprimer le produit'
+  save: '&aVérifier et enregistrer'
+  changes: '&7Champs modifiés : {fields}'
+  close: '&eFermer (garder le brouillon)'
+  resume: '&7Reprendre avec /shop admin editor.'
+  prompt-id: '&eEntrez un identifiant unique (minuscules, chiffres, _ ou -).'
+  commands-warning: '&cCes commandes seront exécutées avec tous les droits du serveur : {commands}'
+  commands-confirm: '&cTapez CONFIRM COMMANDS pour préparer cette modification.'
+  confirm-first: '&cConfirmer cette modification'
+  confirm-final: '&aConfirmer et publier'
+  cancel: '&eAnnuler'
+  preview-title: '&8Aperçu du produit'
+  preview-note: '&7Prévisualisation uniquement ; aucun achat.'
+  return: '&eRetour à l''éditeur'
+  saved: '&aCatalogue enregistré. Ancien fichier : shops.yml.bak'
+  prompt-search: '&eEntrez un nom, un identifiant ou une catégorie ; - efface la recherche.'
+  replace-confirm: '&eTapez CONFIRM ITEM pour remplacer toutes les données de l''objet.'
+  prompt-duplicate: '&eEntrez un identifiant unique pour la copie.'
+  prompt-stock-now: '&eEntrez le stock actuel (dans la capacité déjà enregistrée).'
+  discard-title: '&8Abandonner les modifications ?'
+  review-title: '&8Vérifier les modifications'
+  review-product: '&fProduit : {id}'
+  save-backup: '&7Une sauvegarde de l''ancien catalogue sera conservée.'
+  delete-title: '&8Supprimer le produit ?'
+  delete-warning: '&cLe produit {id} sera supprimé du catalogue.'
+  delete-final-title: '&8Confirmer la suppression'
+  delete-history: '&7L''historique des transactions sera conservé.'
+  deleted: '&aProduit supprimé ; ancien catalogue conservé dans shops.yml.bak.'
+  field:
+    name: '&eNom affiché'
+    category: '&eCatégorie'
+    buy: '&aPrix d''achat'
+    sell: '&aPrix de vente'
+    stock: '&eCapacité du stock'
+    restock-hours: '&eIntervalle de réassort'
+    daily-buy-limit: '&eLimite d''achat quotidienne'
+    daily-sell-limit: '&eLimite de vente quotidienne'
+    permission: '&ePermission requise'
+    worlds: '&eMondes autorisés'
+    dynamic:
+      enabled: '&ePrix dynamiques'
+      step: '&eVariation dynamique'
+      min: '&eMultiplicateur minimal'
+      max: '&eMultiplicateur maximal'
+      decay-hours: '&eDemi-vie après inactivité'
+    rotating: '&eDisponible en promotion'
+    rotation-only: '&eUniquement en promotion'
+    commands: '&cCommandes de livraison'
+  hint:
+    name: '&7Les couleurs avec & sont acceptées.'
+    category: '&7Choisissez un nom de catégorie.'
+    buy: '&7Prix par objet ; -1 désactive l''achat.'
+    sell: '&7Prix par objet ; -1 désactive la vente.'
+    stock: '&7-1 illimité, sinon de 0 à 1000000000.'
+    restock-hours: '&7En heures ; 0 désactive le réassort.'
+    daily-buy-limit: '&7Objets par joueur et par jour UTC ; 0 illimité.'
+    daily-sell-limit: '&7Objets par joueur et par jour UTC ; 0 illimité.'
+    permission: '&7Entrez - pour retirer la permission.'
+    worlds: '&7Mondes séparés par des virgules ; - pour tous.'
+    dynamic:
+      enabled: '&7Cliquez pour activer ou désactiver les prix dynamiques.'
+      step: '&7Variation par objet acheté net.'
+      min: '&7Valeur positive, inférieure ou égale au maximum.'
+      max: '&7Entre le minimum et 1000.'
+      decay-hours: '&7La demande est divisée par deux par période inactive ; 0 désactive.'
+    rotating: '&7Cliquez pour activer ou désactiver les promotions.'
+    rotation-only: '&7Le produit doit être disponible en promotion.'
+    commands: '&7Séparez les commandes avec || ; - les supprime.'
+  prompt:
+    buy: '&eEntrez le prix d''achat par objet (-1 désactive l''achat).'
+    sell: '&eEntrez le prix de vente par objet (-1 désactive la vente).'
+    name: '&eEntrez le nom affiché (couleurs avec &) ; - le conserve à la création.'
+    category: '&eEntrez la catégorie ; - la conserve à la création.'
+    stock: '&eEntrez la capacité du stock (-1 illimité ; de 0 à 1000000000).'
+    restock-hours: '&eEntrez les heures de réassort (0 désactivé ; maximum 876000).'
+    daily-buy-limit: '&eEntrez la limite d''achat par joueur et par jour (0 illimité).'
+    daily-sell-limit: '&eEntrez la limite de vente par joueur et par jour (0 illimité).'
+    permission: '&eEntrez la permission requise ; - la retire.'
+    worlds: '&eEntrez les mondes séparés par des virgules ; - autorise tous les mondes.'
+    dynamic:
+      step: '&eEntrez la variation du multiplicateur (zéro ou positive).'
+      min: '&eEntrez le multiplicateur minimal strictement positif.'
+      max: '&eEntrez le multiplicateur maximal (jusqu''à 1000).'
+      decay-hours: '&eEntrez la demi-vie en heures inactives (0 désactivé ; maximum 876000).'
+    commands: '&cEntrez les commandes console séparées par ||, ou - pour les retirer.'
+phrases:
+  - source: 'Invalid input.'
+    target: 'Valeur incorrecte.'
+  - source: 'This command requires a player.'
+    target: 'Cette commande nécessite un joueur.'
+  - source: 'Administrator permission required.'
+    target: 'Une permission d''administration est requise.'
+  - source: 'Administrator permission required: {permission}'
+    target: 'Permission d''administration requise : {permission}'
+  - source: 'This command/action is disabled by the server administrator: {action}'
+    target: 'Cette commande ou action a été désactivée : {action}'
+  - source: 'Unknown product: {id}'
+    target: 'Produit inconnu : {id}'
+  - source: 'Hold the exact item to add.'
+    target: 'Tenez en main l''objet exact à ajouter.'
+  - source: 'This ID already exists.'
+    target: 'Cet identifiant existe déjà.'
+  - source: 'The held item has no matching sell product.'
+    target: 'Aucun produit de vente ne correspond à l''objet en main.'
+  - source: 'No sellable items were found in your storage slots.'
+    target: 'Votre inventaire ne contient aucun objet vendable.'
+  - source: 'Preview your inventory sale again first.'
+    target: 'Prévisualisez à nouveau la vente de votre inventaire.'
+  - source: 'That player is not online.'
+    target: 'Ce joueur n''est pas connecté.'
+  - source: 'Language must be en or fr.'
+    target: 'La langue doit être en ou fr.'
+  - source: 'Language permission required.'
+    target: 'La permission de changer la langue est requise.'
+  - source: 'Player language preferences are disabled.'
+    target: 'Le choix individuel de la langue est désactivé.'
+  - source: 'The value is too long.'
+    target: 'La valeur est trop longue.'
+  - source: 'Invalid stock/limit value.'
+    target: 'Valeur de stock ou de limite incorrecte.'
+  - source: 'Invalid dynamic pricing value.'
+    target: 'Valeur de prix dynamique incorrecte.'
+  - source: 'Invalid world name.'
+    target: 'Nom de monde incorrect.'
+  - source: 'Invalid delivery command.'
+    target: 'Commande de livraison incorrecte.'
+  - source: 'Invalid permission node.'
+    target: 'Permission incorrecte.'
+  - source: 'Invalid name or category.'
+    target: 'Nom ou catégorie incorrects.'
+  - source: 'Unknown editable product field.'
+    target: 'Champ de produit inconnu.'
+  - source: 'This editor draft is no longer active.'
+    target: 'Ce brouillon n''est plus actif.'
+  - source: 'The catalog changed while you were editing. Discard this draft and reopen the product.'
+    target: 'Le catalogue a changé pendant la modification. Abandonnez ce brouillon et rouvrez le produit.'
+  - source: 'Stock must be between 0 and the product''s configured capacity.'
+    target: 'Le stock doit être compris entre 0 et la capacité du produit.'
+  - source: 'Keep at least one product.'
+    target: 'Conservez au moins un produit.'
+  - source: 'No supported products were found.'
+    target: 'Aucun produit compatible n''a été trouvé.'
+  - source: 'Usage: {syntax}'
+    target: 'Utilisation : {syntax}'
+  - source: 'Listing created: {id}'
+    target: 'Annonce créée : {id}'
+  - source: 'Market transaction complete.'
+    target: 'Transaction du marché terminée.'
+  - source: 'Sent {amount} to {player}'
+    target: '{amount} envoyés à {player}'
+  - source: 'Received {amount} from {player}'
+    target: '{amount} reçus de {player}'
+  - source: 'Balance updated.'
+    target: 'Solde mis à jour.'
+  - source: 'Stock updated.'
+    target: 'Stock mis à jour.'
+  - source: 'Configuration and catalog reloaded.'
+    target: 'Configuration et catalogue rechargés.'
+  - source: 'Catalog saved. Previous file: shops.yml.bak'
+    target: 'Catalogue enregistré. Ancien fichier : shops.yml.bak'
+  - source: 'Recovery decision recorded. Trading unlocked.'
+    target: 'Décision de récupération enregistrée. Échanges déverrouillés.'
+  - source: 'Exported {file}'
+    target: 'Export enregistré : {file}'
+  - source: 'Backup saved: {file}'
+    target: 'Sauvegarde enregistrée : {file}'
+  - source: 'No matching transactions.'
+    target: 'Aucune transaction correspondante.'
+  - source: 'Favorites updated: {ids}'
+    target: 'Favoris mis à jour : {ids}'
+  - source: 'Your favorites list is full.'
+    target: 'Votre liste de favoris est pleine.'
+  - source: 'This product is unavailable.'
+    target: 'Ce produit est indisponible.'
+  - source: 'This item is protected from shop sales.'
+    target: 'Cet objet est protégé contre les ventes en boutique.'
+  - source: 'The {module} module is disabled.'
+    target: 'Le module {module} est désactivé.'
+  - source: 'Sort must be catalog, name or price.'
+    target: 'Le tri doit être catalog, name ou price.'
+  - source: 'Amounts must have at most two decimal places and stay within the supported range.'
+    target: 'Les montants doivent avoir au maximum deux décimales et respecter la plage autorisée.'
+  - source: 'Amount is outside the supported range.'
+    target: 'Le montant dépasse la plage autorisée.'
+  - source: 'Balance or total is outside the supported range.'
+    target: 'Le solde ou le total dépasse la plage autorisée.'
+  - source: 'Price exceeds the supported range.'
+    target: 'Le prix dépasse la plage autorisée.'
+  - source: 'Invalid amount.'
+    target: 'Montant incorrect.'
+  - source: 'Another transaction is in progress.'
+    target: 'Une autre transaction est en cours.'
+  - source: 'Trading is locked pending administrator recovery.'
+    target: 'Les échanges sont bloqués en attente de récupération par un administrateur.'
+  - source: 'You do not have permission to use the shop.'
+    target: 'Vous n''avez pas la permission d''utiliser la boutique.'
+  - source: 'Shops are disabled in this world.'
+    target: 'Les boutiques sont désactivées dans ce monde.'
+  - source: 'Switch out of Creative mode before trading.'
+    target: 'Quittez le mode Créatif avant d''échanger.'
+  - source: 'Please wait before making another transaction.'
+    target: 'Patientez avant d''effectuer une autre transaction.'
+  - source: 'Invalid quantity.'
+    target: 'Quantité incorrecte.'
+  - source: 'Services can only be purchased one at a time.'
+    target: 'Les services s''achètent un par un.'
+  - source: 'You do not have permission for this transaction.'
+    target: 'Vous n''avez pas la permission d''effectuer cette transaction.'
+  - source: 'This product is not available to you here.'
+    target: 'Ce produit n''est pas disponible pour vous ici.'
+  - source: 'The price changed. Review a fresh quote before confirming.'
+    target: 'Le prix a changé. Vérifiez un nouveau devis avant de confirmer.'
+  - source: 'You do not have enough money.'
+    target: 'Vous n''avez pas assez d''argent.'
+  - source: 'This product is out of stock.'
+    target: 'Ce produit est en rupture de stock.'
+  - source: 'Your daily limit for this product has been reached.'
+    target: 'Votre limite quotidienne pour ce produit est atteinte.'
+  - source: 'This transaction was cancelled by a server rule.'
+    target: 'Cette transaction a été annulée par une règle du serveur.'
+  - source: 'The economy provider declined this transaction.'
+    target: 'Le plugin d''économie a refusé cette transaction.'
+  - source: 'A delivery command failed; trading is locked for administrator recovery.'
+    target: 'Une commande de livraison a échoué ; les échanges sont bloqués pour récupération.'
+  - source: 'Use your economy provider''s payment command in Vault mode.'
+    target: 'Utilisez la commande de paiement du plugin d''économie en mode Vault.'
+  - source: 'You do not have permission to send money.'
+    target: 'Vous n''avez pas la permission d''envoyer de l''argent.'
+  - source: 'Choose another player and a positive amount.'
+    target: 'Choisissez un autre joueur et un montant positif.'
+  - source: 'Use the Vault provider''s balance management commands.'
+    target: 'Utilisez les commandes de gestion des soldes du plugin d''économie Vault.'
+  - source: 'The player market is disabled for this economy.'
+    target: 'Le marché des joueurs est désactivé pour cette économie.'
+  - source: 'You do not have permission to use the player market.'
+    target: 'Vous n''avez pas la permission d''utiliser le marché des joueurs.'
+  - source: 'Invalid quantity or listing price.'
+    target: 'Quantité ou prix de l''annonce incorrect.'
+  - source: 'Hold the item to list.'
+    target: 'Tenez en main l''objet à mettre en vente.'
+  - source: 'The player market is full. Reclaim expired listings first.'
+    target: 'Le marché est plein. Récupérez d''abord les annonces expirées.'
+  - source: 'The listing price is below the configured minimum.'
+    target: 'Le prix de l''annonce est inférieur au minimum autorisé.'
+  - source: 'Cancel an existing listing before creating another.'
+    target: 'Annulez une annonce existante avant d''en créer une autre.'
+  - source: 'Inventory changed during validation.'
+    target: 'L''inventaire a changé pendant la vérification.'
+  - source: 'Invalid listing ID.'
+    target: 'Identifiant d''annonce incorrect.'
+  - source: 'That listing no longer exists.'
+    target: 'Cette annonce n''existe plus.'
+  - source: 'Only the seller can cancel this listing.'
+    target: 'Seul le vendeur peut annuler cette annonce.'
+  - source: 'Use /shop market cancel to reclaim your own listing.'
+    target: 'Utilisez /shop market cancel pour récupérer votre annonce.'
+  - source: 'This listing has expired.'
+    target: 'Cette annonce a expiré.'
+  - source: 'This market transaction was cancelled by a server rule.'
+    target: 'Cette transaction du marché a été annulée par une règle du serveur.'
+  - source: 'Pending Vault credit requires the original economy provider.'
+    target: 'Les gains Vault en attente nécessitent le plugin d''économie d''origine.'
+  - source: 'You do not have permission to sell.'
+    target: 'Vous n''avez pas la permission de vendre.'
+  - source: 'Prices changed. Preview again.'
+    target: 'Les prix ont changé. Prévisualisez à nouveau.'
+  - source: 'A server rule cancelled the inventory sale.'
+    target: 'Une règle du serveur a annulé la vente de l''inventaire.'
+  - source: 'Trading is paused for this product or direction.'
+    target: 'Les échanges sont suspendus pour ce produit ou cette opération.'
+  - source: 'Quantity is outside this product''s order limits.'
+    target: 'La quantité ne respecte pas les limites de ce produit.'
+  - source: 'This product is on cooldown for you.'
+    target: 'Vous devez patienter avant d''échanger ce produit.'
+  - source: 'The server-wide daily product quota has been reached.'
+    target: 'Le quota quotidien global de ce produit est atteint.'
+  - source: 'Your daily shop budget has been reached.'
+    target: 'Votre budget quotidien de boutique est atteint.'
+  - source: 'The server shop is currently closed.'
+    target: 'La boutique du serveur est actuellement fermée.'
+  - source: 'The server shop is currently closed. Please come back later.'
+    target: 'La boutique du serveur est actuellement fermée. Revenez plus tard.'
+  - source: '{id}: sell price must not exceed buy price.'
+    target: '{id} : le prix de vente ne doit pas dépasser le prix d''achat.'
+  - source: '{id}: command products cannot be sold.'
+    target: '{id} : les produits livrés par commande ne peuvent pas être revendus.'
+  - source: 'rotation-only requires rotating: true.'
+    target: 'rotation-only nécessite rotating: true.'
+  - source: 'Enter between 1 and 128 characters.'
+    target: 'Entrez de 1 à 128 caractères.'
+  - source: 'Enter between 1 and {limit} characters.'
+    target: 'Entrez de 1 à {limit} caractères.'
+  - source: 'Formatting and control characters are not allowed.'
+    target: 'Les caractères de mise en forme et de contrôle sont interdits.'
+  - source: 'This input has expired. Open the menu again.'
+    target: 'Cette saisie a expiré. Ouvrez à nouveau le menu.'
+  - source: 'Enter a whole number from 1 to 2304.'
+    target: 'Entrez un nombre entier entre 1 et 2304.'
+  - source: 'Quantity must be between 1 and 2304.'
+    target: 'La quantité doit être comprise entre 1 et 2304.'
+  - source: 'Hold an item to list.'
+    target: 'Tenez en main un objet à mettre en vente.'
+  - source: 'The listing price must be positive.'
+    target: 'Le prix de l''annonce doit être positif.'
+  - source: 'The held item changed. Create a fresh listing.'
+    target: 'L''objet en main a changé. Créez une nouvelle annonce.'
+  - source: 'This preview expired. Create a fresh listing.'
+    target: 'Cet aperçu a expiré. Créez une nouvelle annonce.'
+  - source: 'No quantity can be traded with your current money, items, stock and quotas.'
+    target: 'Aucune quantité échangeable avec votre argent, vos objets, le stock et les quotas actuels.'
+
+# Player menus, native forms and private input prompts.
+bedrock:
+  admin-help: "Activez les modules utiles. Stocks, statistiques et rapports s’affichent dans le chat."
+  browse-help: "Choisissez un produit. Les boutons Acheter et Vendre sont séparés."
+  categories-help: "Choisissez une catégorie."
+  confirm-buy: "Confirmer l’achat"
+  confirm-sell: "Confirmer la vente"
+  expired: "Expiré"
+  favorite: "Ajouter ou retirer le favori"
+  market-help: "Consultez les annonces ou vendez l’objet en main. Les objets expirés restent conservés."
+  order-buy: "Acheter {quantity} x {product}"
+  order-sell: "Vendre {quantity} x {product}"
+  product-buy: "Acheter - {price}"
+  product-sell: "Vendre - {price}"
+  sellall-title: "UniversalShop | Vente groupée"
+input:
+  cancelled: "&eSaisie annulée."
+  help: "&7Répondez dans le chat sous 2 minutes. Écrivez cancel pour annuler. Votre réponse reste privée."
+  market-price: "&eEntrez le prix total pour les {quantity} objets :"
+  market-quantity: "&eCombien d’objets de ce type souhaitez-vous vendre ?"
+  market-search: "&eRecherchez un nom, un matériau ou un vendeur (* pour tout afficher) :"
+  quantity: "&eEntrez la quantité pour {product} :"
+  search: "&eEntrez un nom, une catégorie ou un identifiant (* pour tout afficher) :"
+  timeout: "&eSaisie expirée. Ouvrez à nouveau le menu."
+menu:
+  admin:
+    close: "&cFermer la boutique"
+    editor: "&6Éditeur de catalogue"
+    editor-help: "&7Créez et modifiez les produits en jeu."
+    open: "&aOuvrir la boutique"
+    report: "&eExporter les ventes en CSV"
+    stats: "&eStatistiques des ventes"
+    stock: "&eÉtat des stocks"
+    title: "UniversalShop | Gestion"
+    toggle: "&7Cliquez pour activer ou désactiver ce module."
+  all: "&eTous les produits"
+  back: "&eRetour"
+  balance: "&aSolde : {balance}"
+  basket-summary: "&e{count} types de produits"
+  browse:
+    title: "&8UniversalShop &6| &8{page}"
+  cancel: "&cAnnuler"
+  categories: "&6Catégories"
+  categories-title: "UniversalShop | Catégories"
+  close: "&cFermer"
+  confirm: "&aConfirmer"
+  confirm-buy: "&7Acheter {quantity}"
+  confirm-sell: "&7Vendre {quantity}"
+  confirm-title: "UniversalShop | Confirmation"
+  custom-quantity: "&eQuantité personnalisée"
+  deals: "&6Offres du moment"
+  deals-reset: "&7Prochaine rotation (UTC) : {time}"
+  empty: "&eAucun produit correspondant"
+  empty-help: "&7Essayez une autre recherche ou catégorie."
+  favorites: "&eFavoris"
+  list-title: "UniversalShop | Nouvelle annonce"
+  listing-title: "UniversalShop | Achat marché"
+  market: "&bMarché des joueurs"
+  market-all: "&eToutes les annonces actives"
+  market-buy: "&aAcheter pour {price}"
+  market-buy-help: "&eCliquez pour vérifier l’achat"
+  market-claim: "&aRécupérer les objets et les gains"
+  market-claimed: "&a{count} annonces expirées récupérées. Les objets sans place restent conservés."
+  market-complete: "&aTransaction du marché terminée."
+  market-credit: "&7Gains à récupérer : {price}"
+  market-empty: "&eAucune annonce correspondante"
+  market-expired: "&cExpiré : objets conservés pour récupération"
+  market-expired-button: "&eObjets expirés"
+  market-expiry: "&7Expire le : {time}"
+  market-list: "&aVendre l’objet en main"
+  market-listed: "&aAnnonce #{id} publiée."
+  market-mine: "&eMes annonces"
+  market-notices: "&eNotifications de vente : {count}"
+  market-publish: "&aPublier l’annonce"
+  market-reclaim: "&aRécupérer les objets"
+  market-reclaim-help: "&eCliquez pour récupérer les objets"
+  market-seller: "&7Vendeur : {seller}"
+  market-sort: "&eTri : {sort}"
+  market-sort-name: "Nom de l’objet"
+  market-sort-newest: "Plus récentes"
+  market-sort-price: "Prix croissant"
+  market-sort-seller: "Nom du vendeur"
+  market-title: "UniversalShop | Marché joueurs"
+  max-help: "&7Selon l’argent, les objets, le stock et les quotas."
+  max-quantity: "&aMaximum : {quantity}"
+  next: "&ePage suivante"
+  previous: "&ePage précédente"
+  product:
+    buy: "&aAcheter : {price} &7Clic gauche"
+    buy-paused: "&cLes achats sont suspendus pour ce produit."
+    deal: "&6Offre du moment"
+    favorite: "&bClic du milieu : ajouter ou retirer le favori"
+    sell: "&eVendre : {price} &7Clic droit"
+    sell-paused: "&cLes ventes sont suspendues pour ce produit."
+    stack: "&7Maj + clic : une pile"
+    stock: "&7Stock : {stock}"
+  quantity: "&e{quantity} objets"
+  quote-expiry: "&7Prix valable pendant 30 secondes."
+  recent: "&eTransactions récentes"
+  remaining-buy: "&7Quota d’achat restant aujourd’hui : {remaining}"
+  remaining-sell: "&7Quota de vente restant aujourd’hui : {remaining}"
+  search: "&eRechercher"
+  search-help: "&7Recherchez par nom, identifiant ou catégorie."
+  sellall: "&eVendre l’inventaire"
+  sellall-help: "&7Vérifiez les objets avant de les vendre."
+  server-shop: "&eBoutique du serveur"
+  sort: "&eTrier les produits"
+  sort-catalog: "&eOrdre du catalogue"
+  sort-name: "&eNom"
+  sort-price: "&ePrix d’achat"
+  sort-title: "UniversalShop | Tri"
+  switch-buy: "&ePasser à Acheter"
+  switch-sell: "&ePasser à Vendre"
+  total: "&6Total : {price}"
+  unlimited: "Illimité"

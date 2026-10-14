@@ -28,6 +28,10 @@ public final class Economy {
     return provider != null;
   }
 
+  public String providerName() throws Exception {
+    return external() ? String.valueOf(api.getMethod("getName").invoke(provider)) : "INTERNAL";
+  }
+
   public long balance(Player player) throws Exception {
     double amount =
         ((Number) api.getMethod("getBalance", OfflinePlayer.class).invoke(provider, player))

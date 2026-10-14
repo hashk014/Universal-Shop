@@ -1,0 +1,236 @@
+# Placeholders in braces must be preserved. Missing keys use the bundled defaults.
+messages:
+  success: '&aTransaction complete: {quantity} x {product} for {price}.'
+  error: '&c{reason}'
+  balance: '&eBalance: {balance}'
+errors:
+  safe-failure: 'The operation could not finish safely. Contact an administrator.'
+language:
+  changed: '&aLanguage: {language}'
+market:
+  claimed: '&aClaimed {count} item stacks and available seller earnings.'
+  no-notices: '&7No new market notifications.'
+  notifications: '&eYou have {count} market notifications. /shop market notices'
+editor:
+  list-title: '&8Catalog editor | {page}'
+  edit-title: '&8Edit: {id}'
+  list-prices: '&7Buy: {buy} / Sell: {sell}'
+  list-edit: '&eClick to edit this product.'
+  previous: '&ePrevious page'
+  next: '&eNext page'
+  search: '&eSearch products'
+  create: '&aCreate from held item'
+  create-lore: '&7Hold the finished item before opening this menu.'
+  diagnose: '&eCatalog diagnostics'
+  dashboard: '&eAdministration dashboard'
+  disabled: 'disabled'
+  default: 'default'
+  value: '&fCurrent: {value}'
+  replace: '&eReplace template with held item'
+  replace-lore: '&7Preserves the held item''s complete metadata.'
+  preview: '&ePreview product'
+  duplicate: '&eDuplicate this draft'
+  stock-now: '&eSet current stock'
+  back: '&eReturn to catalog'
+  delete: '&cDelete product'
+  save: '&aReview and save'
+  changes: '&7Unsaved fields: {fields}'
+  close: '&eClose (keep draft)'
+  resume: '&7Reopen with /shop admin editor.'
+  prompt-id: '&eEnter a unique product ID (lowercase letters, digits, _ or -).'
+  commands-warning: '&cConsole commands execute with full server privileges: {commands}'
+  commands-confirm: '&cType CONFIRM COMMANDS to stage this command change.'
+  confirm-first: '&cConfirm this change'
+  confirm-final: '&aConfirm and publish'
+  cancel: '&eCancel'
+  preview-title: '&8Product preview'
+  preview-note: '&7Preview only; no purchase is performed.'
+  return: '&eReturn to editor'
+  saved: '&aCatalog saved. Previous file: shops.yml.bak'
+  prompt-search: '&eEnter a product name, ID or category; - clears the search.'
+  replace-confirm: '&eType CONFIRM ITEM to replace the entire item template.'
+  prompt-duplicate: '&eEnter a new unique ID for the duplicate.'
+  prompt-stock-now: '&eEnter current stock (within the saved product capacity).'
+  discard-title: '&8Discard unsaved changes?'
+  review-title: '&8Review catalog changes'
+  review-product: '&fProduct: {id}'
+  save-backup: '&7A previous catalog backup will be kept.'
+  delete-title: '&8Delete product?'
+  delete-warning: '&cProduct {id} will be removed from the catalog.'
+  delete-final-title: '&8Confirm permanent deletion'
+  delete-history: '&7Historical transactions remain in the ledger.'
+  deleted: '&aProduct deleted; previous catalog saved to shops.yml.bak.'
+  field:
+    name: '&eDisplay name'
+    category: '&eCategory'
+    buy: '&aBuy price'
+    sell: '&aSell price'
+    stock: '&eStock capacity'
+    restock-hours: '&eRestock interval'
+    daily-buy-limit: '&eDaily buy limit'
+    daily-sell-limit: '&eDaily sell limit'
+    permission: '&eRequired permission'
+    worlds: '&eAllowed worlds'
+    dynamic:
+      enabled: '&eDynamic pricing'
+      step: '&eDynamic step'
+      min: '&eMinimum multiplier'
+      max: '&eMaximum multiplier'
+      decay-hours: '&eIdle demand half-life'
+    rotating: '&eEligible for deals'
+    rotation-only: '&eOnly during deals'
+    commands: '&cConsole delivery commands'
+  hint:
+    name: '&7Color codes with & are supported.'
+    category: '&7Choose a category name.'
+    buy: '&7Price per item; -1 disables buying.'
+    sell: '&7Price per item; -1 disables selling.'
+    stock: '&7-1 unlimited, otherwise 0 to 1000000000.'
+    restock-hours: '&7Hours; 0 disables automatic restocking.'
+    daily-buy-limit: '&7Units per player per UTC day; 0 unlimited.'
+    daily-sell-limit: '&7Units per player per UTC day; 0 unlimited.'
+    permission: '&7Enter - to clear the permission.'
+    worlds: '&7Comma-separated world names; - for all worlds.'
+    dynamic:
+      enabled: '&7Click to toggle demand-based pricing.'
+      step: '&7Multiplier change for each net purchased item.'
+      min: '&7Positive multiplier, at most the maximum.'
+      max: '&7Multiplier between the minimum and 1000.'
+      decay-hours: '&7Demand halves per full idle interval; 0 preserves it.'
+    rotating: '&7Click to toggle rotating deal eligibility.'
+    rotation-only: '&7Requires rotating deals enabled for this product.'
+    commands: '&7Separate commands with ||; - clears commands.'
+  prompt:
+    buy: '&eEnter the buy price per item (-1 disables buying).'
+    sell: '&eEnter the sell price per item (-1 disables selling).'
+    name: '&eEnter the display name (& color codes supported); - keeps it.'
+    category: '&eEnter the category name; - keeps it during creation.'
+    stock: '&eEnter stock capacity (-1 unlimited; 0 to 1000000000).'
+    restock-hours: '&eEnter restock hours (0 disabled; maximum 876000).'
+    daily-buy-limit: '&eEnter the daily buy limit per player (0 unlimited).'
+    daily-sell-limit: '&eEnter the daily sell limit per player (0 unlimited).'
+    permission: '&eEnter the permission node; - clears it.'
+    worlds: '&eEnter comma-separated world names; - allows all worlds.'
+    dynamic:
+      step: '&eEnter the dynamic multiplier step (zero or positive).'
+      min: '&eEnter the positive minimum price multiplier.'
+      max: '&eEnter the maximum multiplier (up to 1000).'
+      decay-hours: '&eEnter idle half-life hours (0 disabled; maximum 876000).'
+    commands: '&cEnter console commands separated with ||, or - to clear.'
+phrases: []
+
+# Player menus, native forms and private input prompts.
+bedrock:
+  admin-help: "Enable only the modules you need. Stock, statistics and reports appear in chat."
+  browse-help: "Choose a product. Buy and Sell are separate buttons."
+  categories-help: "Choose a category."
+  confirm-buy: "Confirm purchase"
+  confirm-sell: "Confirm sale"
+  expired: "Expired"
+  favorite: "Toggle favorite"
+  market-help: "Review listings or list your held item. Expired items remain safely stored."
+  order-buy: "Buy {quantity} x {product}"
+  order-sell: "Sell {quantity} x {product}"
+  product-buy: "Buy - {price}"
+  product-sell: "Sell - {price}"
+  sellall-title: "UniversalShop | Sell inventory"
+input:
+  cancelled: "&eInput cancelled."
+  help: "&7Reply in chat within 2 minutes. Type cancel to stop. Your reply stays private."
+  market-price: "&eEnter the total price for all {quantity} items:"
+  market-quantity: "&eHow many held items do you want to list?"
+  market-search: "&eSearch item names, materials or sellers (type * for all):"
+  quantity: "&eEnter the quantity for {product}:"
+  search: "&eEnter a product name, category or ID (type * for all):"
+  timeout: "&eInput expired. Open the menu again."
+menu:
+  admin:
+    close: "&cClose shop"
+    editor: "&6Catalog editor"
+    editor-help: "&7Create and edit products in game."
+    open: "&aOpen shop"
+    report: "&eExport sales CSV"
+    stats: "&eSales statistics"
+    stock: "&eStock overview"
+    title: "UniversalShop | Management"
+    toggle: "&7Click to toggle this optional module."
+  all: "&eAll products"
+  back: "&eBack"
+  balance: "&aBalance: {balance}"
+  basket-summary: "&e{count} product types"
+  browse:
+    title: "&8UniversalShop &6| &8{page}"
+  cancel: "&cCancel"
+  categories: "&6Categories"
+  categories-title: "UniversalShop | Categories"
+  close: "&cClose"
+  confirm: "&aConfirm"
+  confirm-buy: "&7Buy {quantity}"
+  confirm-sell: "&7Sell {quantity}"
+  confirm-title: "UniversalShop | Confirm"
+  custom-quantity: "&eCustom quantity"
+  deals: "&6Featured deals"
+  deals-reset: "&7Next rotation (UTC): {time}"
+  empty: "&eNo matching products"
+  empty-help: "&7Try another search or category."
+  favorites: "&eFavorites"
+  list-title: "UniversalShop | Create Listing"
+  listing-title: "UniversalShop | Market Confirm"
+  market: "&bPlayer market"
+  market-all: "&eAll active listings"
+  market-buy: "&aBuy for {price}"
+  market-buy-help: "&eClick to review purchase"
+  market-claim: "&aRecover items and earnings"
+  market-claimed: "&aRecovered {count} expired listings. Items that do not fit remain safely stored."
+  market-complete: "&aMarket transaction complete."
+  market-credit: "&7Unclaimed earnings: {price}"
+  market-empty: "&eNo matching listings"
+  market-expired: "&cExpired - safely stored for recovery"
+  market-expired-button: "&eExpired items"
+  market-expiry: "&7Expires: {time}"
+  market-list: "&aList held item"
+  market-listed: "&aListing #{id} published."
+  market-mine: "&eMy listings"
+  market-notices: "&eSale notifications: {count}"
+  market-publish: "&aPublish listing"
+  market-reclaim: "&aReclaim items"
+  market-reclaim-help: "&eClick to reclaim"
+  market-seller: "&7Seller: {seller}"
+  market-sort: "&eSort: {sort}"
+  market-sort-name: "Item name"
+  market-sort-newest: "Newest first"
+  market-sort-price: "Lowest price"
+  market-sort-seller: "Seller name"
+  market-title: "UniversalShop | Player Market"
+  max-help: "&7Considers money, inventory, stock and quotas."
+  max-quantity: "&aMaximum: {quantity}"
+  next: "&eNext page"
+  previous: "&ePrevious page"
+  product:
+    buy: "&aBuy: {price} &7Left click"
+    buy-paused: "&cPurchases are paused for this product."
+    deal: "&6Featured deal"
+    favorite: "&bMiddle click: toggle favorite"
+    sell: "&eSell: {price} &7Right click"
+    sell-paused: "&cSales are paused for this product."
+    stack: "&7Shift click: stack"
+    stock: "&7Stock: {stock}"
+  quantity: "&e{quantity} items"
+  quote-expiry: "&7Quote expires in 30 seconds."
+  recent: "&eRecent trades"
+  remaining-buy: "&7Buy quota remaining today: {remaining}"
+  remaining-sell: "&7Sell quota remaining today: {remaining}"
+  search: "&eSearch"
+  search-help: "&7Search names, IDs and categories."
+  sellall: "&eSell inventory"
+  sellall-help: "&7Review matching items before selling."
+  server-shop: "&eServer shop"
+  sort: "&eSort products"
+  sort-catalog: "&eCatalog order"
+  sort-name: "&eName"
+  sort-price: "&eBuy price"
+  sort-title: "UniversalShop | Sort"
+  switch-buy: "&eSwitch to Buy"
+  switch-sell: "&eSwitch to Sell"
+  total: "&6Total: {price}"
+  unlimited: "Unlimited"

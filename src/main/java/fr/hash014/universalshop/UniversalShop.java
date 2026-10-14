@@ -23,9 +23,14 @@ public final class UniversalShop extends JavaPlugin
   ShopMenus menus;
   BedrockForms bedrock;
   ShopManagement management;
+  PlayerInputs inputs;
+  CatalogEditor editor;
+  Texts texts;
+  private LedgerLease lease;
   private CommandPolicy commandPolicy = new CommandPolicy(Collections.<String>emptyList());
   long startingBalance;
   private long catalogRevision;
+  private long catalogEditRevision;
   private final Map<UUID, Basket> baskets = new HashMap<UUID, Basket>();
 
   private static final class Basket {
@@ -43,9 +48,11 @@ public final class UniversalShop extends JavaPlugin
   @Override
   public void onEnable() {
     try {
+      lease = new LedgerLease(getDataFolder().toPath());
       saveDefaultConfig();
       saveResourceIfMissing("shops.yml");
       validateConfig();
+      texts = new Texts(this);
       loadCatalog();
       store = new Store(getDataFolder().toPath());
       String mode = getConfig().getString("economy", "INTERNAL").toUpperCase(Locale.ROOT);
@@ -55,6 +62,21 @@ public final class UniversalShop extends JavaPlugin
             "Economy mode differs from the saved ledger. Follow the documented offline migration"
                 + " procedure.");
       Economy economy = new Economy(mode);
+      if (economy.external()) {
+        String provider = economy.providerName();
+        String previousProvider = store.state().getString("economy-provider", provider);
+        ConfigurationSection credits = store.state().getConfigurationSection("market-credits");
+        boolean owesCredits = false;
+        if (credits != null) for (String id : credits.getKeys(false))
+          if (credits.getLong(id) > 0) owesCredits = true;
+        if (!provider.equals(previousProvider) && owesCredits)
+          throw new IllegalStateException("The Vault provider changed while seller credits remain. Collect or migrate liabilities with the original provider first.");
+        if (!provider.equals(store.state().getString("economy-provider", "")) && !store.blocked()) {
+          YamlConfiguration binding = store.copy();
+          binding.set("economy-provider", provider);
+          store.save(binding, "BIND VAULT PROVIDER " + provider);
+        }
+      }
       if (!store.state().contains("economy-mode")) {
         YamlConfiguration initial = store.copy();
         initial.set("economy-mode", mode);
@@ -63,10 +85,13 @@ public final class UniversalShop extends JavaPlugin
       service = new ShopService(this, store, economy);
       menus = new ShopMenus(this);
       bedrock = new BedrockForms(this);
+      inputs = new PlayerInputs(this);
+      editor = new CatalogEditor(this);
       getCommand("shop").setExecutor(this);
       getCommand("shop").setTabCompleter(this);
       getServer().getPluginManager().registerEvents(this, this);
       getServer().getPluginManager().registerEvents(menus, this);
+      getServer().getPluginManager().registerEvents(editor, this);
       getLogger()
           .info(
               "Loaded "
@@ -88,13 +113,27 @@ public final class UniversalShop extends JavaPlugin
   @Override
   public void onDisable() {
     for (Player p : onlinePlayers())
-      if (p.getOpenInventory().getTopInventory().getHolder() instanceof ShopMenus.Menu)
+      if (p.getOpenInventory().getTopInventory().getHolder() instanceof ShopMenus.Menu
+          || p.getOpenInventory().getTopInventory().getHolder() instanceof CatalogEditor.Menu)
         p.closeInventory();
     baskets.clear();
     if (bedrock != null) bedrock.sessions.clear();
+    if (inputs != null) inputs.clear();
+    if (editor != null) editor.clear();
+    if (menus != null) menus.clear();
+    if (store != null) {
+      try { store.close(); }
+      catch (Exception e) { getLogger().log(java.util.logging.Level.SEVERE, "Could not checkpoint the ledger during shutdown; durable audit records remain available.", e); }
+    }
+    if (lease != null) {
+      try { lease.close(); }
+      catch (Exception e) { getLogger().log(java.util.logging.Level.SEVERE, "Could not release ledger lease.", e); }
+      lease = null;
+    }
   }
 
   private void validateConfig() throws Exception {
+    Texts.language(getConfig().getString("language", "en"));
     commandPolicy = new CommandPolicy(getConfig().getStringList("disabled-commands"));
     startingBalance = Money.parse(String.valueOf(getConfig().get("starting-balance", 100)));
     for (String field :
@@ -117,6 +156,11 @@ public final class UniversalShop extends JavaPlugin
     if (getConfig().getInt("rotation.count", 3) < 0
         || getConfig().getInt("market.max-listings-per-player", 10) < 1)
       throw new IllegalArgumentException("Invalid rotation or market count.");
+    int listings = getConfig().getInt("market.max-total-listings", 10000);
+    if (listings < 1 || listings > 100000)
+      throw new IllegalArgumentException("market.max-total-listings must be between 1 and 100000.");
+    if (Money.parse(String.valueOf(getConfig().get("market.min-price", "0.01"))) < 1)
+      throw new IllegalArgumentException("market.min-price must be at least 0.01.");
     String start = getConfig().getString("promotion.starts", ""),
         end = getConfig().getString("promotion.ends", "");
     if (!start.isEmpty() || !end.isEmpty())
@@ -144,6 +188,7 @@ public final class UniversalShop extends JavaPlugin
     YamlConfiguration yaml = new YamlConfiguration();
     yaml.load(new File(getDataFolder(), "shops.yml"));
     products = parseCatalog(yaml);
+    catalogEditRevision++;
     catalogRevision++;
     baskets.clear();
   }
@@ -178,26 +223,32 @@ public final class UniversalShop extends JavaPlugin
 
   public void tell(CommandSender sender, String text) {
     sender.sendMessage(
-        color(getConfig().getString("messages.prefix", "&6UniversalShop &8> &r") + text));
+        color(getConfig().getString("messages.prefix", "&6UniversalShop &8> &r")
+            + (texts == null ? text : texts.translate(sender, text))));
   }
 
   public void message(CommandSender sender, String key, String... replacements) {
     String text = getConfig().getString("messages." + key, key);
+    String defaultText = getConfig().getDefaults() == null ? text : getConfig().getDefaults().getString("messages." + key, text);
+    if (texts != null && (!texts.locale(sender).equals("en") || text.equals(defaultText)))
+      text = texts.format(sender, "messages." + key, text);
     for (int i = 0; i < replacements.length; i += 2)
       text = text.replace("{" + replacements[i] + "}", replacements[i + 1]);
     tell(sender, text);
   }
 
   public void failure(CommandSender sender, Exception e) {
-    if (e instanceof IllegalArgumentException || e instanceof IllegalStateException)
+    if (e instanceof IllegalArgumentException || e instanceof IllegalStateException || e instanceof ArithmeticException)
       message(
-          sender, "error", "reason", e.getMessage() == null ? "Invalid input." : e.getMessage());
+          sender, "error", "reason", texts == null ? (e instanceof ArithmeticException ? "Amounts must have at most two decimal places and stay within the supported range." : e.getMessage() == null ? "Invalid input." : e.getMessage())
+              : texts.translate(sender, e instanceof ArithmeticException ? "Amounts must have at most two decimal places and stay within the supported range." : e.getMessage() == null ? "Invalid input." : e.getMessage()));
     else {
       message(
           sender,
           "error",
           "reason",
-          "The operation could not finish safely. Contact an administrator.");
+          texts == null ? "The operation could not finish safely. Contact an administrator."
+              : texts.format(sender, "errors.safe-failure", "The operation could not finish safely. Contact an administrator."));
       getLogger()
           .log(
               java.util.logging.Level.SEVERE,
@@ -212,9 +263,13 @@ public final class UniversalShop extends JavaPlugin
     return (Player) sender;
   }
 
-  private void admin(CommandSender sender) {
-    if (!sender.hasPermission("universalshop.admin"))
-      throw new IllegalArgumentException("Administrator permission required.");
+  public boolean hasAdmin(CommandSender sender, String action) {
+    return AdminPermissions.allowed(sender::hasPermission, action);
+  }
+
+  public void requireAdmin(CommandSender sender, String action) {
+    if (!hasAdmin(sender, action))
+      throw new IllegalArgumentException("Administrator permission required: universalshop.admin." + AdminPermissions.scope(action));
   }
 
   private void usage(boolean valid, String syntax) {
@@ -229,8 +284,8 @@ public final class UniversalShop extends JavaPlugin
     if (items.isEmpty())
       throw new IllegalArgumentException("No sellable items were found in your storage slots.");
     long total = service.basketQuote(p, items);
-    if (bedrock.sellAll(p, items, total)) return;
     baskets.put(p.getUniqueId(), new Basket(items, total, catalogRevision));
+    if (menus.sellAll(p, items, total)) return;
     tell(p, "&eInventory sale: " + items + ". Total: " + money(total));
     tell(
         p,
@@ -248,7 +303,7 @@ public final class UniversalShop extends JavaPlugin
       }
       String sub = args[0].toLowerCase(Locale.ROOT);
       if (sub.equals("test") && Boolean.getBoolean("universalshop.test")) {
-        admin(sender);
+        requireAdmin(sender, "manage");
         new ServerTests(this).run(sender, args);
         return true;
       }
@@ -257,8 +312,15 @@ public final class UniversalShop extends JavaPlugin
         return true;
 
       } else if (sub.equals("admin")) {
-        admin(sender);
         adminCommand(sender, args);
+      } else if (sub.equals("language")) {
+        usage(args.length == 2, "/shop language <en|fr|auto>");
+        Player p = player(sender);
+        if (!p.hasPermission("universalshop.language")) throw new IllegalArgumentException("Language permission required.");
+        if (!getConfig().getBoolean("player-language", true)) throw new IllegalArgumentException("Player language preferences are disabled.");
+        texts.setLocale(p.getUniqueId(), args[1]);
+        invalidateView(p);
+        tell(p, texts.format(p, "language.changed", "&aLanguage: {language}", "language", texts.locale(p)));
       } else if (sub.equals("balance")) {
         Player p = player(sender);
         service.allowed(p);
@@ -323,6 +385,17 @@ public final class UniversalShop extends JavaPlugin
   }
 
   private void marketCommand(Player p, String[] args) throws Exception {
+    if (args.length == 2 && args[1].equalsIgnoreCase("claim")) {
+      int count = service.claimExpired(p);
+      tell(p, texts.format(p, "market.claimed", "&aClaimed {count} item stacks and available seller earnings.", "count", String.valueOf(count)));
+      return;
+    }
+    if (args.length == 2 && args[1].equalsIgnoreCase("notices")) {
+      List<String> notices = service.consumeNotifications(p);
+      if (notices.isEmpty()) tell(p, texts.format(p, "market.no-notices", "&7No new market notifications."));
+      for (String notice : notices) tell(p, "&e" + notice);
+      return;
+    }
     if (args.length <= 2 && (args.length == 1 || args[1].matches("[0-9]+"))) {
       menus.market(p, args.length == 2 ? Math.max(0, Integer.parseInt(args[1]) - 1) : 0);
       return;
@@ -344,10 +417,30 @@ public final class UniversalShop extends JavaPlugin
   }
 
   private void adminCommand(CommandSender sender, String[] args) throws Exception {
+    if (args.length == 1) {
+      requireAdmin(sender, "panel");
+      menus.adminPanel(player(sender));
+      return;
+    }
     usage(
         args.length >= 2,
         "/shop admin <add|remove|price|stock|balance|history|reload|recovery|export>");
     String action = args[1].toLowerCase(Locale.ROOT);
+    requireAdmin(sender, action.equals("manage")
+        ? "manage." + (args.length > 2 ? args[2].toLowerCase(Locale.ROOT) : "status") : action);
+    if (action.equals("editor")) {
+      editor.open(player(sender));
+      return;
+    }
+    if (action.equals("diagnose")) {
+      for (String issue : CatalogDiagnostics.inspect(this)) tell(sender, "&e" + issue);
+      for (String line : store.diagnostics()) tell(sender, "&7" + line);
+      return;
+    }
+    if (action.equals("backup")) {
+      tell(sender, "&aBackup saved: " + store.backup().getFileName());
+      return;
+    }
     if (action.equals("panel")) {
       menus.adminPanel(player(sender));
       return;
@@ -373,12 +466,12 @@ public final class UniversalShop extends JavaPlugin
       if (args[2].equalsIgnoreCase("enable")) disabled.removeAll(Collections.singleton(path));
       else if (!disabled.contains(path)) disabled.add(path);
       YamlConfiguration next = new YamlConfiguration();
-      next.loadFromString(getConfig().saveToString());
+      next.loadFromString(SafeYaml.write(getConfig()));
       next.set("disabled-commands", disabled);
-      AtomicFiles.write(getDataFolder().toPath().resolve("config.yml"), next.saveToString());
+      AtomicFiles.write(getDataFolder().toPath().resolve("config.yml"), SafeYaml.write(next));
       getConfig().set("disabled-commands", disabled);
       commandPolicy = new CommandPolicy(disabled);
-      bedrock.sessions.clear();
+      invalidateViews();
       tell(sender, "&aDisabled commands: " + disabled);
       return;
     }
@@ -401,17 +494,31 @@ public final class UniversalShop extends JavaPlugin
       return;
     }
     if (action.equals("history")) {
-      usage(args.length <= 3, "/shop admin history [lines]");
-      List<String> history = store.state().getStringList("history");
-      int count = args.length == 3 ? Math.max(1, Math.min(200, Integer.parseInt(args[2]))) : 10;
-      for (String line : history.subList(Math.max(0, history.size() - count), history.size()))
+      if (args.length >= 3 && args[2].equalsIgnoreCase("csv")) {
+        String filter = args.length > 3 ? join(args, 3) : "";
+        Path path = getDataFolder().toPath().resolve("exports/audit-" + System.currentTimeMillis() + ".csv");
+        AtomicFiles.write(path, store.auditCsv(filter));
+        tell(sender, "&aExported " + path.getFileName());
+        return;
+      }
+      String filter = "";
+      int count = 10;
+      int end = args.length;
+      if (end > 2 && args[end - 1].matches("[0-9]+")) {
+        count = Integer.parseInt(args[end - 1]);
+        end--;
+      }
+      if (end > 2) filter = join(Arrays.copyOf(args, end), 2);
+      List<String> history = store.auditHistory(filter, Math.max(1, Math.min(1000, count)));
+      if (history.isEmpty()) tell(sender, "&7No matching transactions.");
+      for (String line : history)
         tell(sender, "&7" + line);
       return;
     }
     if (action.equals("export")) {
       Path path =
           getDataFolder().toPath().resolve("exports/state-" + System.currentTimeMillis() + ".yml");
-      AtomicFiles.write(path, store.state().saveToString());
+      AtomicFiles.write(path, SafeYaml.write(store.state()));
       tell(sender, "&aExported " + path.getFileName());
       return;
     }
@@ -424,11 +531,12 @@ public final class UniversalShop extends JavaPlugin
           .equalsIgnoreCase(getConfig().getString("economy", "INTERNAL")))
         throw new IllegalArgumentException(
             "Changing economy requires a server restart and a planned balance migration.");
-      String previous = getConfig().saveToString();
+      String previous = SafeYaml.write(getConfig());
       long previousBalance = startingBalance;
       try {
-        getConfig().loadFromString(candidate.saveToString());
+        getConfig().loadFromString(SafeYaml.write(candidate));
         validateConfig();
+        texts.reload();
         loadCatalog();
       } catch (Exception e) {
         getConfig().loadFromString(previous);
@@ -442,6 +550,8 @@ public final class UniversalShop extends JavaPlugin
           p.closeInventory();
       tell(sender, "&aConfiguration and catalog reloaded.");
       bedrock.sessions.clear();
+      editor.clear();
+      inputs.clear();
       return;
     }
     if (action.equals("balance")) {
@@ -466,12 +576,11 @@ public final class UniversalShop extends JavaPlugin
             "products." + product.id + ".restock",
             System.currentTimeMillis() / (product.restockHours * 3600000L));
       store.save(next, "ADMIN STOCK " + product.id + "=" + stock);
+      invalidateViews();
       tell(sender, "&aStock updated.");
       return;
     }
-    YamlConfiguration catalog = new YamlConfiguration();
-    File file = new File(getDataFolder(), "shops.yml");
-    catalog.load(file);
+    YamlConfiguration catalog = catalogCopy();
     if (action.equals("add")) {
       usage(args.length >= 5, "/shop admin add <id> <buy|-1> <sell|-1> [category]");
       if (!args[2].matches("[a-z0-9_-]{1,48}"))
@@ -522,13 +631,25 @@ public final class UniversalShop extends JavaPlugin
           "products." + source.id + (action.equals("rename") ? ".name" : ".category"),
           join(args, 3));
     } else throw new IllegalArgumentException("Unknown admin command. Use /shop help.");
-    parseCatalog(catalog);
-    AtomicFiles.write(
-        file.toPath().resolveSibling("shops.yml.bak"),
-        new String(Files.readAllBytes(file.toPath()), java.nio.charset.StandardCharsets.UTF_8));
-    AtomicFiles.write(file.toPath(), catalog.saveToString());
-    loadCatalog();
+    saveCatalog(catalog);
     tell(sender, "&aCatalog saved. Previous file: shops.yml.bak");
+  }
+
+  public YamlConfiguration catalogCopy() throws Exception {
+    YamlConfiguration catalog = new YamlConfiguration();
+    catalog.load(new File(getDataFolder(), "shops.yml"));
+    return catalog;
+  }
+
+  public void saveCatalog(YamlConfiguration catalog) throws Exception {
+    Map<String, Product> checked = parseCatalog(catalog);
+    Path file = getDataFolder().toPath().resolve("shops.yml");
+    String previous = new String(Files.readAllBytes(file), java.nio.charset.StandardCharsets.UTF_8);
+    AtomicFiles.write(file.resolveSibling("shops.yml.bak"), previous);
+    AtomicFiles.write(file, SafeYaml.write(catalog));
+    products = checked;
+    catalogEditRevision++;
+    invalidateViews();
   }
 
   private String join(String[] args, int from) {
@@ -569,18 +690,19 @@ public final class UniversalShop extends JavaPlugin
               "search",
               "category",
               "deals",
+              "language",
               "market"));
     if (args.length == 1) {
       if (management.enabled("personal"))
         values.addAll(Arrays.asList("favorite", "favorites", "recent", "sort"));
       if (management.enabled("analytics")) values.add("stats");
     }
-    if (args.length == 1 && sender.hasPermission("universalshop.admin")) values.add("admin");
+    if (args.length == 1 && hasAdmin(sender, "panel")) values.add("admin");
     if (args.length == 2 && (args[0].equalsIgnoreCase("buy") || args[0].equalsIgnoreCase("sell")))
       values.addAll(products.keySet());
     if (args.length == 2
         && args[0].equalsIgnoreCase("admin")
-        && sender.hasPermission("universalshop.admin"))
+        && hasAdmin(sender, "panel"))
       values.addAll(
           Arrays.asList(
               "add",
@@ -598,10 +720,12 @@ public final class UniversalShop extends JavaPlugin
               "duplicate",
               "rename",
               "category"));
+    if (args.length == 2 && args[0].equalsIgnoreCase("admin") && hasAdmin(sender, "panel"))
+      values.addAll(Arrays.asList("editor", "diagnose", "backup"));
     if (args.length == 3
         && args[0].equalsIgnoreCase("admin")
         && args[1].equalsIgnoreCase("manage")
-        && sender.hasPermission("universalshop.admin"))
+        && hasAdmin(sender, "panel"))
       values.addAll(
           Arrays.asList(
               "status",
@@ -621,7 +745,7 @@ public final class UniversalShop extends JavaPlugin
     if (args.length == 4
         && args[0].equalsIgnoreCase("admin")
         && args[1].equalsIgnoreCase("manage")
-        && sender.hasPermission("universalshop.admin")) {
+        && hasAdmin(sender, "panel")) {
       if (args[2].equalsIgnoreCase("enable") || args[2].equalsIgnoreCase("disable"))
         values.addAll(ManagementPolicy.MODULES);
       if (Arrays.asList("pause", "resume", "restock", "reset-demand", "stats")
@@ -632,7 +756,9 @@ public final class UniversalShop extends JavaPlugin
     if (args.length == 2 && args[0].equalsIgnoreCase("sort") && management.enabled("personal"))
       values.addAll(Arrays.asList("catalog", "name", "price"));
     if (args.length == 2 && args[0].equalsIgnoreCase("market"))
-      values.addAll(Arrays.asList("list", "buy", "cancel"));
+      values.addAll(Arrays.asList("list", "buy", "cancel", "claim", "notices"));
+    if (args.length == 2 && args[0].equalsIgnoreCase("language"))
+      values.addAll(Arrays.asList("en", "fr", "auto"));
     String prefix = args[args.length - 1].toLowerCase(Locale.ROOT);
     Iterator<String> it = values.iterator();
     while (it.hasNext()) {
@@ -640,7 +766,12 @@ public final class UniversalShop extends JavaPlugin
       String[] completed = args.clone();
       completed[completed.length - 1] = value;
       if (!value.toLowerCase(Locale.ROOT).startsWith(prefix)
-          || !actionEnabled(sender, CommandPolicy.path(completed))) it.remove();
+          || !actionEnabled(sender, CommandPolicy.path(completed))
+          || (completed.length >= 2 && completed[0].equalsIgnoreCase("admin")
+              && !(completed[1].equalsIgnoreCase("manage") && completed.length == 2
+                  ? hasAdmin(sender, "manage") || hasAdmin(sender, "stock") || hasAdmin(sender, "history")
+                  : hasAdmin(sender, completed[1].equalsIgnoreCase("manage") && completed.length >= 3
+                      ? "manage." + completed[2] : completed[1])))) it.remove();
     }
     return values;
   }
@@ -650,6 +781,21 @@ public final class UniversalShop extends JavaPlugin
     bedrock.sessions.close(e.getPlayer().getUniqueId());
     baskets.remove(e.getPlayer().getUniqueId());
     service.forget(e.getPlayer().getUniqueId());
+    inputs.cancel(e.getPlayer().getUniqueId());
+    editor.forget(e.getPlayer().getUniqueId());
+    menus.forget(e.getPlayer().getUniqueId());
+  }
+
+  @EventHandler
+  public void join(final PlayerJoinEvent e) {
+    getServer().getScheduler().runTaskLater(this, new Runnable() {
+      public void run() {
+        Player p = e.getPlayer();
+        if (!p.isOnline()) return;
+        int count = service.notificationCount(p);
+        if (count > 0) tell(p, texts.format(p, "market.notifications", "&eYou have {count} market notifications. /shop market notices", "count", String.valueOf(count)));
+      }
+    }, 40L);
   }
 
   boolean actionEnabled(CommandSender sender, String action) {
@@ -666,13 +812,26 @@ public final class UniversalShop extends JavaPlugin
     return catalogRevision;
   }
 
-  void invalidateViews() {
+  long catalogEditRevision() { return catalogEditRevision; }
+
+  public void invalidateViews() {
     catalogRevision++;
     baskets.clear();
     if (bedrock != null) bedrock.sessions.clear();
+    if (inputs != null) inputs.clear();
     for (Player player : onlinePlayers())
-      if (player.getOpenInventory().getTopInventory().getHolder() instanceof ShopMenus.Menu)
+      if (player.getOpenInventory().getTopInventory().getHolder() instanceof ShopMenus.Menu
+          || player.getOpenInventory().getTopInventory().getHolder() instanceof CatalogEditor.Menu)
         player.closeInventory();
+  }
+
+  private void invalidateView(Player player) {
+    baskets.remove(player.getUniqueId());
+    if (inputs != null) inputs.cancel(player.getUniqueId());
+    if (bedrock != null) bedrock.sessions.close(player.getUniqueId());
+    if (player.getOpenInventory().getTopInventory().getHolder() instanceof ShopMenus.Menu
+        || player.getOpenInventory().getTopInventory().getHolder() instanceof CatalogEditor.Menu)
+      player.closeInventory();
   }
 
   private void showHelp(CommandSender sender) {
@@ -691,9 +850,17 @@ public final class UniversalShop extends JavaPlugin
       {"market.list", "/shop market list <amount> <total price>"},
       {"market.buy", "/shop market buy <id> confirm"},
       {"market.cancel", "/shop market cancel <id> confirm"},
+      {"market.claim", "/shop market claim - reclaim expired listings and seller earnings"},
+      {"market.notices", "/shop market notices"},
+      {"language", "/shop language <en|fr|auto>"},
       {"admin.command", "/shop admin command [enable|disable <path>]"},
       {"admin.manage", "/shop admin manage [action] - optional management modules"},
+      {"admin.manage.stock", "/shop admin manage stock|restock|reset-demand [product]"},
+      {"admin.manage.stats", "/shop admin manage stats|report [product]"},
       {"admin.panel", "/shop admin panel - management dashboard"},
+      {"admin.editor", "/shop admin editor - edit the catalog in game"},
+      {"admin.diagnose", "/shop admin diagnose - catalog and ledger diagnostics"},
+      {"admin.backup", "/shop admin backup - ledger backup"},
       {"admin.duplicate", "/shop admin duplicate <source> <new-id>"},
       {"admin.rename", "/shop admin rename <id> <name>"},
       {"admin.category", "/shop admin category <id> <category>"},
@@ -703,13 +870,13 @@ public final class UniversalShop extends JavaPlugin
       {"admin.price", "/shop admin price <id> <buy> <sell>"},
       {"admin.stock", "/shop admin stock <id> <quantity>"},
       {"admin.balance", "/shop admin balance <online player|uuid> <amount>"},
-      {"admin.history", "/shop admin history [lines]"},
+      {"admin.history", "/shop admin history [filter] [lines] or csv [filter]"},
       {"admin.export", "/shop admin export"},
       {"admin.recovery", "/shop admin recovery [commit|abort] confirm"}
     };
     for (String[] entry : entries)
       if (actionEnabled(sender, entry[0])
-          && (!entry[0].startsWith("admin.") || sender.hasPermission("universalshop.admin")))
+          && (!entry[0].startsWith("admin.") || hasAdmin(sender, entry[0])))
         tell(sender, "&e" + entry[1]);
     if (management.enabled("personal"))
       for (String action : Arrays.asList("favorite", "favorites", "recent", "sort"))
@@ -728,7 +895,7 @@ public final class UniversalShop extends JavaPlugin
   @EventHandler(ignoreCancelled = true)
   public void signCreate(SignChangeEvent e) {
     if (!e.getLine(0).equalsIgnoreCase("[ushop]")) return;
-    if (!e.getPlayer().hasPermission("universalshop.admin")) {
+    if (!hasAdmin(e.getPlayer(), "sign")) {
       e.setCancelled(true);
       tell(e.getPlayer(), "&cOnly administrators can create shop signs.");
       return;

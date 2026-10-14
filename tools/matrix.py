@@ -60,6 +60,15 @@ def scenario(version,args):
         data=plugins/'UniversalShop';data.mkdir(exist_ok=True)
         config=(ROOT/'src/main/resources/config.yml').read_text().replace('economy: INTERNAL','economy: VAULT')
         (data/'config.yml').write_text(config)
+        # Decline-after-preflight scenarios require a provider with overdraft disabled.
+        # This is confined to the disposable test server, never production provider data.
+        essentials=plugins/'Essentials';essentials.mkdir(exist_ok=True)
+        provider_config=essentials/'config.yml'
+        provider_text=provider_config.read_text(encoding='utf-8') if provider_config.exists() else ''
+        if re.search(r'^min-money:',provider_text,re.M):
+            provider_text=re.sub(r'^min-money:.*$', 'min-money: 0',provider_text,flags=re.M)
+        else: provider_text+='\nmin-money: 0\n'
+        provider_config.write_text(provider_text,encoding='utf-8')
     with socket.socket() as reservation:
         reservation.bind(('127.0.0.1',0));port=reservation.getsockname()[1]
     (folder/'eula.txt').write_text('eula=true\n')

@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack;
 public final class Product {
   public final String id, name, category, permission;
   public final ItemStack item;
-  public final long buy, sell, stock, restockHours, dailyBuy, dailySell;
+  public final long buy, sell, stock, restockHours, dailyBuy, dailySell, decayHours;
   public final double step, min, max;
   public final boolean rotating, rotationOnly;
   public final List<String> commands, worlds;
@@ -53,6 +53,9 @@ public final class Product {
         || dailyBuy < 0
         || dailySell < 0) throw new IllegalArgumentException("Invalid stock/limit for " + id);
     boolean dynamic = s.getBoolean("dynamic.enabled", false);
+    decayHours = dynamic ? s.getLong("dynamic.decay-hours", 0) : 0;
+    if (decayHours < 0 || decayHours > 876000)
+      throw new IllegalArgumentException("Invalid dynamic decay hours for " + id);
     step = dynamic ? s.getDouble("dynamic.step", .005) : 0;
     min = dynamic ? s.getDouble("dynamic.min", .5) : 1;
     max = dynamic ? s.getDouble("dynamic.max", 2) : 1;

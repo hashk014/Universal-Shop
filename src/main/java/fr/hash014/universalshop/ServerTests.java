@@ -175,7 +175,7 @@ final class ServerTests {
 
   private void live(final Player player, final Player buyer) throws Exception {
     if (p.service.economy.external()) {
-      vault(player);
+      vault(player, buyer);
       return;
     }
     p.getConfig().set("cooldown-milliseconds", 0);
@@ -189,6 +189,7 @@ final class ServerTests {
     p.service.setBalance(player.getUniqueId(), 10000000);
     p.service.setBalance(buyer.getUniqueId(), 10000000);
     management(player, buyer);
+    referenceV2(player, buyer);
     final Product stone = p.product("stone");
     p.onCommand(
         Bukkit.getConsoleSender(),
@@ -389,6 +390,134 @@ final class ServerTests {
             4);
   }
 
+  private void referenceV2(Player player, Player buyer) throws Exception {
+    String config = SafeYaml.write(p.getConfig());
+    long wallet = p.service.balance(player), buyerWallet = p.service.balance(buyer);
+    Product stone = p.product("stone");
+    org.bukkit.event.Listener guard = new org.bukkit.event.Listener() {};
+    try {
+      player.getInventory().clear(); buyer.getInventory().clear();
+      p.service.setBalance(player.getUniqueId(), 10000);
+      YamlConfiguration cleanBudgets = p.store.copy();
+      cleanBudgets.set("management.daily." + player.getUniqueId(), null);
+      p.store.save(cleanBudgets, "TEST V2 clear previous daily budget");
+      check(p.service.maxQuantity(player, stone, true) == 50, "Maximum purchase respects exact available balance");
+      player.getInventory().setItem(0, new ItemStack(Material.STONE, 7));
+      check(p.service.maxQuantity(player, stone, false) == 7, "Maximum sale counts matching metadata");
+      p.service.setBalance(player.getUniqueId(), Money.MAX);
+      check(p.service.maxQuantity(player, stone, false) == 0, "Maximum sale respects wallet upper bound");
+      p.service.setBalance(player.getUniqueId(), 10000);
+      YamlConfiguration serviceConfig = new YamlConfiguration();
+      serviceConfig.set("material", "STONE"); serviceConfig.set("buy", 1); serviceConfig.set("sell", -1);
+      serviceConfig.set("commands", Arrays.asList("say test")); serviceConfig.set("stock", 0);
+      Product emptyService = new Product("test_v2_empty_service", serviceConfig);
+      check(p.service.maxQuantity(player, emptyService, true) == 0, "Maximum service quantity respects finite stock");
+      check(Inventories.capacity(Inventories.snapshot(player), stone.item) == 2297, "Inventory capacity includes partial stacks");
+      YamlConfiguration limited = new YamlConfiguration();
+      limited.set("material", "STONE"); limited.set("buy", 2); limited.set("sell", 0.5); limited.set("daily-buy-limit", 2);
+      Product quota = new Product("test_v2_quota", limited); p.products.put(quota.id, quota);
+      check(p.service.maxQuantity(player, quota, true) == 2, "Maximum purchase includes daily quota");
+      p.service.trade(player, quota, 1, true, null);
+      check(p.service.remainingLimit(player, quota, true) == 1, "Remaining daily quota is accurate after commit");
+      p.getConfig().set("management.budgets.enabled", true);
+      p.getConfig().set("management.budgets.daily-spend", 4);
+      p.management = new ShopManagement(p);
+      check(p.service.maxQuantity(player, stone, true) == 2, "Maximum quantity includes managed budget");
+      p.getConfig().set("management.budgets.enabled", false); p.management = new ShopManagement(p);
+      org.bukkit.permissions.PermissionAttachment perms = player.addAttachment(p);
+      perms.setPermission("universalshop.admin", false);
+      perms.setPermission("universalshop.admin.stock", true);
+      check(p.hasAdmin(player, "stock"), "Delegated stock permission works");
+      check(!p.hasAdmin(player, "balance"), "Stock administrator cannot set balances");
+      player.removeAttachment(perms);
+      player.getInventory().clear(); player.getInventory().setItem(0, new ItemStack(Material.EMERALD, 6));
+      String expired = p.service.list(player, 2, 100);
+      YamlConfiguration next = p.store.copy(); next.set("market." + expired + ".expires", 1L);
+      p.store.save(next, "TEST V2 expiration");
+      check(!p.service.marketEntries(buyer, "", "newest", false).contains(expired), "Expired listings are hidden from public browsing");
+      check(p.service.marketEntries(player, "@expired", "newest", true).contains(expired), "Expired listings remain in seller recovery view");
+      check(p.service.claimExpired(player) == 1, "Expired listings reclaimed in batch");
+      check(Inventories.count(Inventories.snapshot(player), new ItemStack(Material.EMERALD)) == 6, "Batch reclaim returns exact escrow");
+      check(p.service.claimExpired(player) == 0, "Repeated expired claim delivers nothing");
+      String cheap = p.service.list(player, 1, 100), expensive = p.service.list(player, 1, 200);
+      List<String> prices = p.service.marketEntries(buyer, "emerald", "price", false);
+      check(prices.indexOf(cheap) < prices.indexOf(expensive), "Market filter and price ordering");
+      p.service.marketTake(player, cheap, true); p.service.marketTake(player, expensive, true);
+      Bukkit.getPluginManager().registerEvent(ShopMarketEvent.class, guard, org.bukkit.event.EventPriority.NORMAL,
+          (listener, event) -> ((ShopMarketEvent) event).setCancelled(true), p);
+      long before = p.service.balance(player);
+      rejects(() -> p.service.list(player, 1, 100), "Market extension can cancel before preparation");
+      check(!p.store.blocked() && p.service.balance(player) == before
+          && Inventories.count(Inventories.snapshot(player), new ItemStack(Material.EMERALD)) == 6,
+          "Cancelled market event leaves inventory and ledger unchanged");
+      org.bukkit.event.HandlerList.unregisterAll(guard);
+      p.menus.browse(player, "stone", 0);
+      check(player.getOpenInventory().getTopInventory().getSize() == 54, "Refined browse remains a normal inventory");
+      p.menus.browse(buyer, "stone", 0);
+      org.bukkit.inventory.Inventory buyerMenu = buyer.getOpenInventory().getTopInventory();
+      p.onCommand(player, p.getCommand("shop"), "shop", new String[] {"language", "fr"});
+      check(buyer.getOpenInventory().getTopInventory() == buyerMenu, "One player changing language does not close another player's menu");
+      p.menus.confirm(player, stone, 1, true);
+      check(!player.getOpenInventory().getTitle().contains("&"), "French inventory title renders color codes");
+      p.onCommand(player, p.getCommand("shop"), "shop", new String[] {"language", "auto"});
+      p.editor.open(player);
+      check(player.getOpenInventory().getTopInventory().getSize() >= 27, "Catalog editor opens for administrator");
+      player.closeInventory();
+      ItemStack custom = new ItemStack(Material.EMERALD);
+      ItemMeta customMeta = custom.getItemMeta(); customMeta.setDisplayName("Original Custom Emerald");
+      customMeta.setLore(Arrays.asList("Original protected lore")); custom.setItemMeta(customMeta);
+      YamlConfiguration customConfig = new YamlConfiguration(); customConfig.set("item", custom);
+      customConfig.set("name", "Custom Emerald"); customConfig.set("buy", 1); customConfig.set("sell", -1);
+      Product customProduct = new Product("test_v2_custom", customConfig); p.products.put(customProduct.id, customProduct);
+      p.menus.confirm(player, customProduct, 1, true);
+      check(player.getOpenInventory().getTopInventory().getItem(13).getItemMeta().getLore().contains("Original protected lore"), "Confirmation preserves exact custom lore");
+      p.products.remove(customProduct.id); player.closeInventory();
+      ItemStack unicodeItem = new ItemStack(Material.DIAMOND_SWORD, 1, (short) 7);
+      ItemMeta unicodeMeta = unicodeItem.getItemMeta(); unicodeMeta.setDisplayName("Blade \uD83D\uDECD");
+      unicodeMeta.setLore(Arrays.asList("Protected lore \uD83D\uDED2"));
+      org.bukkit.enchantments.Enchantment enchantment = org.bukkit.enchantments.Enchantment.getByName("DURABILITY");
+      if (enchantment == null) enchantment = org.bukkit.enchantments.Enchantment.getByName("UNBREAKING");
+      check(enchantment != null, "Enchantment alias available for Unicode metadata fixture");
+      unicodeMeta.addEnchant(enchantment, 2, true); unicodeItem.setItemMeta(unicodeMeta);
+      Path unicodeFolder = p.getDataFolder().toPath().resolve("test-unicode-ledger");
+      Store unicodeStore = new Store(unicodeFolder);
+      YamlConfiguration unicodeNext = unicodeStore.copy(); unicodeNext.set("custom-item", unicodeItem);
+      unicodeNext.set("custom-text", "Unicode \uD83D\uDECD");
+      unicodeStore.save(unicodeNext, "TEST Unicode \uD83D\uDED2");
+      Store replayedUnicode = new Store(unicodeFolder);
+      check(unicodeItem.equals(replayedUnicode.state().getItemStack("custom-item")), "Audit replay preserves emoji name, lore, enchantment and damage");
+      check("Unicode \uD83D\uDECD".equals(replayedUnicode.state().getString("custom-text")), "Supplementary Unicode remains a String after replay");
+      check(replayedUnicode.auditHistory("\uD83D\uDED2", 10).size() == 1, "Unicode audit description remains filterable");
+      replayedUnicode.close();
+      Store checkpointedUnicode = new Store(unicodeFolder);
+      check(unicodeItem.equals(checkpointedUnicode.state().getItemStack("custom-item")), "Checkpoint reload preserves complete emoji custom item");
+      checkpointedUnicode.close();
+      YamlConfiguration unicodeCatalog = p.catalogCopy();
+      unicodeCatalog.set("products.test_unicode.item", unicodeItem); unicodeCatalog.set("products.test_unicode.buy", 10);
+      YamlConfiguration catalogRoundTrip = new YamlConfiguration(); catalogRoundTrip.loadFromString(SafeYaml.write(unicodeCatalog));
+      check(unicodeItem.equals(catalogRoundTrip.getItemStack("products.test_unicode.item")), "Catalog serialization preserves supplementary custom metadata");
+      List<String> diagnostic = CatalogDiagnostics.inspect(p);
+      check(diagnostic.stream().anyMatch(s -> s.contains("DUPLICATE ITEM")), "Catalog diagnosis identifies exact metadata duplicates");
+      YamlConfiguration extremeConfig = new YamlConfiguration(); extremeConfig.set("material", "EMERALD");
+      extremeConfig.set("buy", Money.format(Money.MAX)); extremeConfig.set("sell", Money.format(Money.MAX));
+      extremeConfig.set("dynamic.enabled", true); extremeConfig.set("dynamic.max", 1000);
+      p.products.put("test_v2_extreme_a", new Product("test_v2_extreme_a", extremeConfig));
+      p.products.put("test_v2_extreme_b", new Product("test_v2_extreme_b", extremeConfig));
+      check(CatalogDiagnostics.inspect(p).stream().anyMatch(s -> s.contains("PRICE RANGE REVIEW")), "Extreme diagnostic prices produce advisories without overflow");
+      p.products.remove("test_v2_extreme_a"); p.products.remove("test_v2_extreme_b");
+      check(!p.store.auditHistory("", 10000).isEmpty(), "Durable audit includes committed actions");
+    } finally {
+      org.bukkit.event.HandlerList.unregisterAll(guard);
+      p.products.remove("test_v2_quota");
+      p.products.remove("test_v2_custom");
+      p.products.remove("test_v2_extreme_a"); p.products.remove("test_v2_extreme_b");
+      p.getConfig().loadFromString(config); p.management = new ShopManagement(p);
+      p.service.setBalance(player.getUniqueId(), wallet); p.service.setBalance(buyer.getUniqueId(), buyerWallet);
+      player.getInventory().clear(); buyer.getInventory().clear(); player.closeInventory();
+      buyer.closeInventory();
+    }
+  }
+
   private void fixture(Player player) throws Exception {
     player.getInventory().clear();
     player.getInventory().setItem(0, new ItemStack(Material.EMERALD, 7));
@@ -421,8 +550,7 @@ final class ServerTests {
                 p.management.admin(
                     Bukkit.getConsoleSender(),
                     new String[] {"admin", "manage", "disable", "access"});
-                fixture(player);
-                p.getLogger().info("PLAYERTEST PASS checks=" + checks);
+                editorFlow(player);
               } catch (Throwable error) {
                 p.getLogger().log(java.util.logging.Level.SEVERE, "TEST FAIL", error);
               }
@@ -430,8 +558,72 @@ final class ServerTests {
             4);
   }
 
+  private void later(Checked work) {
+    Bukkit.getScheduler().runTaskLater(p, () -> {
+      try { work.run(); }
+      catch (Throwable error) { p.getLogger().log(java.util.logging.Level.SEVERE, "TEST FAIL", error); }
+    }, 3L);
+  }
+
+  private InventoryClickEvent editorClick(Player player, int slot) {
+    InventoryClickEvent event = new InventoryClickEvent(player.getOpenInventory(),
+        InventoryType.SlotType.CONTAINER, slot, ClickType.LEFT, InventoryAction.PICKUP_ALL);
+    p.editor.click(event);
+    return event;
+  }
+
+  private void editorFlow(final Player player) throws Exception {
+    final String original = SafeYaml.write(p.catalogCopy());
+    final long previous = p.product("stone").buy;
+    p.editor.open(player);
+    InventoryClickEvent open = editorClick(player, 0);
+    p.editor.click(open);
+    check(open.isCancelled(), "Editor consumes inventory click");
+    later(() -> {
+      check(p.editor.hasDraft(player.getUniqueId()), "Editor opens an isolated product draft");
+      editorClick(player, 12);
+      later(() -> {
+        org.bukkit.event.player.AsyncPlayerChatEvent reply = new org.bukkit.event.player.AsyncPlayerChatEvent(
+            true, player, "3.00", new HashSet<Player>());
+        p.inputs.chat(reply); p.inputs.chat(reply);
+        check(reply.isCancelled(), "Editor input is private and consumed once");
+        later(() -> {
+          check(p.product("stone").buy == previous, "Typing a draft price does not publish it");
+          editorClick(player, 49);
+          later(() -> {
+            check(player.getOpenInventory().getTopInventory().getSize() == 27, "Catalog publication requires review");
+            InventoryClickEvent publish = editorClick(player, 13); p.editor.click(publish);
+            later(() -> {
+              check(p.product("stone").buy == 300 && !p.editor.hasDraft(player.getUniqueId()), "Reviewed draft publishes once");
+              YamlConfiguration backup = new YamlConfiguration(); backup.load(p.getDataFolder().toPath().resolve("shops.yml.bak").toFile());
+              check(new Product("stone", backup.getConfigurationSection("products.stone")).buy == previous, "Published catalog retains prior backup");
+              p.editor.open(player); editorClick(player, 0);
+              later(() -> {
+                p.editor.cancel(player);
+                check(!p.editor.hasDraft(player.getUniqueId()) && p.product("stone").buy == 300, "Cancelling editor draft preserves saved catalog");
+                p.editor.open(player); editorClick(player, 0);
+                later(() -> {
+                  p.onCommand(Bukkit.getConsoleSender(), p.getCommand("shop"), "shop", new String[] {"admin", "price", "stone", "7", "0.5"});
+                  p.editor.open(player);
+                  editorClick(player, 49);
+                  later(() -> {
+                    check(p.product("stone").buy == 700 && p.editor.hasDraft(player.getUniqueId()), "Stale editor cannot overwrite a concurrent catalog change");
+                    p.editor.cancel(player);
+                    YamlConfiguration restored = new YamlConfiguration(); restored.loadFromString(original); p.saveCatalog(restored);
+                    fixture(player);
+                    p.getLogger().info("PLAYERTEST PASS checks=" + checks);
+                  });
+                });
+              });
+            });
+          });
+        });
+      });
+    });
+  }
+
   private void management(Player player, Player buyer) throws Exception {
-    String original = p.getConfig().saveToString();
+    String original = SafeYaml.write(p.getConfig());
     long wallet = p.service.balance(player), buyerWallet = p.service.balance(buyer);
     try {
       Product stone = p.product("stone");
@@ -601,6 +793,12 @@ final class ServerTests {
           Inventories.count(Inventories.snapshot(player), new ItemStack(Material.EMERALD)) == 7,
           "Vault player inventory survives restart");
       check(!p.store.blocked(), "Vault restart unlocked");
+      check(p.service.pendingMarketCredit(player) == 4321, "Unclaimed Vault marketplace credit survives restart");
+      p.getConfig().set("cooldown-milliseconds", 0);
+      p.service.claimExpired(player);
+      check(p.service.balance(player) == 38888, "Restarted marketplace credit deposited once");
+      p.service.claimExpired(player);
+      check(p.service.balance(player) == 38888, "Repeated marketplace claim does not replay credit");
       return;
     }
     check(p.store.state().getBoolean("test.restart"), "Ledger survives server restart");
@@ -620,7 +818,7 @@ final class ServerTests {
         "Favorites survive restart");
   }
 
-  private void vault(Player player) throws Exception {
+  private void vault(Player player, Player buyer) throws Exception {
     p.getConfig().set("cooldown-milliseconds", 0);
     p.getConfig().set("permission-discounts", null);
     player.setOp(true);
@@ -659,12 +857,49 @@ final class ServerTests {
     check(
         p.store.state().getLong("management.stats.products.stone.spent") == 200,
         "Vault managed purchase statistics");
-    rejects(() -> p.service.list(player, 1, 100), "Internal-only market unavailable in Vault mode");
+    buyer.setGameMode(GameMode.SURVIVAL);
+    buyer.getInventory().clear();
+    buyer.getInventory().setItem(0, new ItemStack(Material.EMERALD, 5));
+    long sellerBefore = p.service.balance(buyer);
+    String listing = p.service.list(buyer, 3, 1200);
+    long buyerBefore = p.service.balance(player);
+    p.service.marketTake(player, listing, false);
+    check(p.service.balance(player) == buyerBefore - 1200, "Vault market debits buyer");
+    check(p.service.balance(buyer) == sellerBefore, "Vault seller receives deferred credit instead of an uncertain second provider effect");
+    check(p.service.pendingMarketCredit(buyer) == 1176, "Vault market stores net seller liability");
+    check(Inventories.count(Inventories.snapshot(player), new ItemStack(Material.EMERALD)) == 3, "Vault market delivers escrow");
+    p.service.claimExpired(buyer);
+    check(p.service.balance(buyer) == sellerBefore + 1176, "Vault seller claims exact net proceeds");
+    p.service.claimExpired(buyer);
+    check(p.service.balance(buyer) == sellerBefore + 1176, "Vault credit cannot be paid twice");
+    check(p.service.notificationCount(buyer) == 1, "Offline-capable seller notice retained");
+    check(p.service.consumeNotifications(buyer).size() == 1 && p.service.notificationCount(buyer) == 0, "Seller notices consumed once");
+    String declined = p.service.list(buyer, 1, 100);
+    long fundsBeforeDecline = p.service.balance(player);
+    org.bukkit.event.Listener providerRace = new org.bukkit.event.Listener() {};
+    Bukkit.getPluginManager().registerEvent(ShopMarketEvent.class, providerRace, org.bukkit.event.EventPriority.NORMAL,
+        (listener, event) -> {
+          if (((ShopMarketEvent) event).getAction().equals("BUY"))
+            try { p.service.economy.change(player, p.service.balance(player), false); }
+            catch (Exception error) { throw new RuntimeException(error); }
+        }, p);
+    try { rejects(() -> p.service.marketTake(player, declined, false), "Vault decline after preparation is safely aborted"); }
+    finally { org.bukkit.event.HandlerList.unregisterAll(providerRace); }
+    check(p.store.state().contains("market." + declined) && !p.store.blocked(), "Declined Vault market trade retains listing without quarantine");
+    check(p.service.pendingMarketCredit(buyer) == 0, "Declined debit creates no seller credit");
+    check(p.service.economy.change(player, fundsBeforeDecline, true), "Restore provider race test funds");
+    p.service.marketTake(buyer, declined, true);
+    p.getConfig().set("market.allow-vault", false);
+    rejects(() -> p.service.list(buyer, 1, 100), "Vault market config opt-out enforced");
+    p.getConfig().set("market.allow-vault", true);
     long balance = p.service.balance(player);
     check(p.service.economy.change(player, balance, false), "Provider drain");
     rejects(
         () -> p.service.trade(player, stone, 1, true, null), "Vault insufficient funds preflight");
     check(p.service.economy.change(player, 34567, true), "Vault persistence fixture");
+    YamlConfiguration fixture = p.store.copy();
+    fixture.set("market-credits." + player.getUniqueId(), 4321);
+    p.store.save(fixture, "TEST Vault credit restart fixture");
     player.getInventory().clear();
     player.getInventory().setItem(0, new ItemStack(Material.EMERALD, 7));
     player.saveData();

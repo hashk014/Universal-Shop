@@ -31,6 +31,14 @@ public final class Inventories {
     return count;
   }
 
+  public static int capacity(ItemStack[] contents, ItemStack sample) {
+    int room = 0;
+    for (ItemStack item : contents)
+      if (item == null || item.getType() == Material.AIR) room += sample.getMaxStackSize();
+      else if (item.isSimilar(sample)) room += Math.max(0, sample.getMaxStackSize() - item.getAmount());
+    return room;
+  }
+
   public static ItemStack[] change(ItemStack[] before, ItemStack sample, int delta) {
     ItemStack[] result = new ItemStack[before.length];
     for (int i = 0; i < before.length; i++)
@@ -73,6 +81,6 @@ public final class Inventories {
     y.set("player", p.getUniqueId().toString());
     y.set("before", Arrays.asList(before));
     y.set("after", Arrays.asList(after));
-    return y.saveToString();
+    return SafeYaml.write(y);
   }
 }

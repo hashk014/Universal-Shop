@@ -18,10 +18,13 @@ public final class CommandPolicy {
               "search",
               "category",
               "deals",
+              "language",
               "market",
               "market.list",
               "market.buy",
               "market.cancel",
+              "market.claim",
+              "market.notices",
               "favorite",
               "favorites",
               "recent",
@@ -42,7 +45,10 @@ public final class CommandPolicy {
               "admin.panel",
               "admin.duplicate",
               "admin.rename",
-              "admin.category"));
+              "admin.category",
+              "admin.editor",
+              "admin.diagnose",
+              "admin.backup"));
   private final Set<String> disabled = new HashSet<String>();
 
   public CommandPolicy(Collection<String> values) {
@@ -62,8 +68,9 @@ public final class CommandPolicy {
     String path = normalize(action);
     if (disabled.contains("shop")) return false;
     if (disabled.contains(path)) return false;
-    int dot = path.indexOf('.');
-    return dot < 0 || !disabled.contains(path.substring(0, dot));
+    for (int dot = path.indexOf('.'); dot >= 0; dot = path.indexOf('.', dot + 1))
+      if (disabled.contains(path.substring(0, dot))) return false;
+    return true;
   }
 
   public static String path(String[] args) {

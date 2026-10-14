@@ -8,8 +8,11 @@ client.on('modal_form_request', packet => {
   console.log('FORM ' + JSON.stringify({id:packet.form_id, form:JSON.parse(packet.data)}));
 });
 require('readline').createInterface({input:process.stdin}).on('line', line => {
-  const [id,index] = line.split(' ').map(Number);
-  client.queue('modal_form_response', {form_id:id,has_response_data:true,data:JSON.stringify(index),has_cancel_reason:false});
+  const space = line.indexOf(' ');
+  const id = Number(line.slice(0, space));
+  const response = line.slice(space + 1);
+  JSON.parse(response); // A SimpleForm index or a CustomForm response array.
+  client.queue('modal_form_response', {form_id:id,has_response_data:true,data:response,has_cancel_reason:false});
 });
 client.on('disconnect', p => console.log('DISCONNECT', JSON.stringify(p)));
 setTimeout(() => process.exit(2), 180000).unref();

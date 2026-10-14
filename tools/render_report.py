@@ -5,7 +5,7 @@ root=pathlib.Path(__file__).resolve().parent.parent
 report=json.loads((root/'docs/compatibility-results.json').read_text())
 vault=json.loads((root/'docs/vault-results.json').read_text())
 bedrock=json.loads((root/'docs/bedrock-results.json').read_text())
-unit_count=sum(int(ET.parse(p).getroot().get('tests','0')) for p in (root/'target/surefire-reports').glob('TEST-*.xml'))
+unit_count=sum(int(ET.parse(p).getroot().get('tests','0'))-int(ET.parse(p).getroot().get('skipped','0')) for p in (root/'target/surefire-reports').glob('TEST-*.xml'))
 rows=report['results'];passed=sum(r['status']=='passed' for r in rows)
 out=['# Compatibility and validation','',f'Tested on {report["tested_at"]}. **{passed}/{len(rows)} Paper versions passed** the internal-economy suite.','',f'Exact tested plugin SHA-256: `{report["jar_sha256"]}`.','',
 f'Every passing version completed server startup, durable-store checks, two real loopback client logins, player transactions, server-driven GUI event checks, a full server restart, both client reconnections and inventory/wallet persistence checks. The release has also passed {unit_count} JUnit tests.',
@@ -13,7 +13,7 @@ f'Every passing version completed server startup, durable-store checks, two real
 '| Minecraft | Paper build | Channel | Java | Store / player / restart checks | Result |','| --- | --- | --- | --- | --- | --- |']
 for r in rows:
     c=r.get('checks',{});out.append(f'| {r["version"]} | {r.get("paper_build","?")} | {r.get("paper_channel","?")} | {r.get("java","?")} | {c.get("self",0)} / {c.get("player",0)} / {c.get("restart",0)} | {r["status"]} |')
-out+=['','## Vault integration','','Tested with [Vault 1.7.3](https://github.com/MilkBowl/Vault/releases/tag/1.7.3) and [EssentialsX 2.22.0](https://github.com/EssentialsX/Essentials/releases/tag/2.22.0). The Vault suite verifies real provider debits/deposits, item delivery/removal, rejected funds, marketplace mode restrictions and balance/inventory persistence after a full server restart.','', '| Minecraft | Result | Checks (store / player / restart) |','| --- | --- | --- |']
+out+=['','## Vault integration','','Tested with [Vault 1.7.3](https://github.com/MilkBowl/Vault/releases/tag/1.7.3) and [EssentialsX 2.22.0](https://github.com/EssentialsX/Essentials/releases/tag/2.22.0). The Vault suite verifies real provider debits/deposits, item delivery/removal, rejected funds, marketplace escrow, deferred seller credits, repeated claim guards and balance/inventory/credit persistence after a full server restart.','', '| Minecraft | Result | Checks (store / player / restart) |','| --- | --- | --- |']
 for r in vault['results']:
     c=r.get('checks',{});out.append(f'| {r["version"]} | {r["status"]} | {c.get("self",0)} / {c.get("player",0)} / {c.get("restart",0)} |')
 out+=['','## Bedrock integration','',f'Paper {bedrock["paper"]} with Geyser and Floodgate, Bedrock protocol {bedrock["bedrock_protocol"]}: **{bedrock["status"]}**, {bedrock["checks"]} checks and {bedrock["forms_received"]} native forms received over the network. '+bedrock['scope'],'','See [Bedrock setup and limits](BEDROCK-AND-COMMANDS.md) and the [machine-readable results](bedrock-results.json).','','## What this means','',
@@ -26,4 +26,7 @@ out+=['','## Bedrock integration','',f'Paper {bedrock["paper"]} with Geyser and 
 '- Inventory events were driven on the server against connected players. No rendered Minecraft client/UI visual inspection or high-player-count load test was performed.',
 '- Other Vault providers, third-party commands, other plugin combinations, real power loss and network-wide consistency remain deployment-specific. See [OPERATIONS.md](OPERATIONS.md).',
 '','## Reproduce','','See [DEVELOPMENT.md](DEVELOPMENT.md), [machine-readable Paper results](compatibility-results.json) and [Vault results](vault-results.json). Full per-version logs are in the evidence ZIP attached to the release. Official server builds come from the [Paper downloads service](https://docs.papermc.io/misc/downloads-service/) and their SHA-256 checksums are verified by the harness.','']
+unicode=json.loads((root/'docs/unicode-results.json').read_text())
+assert unicode['jar_sha256']==report['jar_sha256'],'Unicode evidence must match matrix JAR'
+out+=['','## Unicode custom-item persistence','',f'The exact production JAR additionally passed {unicode["checks"]} isolated checks on Paper 1.7.10/1.8.8 for emoji names/lore, enchantments, damage, audit replay, checkpoints, Unicode descriptions and genuine binary preservation. The companion probe resolves production classes and does not bundle the serializer fix. See [Unicode results](unicode-results.json).','']
 (root/'docs/COMPATIBILITY.md').write_text('\n'.join(out),encoding='utf-8')

@@ -24,7 +24,7 @@ public final class ManagementPolicy {
   final ZoneId zone;
 
   public ManagementPolicy(org.bukkit.configuration.file.FileConfiguration source) throws Exception {
-    config.loadFromString(source.saveToString());
+    config.loadFromString(SafeYaml.write(source));
     if (source.getDefaults() != null) config.setDefaults(source.getDefaults());
     for (String module : MODULES) bool(module + ".enabled");
     for (String flag :

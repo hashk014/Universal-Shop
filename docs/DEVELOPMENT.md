@@ -41,6 +41,12 @@ python tools/matrix.py 1.21.11 26.3 --vault-fixtures .tools/vault --report docs/
 
 These cases use separate `1.21.11-vault` / `26.3-vault` folders. Command policy tests additionally cover aliases, completion filtering, blocked transactions and console recovery. JUnit tests cover policy hierarchy, invalid paths, form expiration, stale sessions and duplicate callbacks.
 
+The disposable Essentials fixture sets `min-money: 0` so a debit declined after preflight can be reproduced without provider overdrafts. No production provider configuration is changed. Vault market scenarios check debit/escrow delivery, deferred net credits, repeated claims, notices, declined provider effects and unclaimed-credit persistence through restart.
+
+The 2.0 player suite also checks maximum quantities and wallet bounds, service stock, exact metadata previews, local language changes, market search/sort/expiry recovery, extension cancellation, granular staff permissions and actual scheduled editor click/chat/review/publish/cancel/conflict flows.
+
+Storage tests cover immutable decision publication, checksum/gap failures, checkpoint cleanup faults, coordinated ZIP restore, plain legacy ledgers and legacy prepared journals. Run the synthetic storage benchmark explicitly with `mvn test -Duniversalshop.storage-benchmark=true -Dtest=StoreBenchmarkTest`; the JSON output records its fixture and environment. Its timings do not establish Minecraft TPS.
+
 The management suite additionally checks schedule boundaries/timezones, shared global quotas, product cooldowns, daily budgets, campaign eligibility, loyalty progression, analytics and retained upgrade defaults. Each internal-economy server case exercises committed statistics, rejected buy/bulk accounting, two-player quotas, sale protection, catalog duplication/rename/category changes, restock/demand reset, dashboard permissions and a server-driven dashboard click. Restart checks include statistics and favorites. Vault cases verify budget rejection before provider debit and successful managed-transaction accounting.
 
 For the Bedrock suite, first cache Paper 26.2 with the main harness. Download official Geyser-Spigot and Floodgate-Spigot JARs into `.tools/bedrock`, named `Geyser-Spigot.jar` and `floodgate-spigot.jar`. Tested bridge SHA-256 values are recorded in `bedrock-results.json`.

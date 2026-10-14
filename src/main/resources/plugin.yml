@@ -1,5 +1,5 @@
 name: UniversalShop
-version: 1.2.0
+version: 2.0.0
 api-version: '1.13'
 main: fr.hash014.universalshop.UniversalShop
 author: hash014
@@ -24,5 +24,36 @@ permissions:
     default: true
   universalshop.admin:
     default: op
+    description: Full administration (legacy node); explicitly deny it before delegating individual scopes to an operator.
+  universalshop.admin.catalog:
+    default: false
+    description: Edit products and shop signs, inspect catalog diagnostics.
+  universalshop.admin.commands:
+    default: false
+    description: Edit console delivery commands in the catalog editor (also requires catalog access).
+  universalshop.admin.stock:
+    default: false
+    description: View, set, restock stock and reset demand.
+  universalshop.admin.balance:
+    default: false
+    description: Modify player balances.
+  universalshop.admin.history:
+    default: false
+    description: Search and export transaction history and sales analytics.
+  universalshop.admin.recovery:
+    default: false
+    description: Inspect and reconcile ambiguous transactions.
+  universalshop.admin.manage:
+    default: false
+    description: Manage module switches, availability and command switches.
+  universalshop.admin.backup:
+    default: false
+    description: Create ledger backups and state exports.
+  universalshop.admin.reload:
+    default: false
+    description: Reload and validate configuration and languages.
+  universalshop.language:
+    default: true
+    description: Select English, French or the configured server language.
   universalshop.vip:
     default: false

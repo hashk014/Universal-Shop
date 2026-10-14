@@ -6,6 +6,11 @@ import java.util.*;
 import org.junit.jupiter.api.Test;
 
 class CommandPolicyTest {
+  @org.junit.jupiter.api.Test void nestedManagementActionsInheritDisabledGroup() {
+    CommandPolicy policy = new CommandPolicy(java.util.Arrays.asList("admin.manage"));
+    org.junit.jupiter.api.Assertions.assertFalse(policy.enabled("admin.manage.stock"));
+    org.junit.jupiter.api.Assertions.assertTrue(policy.enabled("admin.balance"));
+  }
   @Test
   void parentDisablesChildren() {
     CommandPolicy p = new CommandPolicy(Arrays.asList("market"));

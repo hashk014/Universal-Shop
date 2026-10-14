@@ -13,6 +13,7 @@ jobs:
           java-version: '21'
           cache: maven
       - run: mvn -B clean verify
+      - run: UNIVERSALSHOP_TEST_JAVA="$JAVA_HOME/bin/java" python -m unittest discover -s tools -p test_migrate_economy.py -v
       - uses: actions/upload-artifact@v4
         with:
           name: UniversalShop

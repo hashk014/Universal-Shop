@@ -1,6 +1,16 @@
 # Configuration
 
-The generated `config.yml` controls the economy, taxes, rotation, promotion and marketplace. `shops.yml` holds all products. Validate changes with `/shop admin reload`; invalid reloads preserve the last working configuration in memory. Admin item/price edits validate the catalog and save `shops.yml.bak` before replacing the file.
+The generated `config.yml` controls the economy, taxes, rotation, promotion and marketplace. `shops.yml` holds all products. Validate changes with `/shop admin reload`; invalid reloads preserve the last working configuration in memory. Admin item/price edits validate the catalog and save `shops.yml.bak` before replacing the file. UniversalShop 2.0 adds a complete in-game editor: `/shop admin editor`.
+
+## Edit without YAML
+
+Hold a finished item and open `/shop admin editor`. **Create from held item** captures an amount-one copy including name, lore, enchantments, damage and custom item data. Enter a unique ID, buy/sell prices, display name and category through the guided prompts. Java uses private chat input; detected Bedrock players use native input forms. Type `cancel` to cancel a prompt; drafts remain available through `/shop admin editor` until discarded, logout, reload or shutdown.
+
+Click any product to edit its prices, name, category, exact item template, stock capacity, restock hours, personal daily limits, required permission, worlds, dynamic settings and rotating deals. A template replacement requires `CONFIRM ITEM`. Console delivery changes require `universalshop.admin.commands` in addition to catalog access and `CONFIRM COMMANDS`; setting commands automatically disables selling. These confirmation tokens are the same in both languages.
+
+The editor keeps changes in an unpublished draft. **Preview** shows the actual metadata and configured prices without trading; **Review and save** validates the product and provides a second review screen before publication. Invalid settings leave the draft intact. **Delete** requires two confirmation screens and cannot remove the last supported product. Closing a menu keeps the draft; returning to the product list asks before discarding it.
+
+If another administrator or an external file edit changes the catalog, saving an old draft is rejected. Runtime stock changes do not invalidate a catalog draft. A duplicate copies the current draft into a new unpublished ID and starts fresh runtime stock, limits and statistics. Catalog saves invalidate existing quotes and retain `shops.yml.bak`; balances and historical transactions are retained when products are deleted.
 
 See [command switches and Bedrock setup](BEDROCK-AND-COMMANDS.md) for `disabled-commands`, `/shop admin command`, and `bedrock.enabled`. Upgrading from 1.0.0 preserves existing files; omitted new options use their defaults (no disabled commands, native Bedrock forms enabled).
 
@@ -47,6 +57,7 @@ products:
 | `dynamic.enabled` | Enable demand-based prices |
 | `dynamic.step` | Multiplier change per net item purchased |
 | `dynamic.min`, `dynamic.max` | Lower/upper multiplier bounds |
+| `dynamic.decay-hours` | Idle-demand half-life: demand halves toward zero per completed interval since the last trade; active trades refresh that timer. `0` retains historical demand |
 | `rotating` | Eligible for the featured selection |
 | `rotation-only` | Visible/tradable only while selected; requires `rotating: true` |
 | `commands` | Console delivery commands; replaces item delivery and prohibits selling |
@@ -115,12 +126,23 @@ Prices are rounded conservatively per item: purchases up and sales down to a cen
 | `universalshop.market` | Everyone |
 | `universalshop.pay` | Everyone |
 | `universalshop.admin` | Operators |
+| `universalshop.language` | Everyone |
 | `universalshop.vip` | Nobody; assign explicitly for the example discount |
 
 Product permissions are additional checks. Creative-mode trading is disabled. `disabled-worlds` applies to trading and shop navigation. Use a permissions plugin to adjust access.
 
+Administration can be delegated using `universalshop.admin.catalog`, `.commands`, `.stock`, `.balance`, `.history`, `.recovery`, `.manage`, `.backup` and `.reload`; these nodes default to false. The original `universalshop.admin` node retains full access and defaults to operators. Explicitly deny it before delegating limited scopes to an operator. Catalog access allows product editing and shop-sign creation; `.commands` additionally permits changing console delivery commands. Stock access allows setting/restocking stock and resetting demand. History access allows filtered audit searches and statistics/CSV reports. Recovery decisions, balance changes and configuration management each require their own scope. The dashboard only offers actions the administrator may execute.
+
+## Languages and menu appearance
+
+Set `language: en` or `language: fr` for the server default. Edit generated `languages/en.yml` and `languages/fr.yml` to customize labels, prompts, confirmations and errors, then reload. Preserve the `{placeholders}` in translated values. Missing keys use bundled language defaults. Existing custom English `messages` values remain supported.
+
+With `player-language: true`, `/shop language en`, `/shop language fr` and `/shop language auto` override or reset a player's language. Preferences are persisted to `player-languages.yml` independently of money and transaction history. Configuration and product names are never automatically rewritten by translation.
+
+`menu-background` sets an optional filler material for unoccupied navigation slots; empty disables it. `menu-icons` overrides action icons through modern/legacy material aliases, for example `search: 'SPYGLASS|COMPASS'` and `market.claim: HOPPER`. Invalid aliases use the normal icon. Product previews continue to use exact item templates. See [PLAYER-EXPERIENCE.md](PLAYER-EXPERIENCE.md) for navigation and marketplace controls.
+
 ## Marketplace
 
-The held item identifies an exact template, and the requested quantity is collected from all 36 storage slots. Items are removed into escrow when the listing is created. The buyer pays the listing's **total** price, and the seller receives it minus market tax, even while offline. Expired listings remain reclaimable by their owners and count toward the listing limit until canceled. They are not automatically dropped or mailed, so a full inventory cannot lose returned items.
+The held item identifies an exact template, and the requested quantity is collected from all 36 storage slots. Items are removed into escrow when the listing is created. The buyer pays the listing's **total** price, and the seller receives it minus market tax. Expired listings stay in escrow and remain reclaimable through **My listings** or `/shop market claim`, but do not occupy the seller's active-listing quota. A full inventory retains the unclaimed item safely. `market.max-total-listings` caps total escrow entries, including expired ones; `market.min-price` sets a minimum total price.
 
-The marketplace is only available in internal economy mode. Server shop stock and rotating deals are independent of player listings.
+The market supports internal economy and Vault (`market.allow-vault: true`). Internal sales credit the seller's plugin balance. Vault sales record durable pending earnings, including for offline sellers, collected with `/shop market claim`; they are not silently deposited while offline. Provider payouts use the same incident recovery journal as other external economy operations. Seller notifications survive restart and can be read using `/shop market notices`. Server shop stock and rotating deals are independent of player listings.

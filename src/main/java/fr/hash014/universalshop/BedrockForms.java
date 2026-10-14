@@ -83,7 +83,6 @@ final class BedrockForms {
                           || !player.isOnline()) return;
                       if (index < 0 || index >= actions.size()) return;
                       try {
-                        plugin.service.allowed(player);
                         actions.get(index).run();
                       } catch (Exception error) {
                         plugin.failure(player, error);
@@ -115,6 +114,56 @@ final class BedrockForms {
     return ChatColor.stripColor(UniversalShop.color(text));
   }
 
+  boolean input(Player player, String prompt, int maxLength, PlayerInputs.InputHandler handler) {
+    try {
+      Object[] connection = bridge(player);
+      if (connection == null) return false;
+      Class<?> formClass = Class.forName("org.geysermc.cumulus.form.CustomForm");
+      Class<?> builderClass = Class.forName("org.geysermc.cumulus.form.CustomForm$Builder");
+      Class<?> baseBuilder = Class.forName("org.geysermc.cumulus.form.util.FormBuilder");
+      Class<?> baseForm = Class.forName("org.geysermc.cumulus.form.Form");
+      Class<?> responseClass = Class.forName("org.geysermc.cumulus.response.CustomFormResponse");
+      Object builder = formClass.getMethod("builder").invoke(null);
+      baseBuilder.getMethod("title", String.class).invoke(builder, "UniversalShop");
+      builderClass.getMethod("input", String.class, String.class, String.class)
+          .invoke(builder, plain(prompt), "", "");
+      UUID id = player.getUniqueId(), token = sessions.open(id);
+      long expires = System.currentTimeMillis() + 120000;
+      Consumer<Object> response = value -> {
+        try {
+          final String text = (String) responseClass.getMethod("asInput", int.class).invoke(value, 0);
+          if (!plugin.isEnabled()) return;
+          Bukkit.getScheduler().runTask(plugin, () -> {
+            if (!sessions.consume(id, token, expires, System.currentTimeMillis()) || !player.isOnline()) return;
+            try {
+              if (text == null || text.trim().equalsIgnoreCase("cancel")) return;
+              handler.accept(PlayerInputs.validate(text, maxLength));
+            } catch (Exception error) {
+              plugin.failure(player, error);
+            }
+          });
+        } catch (ReflectiveOperationException error) {
+          warn(error);
+        }
+      };
+      baseBuilder.getMethod("validResultHandler", Consumer.class).invoke(builder, response);
+      Runnable closed = () -> {
+        if (plugin.isEnabled()) Bukkit.getScheduler().runTask(plugin, () -> sessions.consume(id, token, 0, 1));
+      };
+      baseBuilder.getMethod("closedOrInvalidResultHandler", Runnable.class).invoke(builder, closed);
+      Object form = baseBuilder.getMethod("build").invoke(builder);
+      player.closeInventory();
+      boolean sent = Boolean.TRUE.equals(((Class<?>) connection[0])
+          .getMethod("sendForm", UUID.class, baseForm).invoke(connection[1], id, form));
+      if (!sent) sessions.close(id);
+      return sent;
+    } catch (ReflectiveOperationException | LinkageError error) {
+      warn(error);
+      sessions.close(player.getUniqueId());
+      return false;
+    }
+  }
+
   private boolean send(
       Player p, String title, String content, List<String> labels, List<Action> actions) {
     try {
@@ -142,6 +191,10 @@ final class BedrockForms {
     }
   }
 
+  private String text(Player p, String key, String fallback, String... replacements) {
+    return plugin.texts.format(p, key, fallback, replacements);
+  }
+
   boolean browse(Player p, String filter, int requested) throws Exception {
     if (!available(p)) return false;
     List<Product> products = plugin.management.catalog(p, filter);
@@ -154,50 +207,53 @@ final class BedrockForms {
       actions.add(() -> select(p, item));
     }
     if (page > 0) {
-      labels.add("Previous page");
+      labels.add(text(p, "menu.previous", "Previous page"));
       actions.add(() -> plugin.menus.browse(p, filter, page - 1));
     }
     if ((page + 1) * 12 < products.size()) {
-      labels.add("Next page");
+      labels.add(text(p, "menu.next", "Next page"));
       actions.add(() -> plugin.menus.browse(p, filter, page + 1));
     }
-    add(p, labels, actions, "category", "Categories", () -> plugin.menus.categories(p, 0));
-    add(p, labels, actions, "deals", "Featured deals", () -> plugin.menus.browse(p, "deals", 0));
-    add(p, labels, actions, "market", "Player market", () -> plugin.menus.market(p, 0));
-    add(p, labels, actions, "sellall", "Sell inventory", () -> plugin.previewSellAll(p));
+    add(p, labels, actions, "category", text(p, "menu.categories", "Categories"), () -> plugin.menus.categories(p, 0));
+    add(p, labels, actions, "deals", text(p, "menu.deals", "Featured deals"), () -> plugin.menus.browse(p, "deals", 0));
+    add(p, labels, actions, "market", text(p, "menu.market", "Player market"), () -> plugin.menus.market(p, "", "newest", false, 0));
+    add(p, labels, actions, "sellall", text(p, "menu.sellall", "Sell inventory"), () -> plugin.previewSellAll(p));
     add(
         p,
         labels,
         actions,
         "search",
-        "Search (use /shop search <text>)",
-        () -> plugin.tell(p, "&eUse /shop search <text>."));
+        text(p, "menu.search", "Search"),
+        () -> plugin.menus.search(p));
     if (plugin.management.enabled("personal")) {
       add(
           p,
           labels,
           actions,
           "favorites",
-          "Favorites",
+          text(p, "menu.favorites", "Favorites"),
           () -> plugin.menus.browse(p, "@favorites", 0));
       add(
           p,
           labels,
           actions,
           "recent",
-          "Recently traded",
+          text(p, "menu.recent", "Recently traded"),
           () -> plugin.menus.browse(p, "@recent", 0));
+      add(p, labels, actions, "sort", text(p, "menu.sort", "Sort products"), () -> plugin.menus.sorting(p));
     }
-    labels.add("Close");
+    if (plugin.hasAdmin(p, "catalog"))
+      add(p, labels, actions, "admin.editor", text(p, "menu.admin.editor", "Catalog editor"), () -> plugin.editor.open(p));
+    labels.add(text(p, "menu.close", "Close"));
     actions.add(() -> {});
     String balance =
         plugin.actionEnabled(p, "balance")
-            ? "Balance: " + plugin.money(plugin.service.balance(p)) + "\n"
+            ? text(p, "menu.balance", "Balance: {balance}", "balance", plugin.money(plugin.service.balance(p))) + "\n"
             : "";
     return send(
         p,
-        "UniversalShop | " + (page + 1),
-        balance + "Choose a product. Buy and Sell are separate buttons.",
+        text(p, "menu.browse.title", "UniversalShop | {page}", "page", String.valueOf(page + 1)),
+        balance + text(p, "bedrock.browse-help", "Choose a product. Buy and Sell are separate buttons."),
         labels,
         actions);
   }
@@ -213,7 +269,7 @@ final class BedrockForms {
           labels,
           actions,
           "buy",
-          "Buy - " + plugin.money(plugin.service.quote(p, item, 1, true)),
+          text(p, "bedrock.product-buy", "Buy - {price}", "price", plugin.money(plugin.service.quote(p, item, 1, true))),
           () -> plugin.menus.confirm(p, item, 1, true));
     if (item.sell >= 0)
       add(
@@ -221,7 +277,7 @@ final class BedrockForms {
           labels,
           actions,
           "sell",
-          "Sell - " + plugin.money(plugin.service.quote(p, item, 1, false)),
+          text(p, "bedrock.product-sell", "Sell - {price}", "price", plugin.money(plugin.service.quote(p, item, 1, false))),
           () -> plugin.menus.confirm(p, item, 1, false));
     if (plugin.management.enabled("personal"))
       add(
@@ -229,17 +285,18 @@ final class BedrockForms {
           labels,
           actions,
           "favorite",
-          "Toggle favorite",
+          text(p, "bedrock.favorite", "Toggle favorite"),
           () -> {
             plugin.management.personal(p, new String[] {"favorite", item.id});
             select(p, item);
           });
-    labels.add("Back");
-    actions.add(() -> plugin.menus.browse(p, "", 0));
+    labels.add(text(p, "menu.back", "Back"));
+    actions.add(() -> plugin.menus.back(p));
     send(
         p,
         item.name,
-        "Stock: " + (plugin.service.stock(item) < 0 ? "Unlimited" : plugin.service.stock(item)),
+        text(p, "menu.product.stock", "Stock: {stock}", "stock", plugin.menus.stockText(p, item))
+            + "\n" + plugin.menus.limitText(p, item, true) + "\n" + plugin.menus.limitText(p, item, false),
         labels,
         actions);
   }
@@ -250,7 +307,7 @@ final class BedrockForms {
     List<Action> actions = new ArrayList<Action>();
     for (String module : ManagementPolicy.MODULES) {
       boolean enabled = plugin.management.enabled(module);
-      add(
+      if (plugin.hasAdmin(p, "manage")) add(
           p,
           labels,
           actions,
@@ -265,22 +322,27 @@ final class BedrockForms {
             plugin.menus.adminPanel(p);
           });
     }
-    for (String action : Arrays.asList("open", "close", "stock", "stats", "report"))
+    for (String action : Arrays.asList("open", "close", "stock", "stats", "report")) {
+      String permission = action.equals("stock") ? "stock" : action.equals("stats") || action.equals("report") ? "history" : "manage";
+      if (!plugin.hasAdmin(p, permission)) continue;
       add(
           p,
           labels,
           actions,
           "admin.manage",
-          "Shop: " + action,
+          text(p, "menu.admin." + action, "Shop: " + action),
           () -> {
             plugin.onCommand(
                 p, plugin.getCommand("shop"), "shop", new String[] {"admin", "manage", action});
             plugin.menus.adminPanel(p);
           });
+    }
+    if (plugin.hasAdmin(p, "catalog"))
+      add(p, labels, actions, "admin.editor", text(p, "menu.admin.editor", "Catalog editor"), () -> plugin.editor.open(p));
     return send(
         p,
-        "UniversalShop | Management",
-        "Enable only the modules you need. Stock, statistics and report results appear in chat.",
+        text(p, "menu.admin.title", "UniversalShop | Management"),
+        text(p, "bedrock.admin-help", "Enable only the modules you need. Stock, statistics and reports appear in chat."),
         labels,
         actions);
   }
@@ -296,38 +358,48 @@ final class BedrockForms {
         labels,
         actions,
         buying ? "buy" : "sell",
-        "Confirm " + (buying ? "purchase" : "sale"),
+        text(p, buying ? "bedrock.confirm-buy" : "bedrock.confirm-sell", buying ? "Confirm purchase" : "Confirm sale"),
         () -> {
           if (System.currentTimeMillis() > expiry || plugin.products.get(item.id) != item)
             throw new IllegalArgumentException("This quote expired. Open a fresh confirmation.");
           plugin.service.trade(p, item, count, buying, quote);
+          plugin.menus.back(p);
         });
     if (item.commands.isEmpty())
       for (int size : new int[] {1, 16, 64, 256})
         if (size <= plugin.getConfig().getInt("max-transaction-items", 2304)) {
-          labels.add("Quantity: " + size);
+          labels.add(text(p, "menu.quantity", "{quantity} items", "quantity", String.valueOf(size)));
           actions.add(() -> plugin.menus.confirm(p, item, size, buying));
         }
+    if (item.commands.isEmpty()) {
+      labels.add(text(p, "menu.custom-quantity", "Custom quantity"));
+      actions.add(() -> plugin.menus.customQuantity(p, item, buying));
+      int possible = plugin.service.maxQuantity(p, item, buying);
+      labels.add(text(p, "menu.max-quantity", "Maximum: {quantity}", "quantity", String.valueOf(possible)));
+      actions.add(() -> {
+        int max = plugin.service.maxQuantity(p, item, buying);
+        if (max < 1) throw new IllegalArgumentException("No quantity can be traded with your current money, items, stock and quotas.");
+        plugin.menus.confirm(p, item, max, buying);
+      });
+    }
     if ((buying ? item.sell : item.buy) >= 0)
       add(
           p,
           labels,
           actions,
           buying ? "sell" : "buy",
-          buying ? "Switch to Sell" : "Switch to Buy",
+          text(p, buying ? "menu.switch-sell" : "menu.switch-buy", buying ? "Switch to Sell" : "Switch to Buy"),
           () -> plugin.menus.confirm(p, item, count, !buying));
-    labels.add("Cancel");
-    actions.add(() -> plugin.menus.browse(p, "", 0));
+    labels.add(text(p, "menu.cancel", "Cancel"));
+    actions.add(() -> plugin.menus.back(p));
     return send(
         p,
-        "UniversalShop | Confirm",
-        (buying ? "Buy " : "Sell ")
-            + count
-            + " x "
-            + item.name
-            + "\nTotal: "
-            + plugin.money(quote)
-            + "\nQuote valid for 30 seconds.",
+        text(p, "menu.confirm-title", "UniversalShop | Confirm"),
+        text(p, buying ? "bedrock.order-buy" : "bedrock.order-sell", buying ? "Buy {quantity} x {product}" : "Sell {quantity} x {product}",
+            "quantity", String.valueOf(count), "product", item.name)
+            + "\n" + text(p, "menu.total", "Total: {price}", "price", plugin.money(quote))
+            + "\n" + plugin.menus.limitText(p, item, buying)
+            + "\n" + text(p, "menu.quote-expiry", "Quote expires in 30 seconds."),
         labels,
         actions);
   }
@@ -346,16 +418,16 @@ final class BedrockForms {
       actions.add(() -> plugin.menus.browse(p, name, 0));
     }
     if (page > 0) {
-      labels.add("Previous page");
+      labels.add(text(p, "menu.previous", "Previous page"));
       actions.add(() -> plugin.menus.categories(p, page - 1));
     }
     if ((page + 1) * 12 < names.size()) {
-      labels.add("Next page");
+      labels.add(text(p, "menu.next", "Next page"));
       actions.add(() -> plugin.menus.categories(p, page + 1));
     }
-    labels.add("All products");
+    labels.add(text(p, "menu.all", "All products"));
     actions.add(() -> plugin.menus.browse(p, "", 0));
-    return send(p, "UniversalShop | Categories", "Choose a category.", labels, actions);
+    return send(p, text(p, "menu.categories-title", "UniversalShop | Categories"), text(p, "bedrock.categories-help", "Choose a category."), labels, actions);
   }
 
   boolean sellAll(Player p, Map<String, Integer> basket, long quote) {
@@ -363,54 +435,77 @@ final class BedrockForms {
     long expiry = System.currentTimeMillis() + 30000, revision = plugin.catalogRevision();
     return send(
         p,
-        "UniversalShop | Sell inventory",
-        basket + "\nTotal: " + plugin.money(quote),
-        Arrays.asList("Confirm sale", "Cancel"),
+        text(p, "bedrock.sellall-title", "UniversalShop | Sell inventory"),
+        basket + "\n" + text(p, "menu.total", "Total: {price}", "price", plugin.money(quote)),
+        Arrays.asList(text(p, "bedrock.confirm-sell", "Confirm sale"), text(p, "menu.cancel", "Cancel")),
         Arrays.<Action>asList(
             () -> {
               if (System.currentTimeMillis() > expiry || revision != plugin.catalogRevision())
                 throw new IllegalArgumentException("This preview expired. Preview again.");
               plugin.service.sellAll(p, basket, quote);
+              plugin.menus.back(p);
             },
-            () -> {}));
+            () -> plugin.menus.back(p)));
+  }
+
+  boolean sorting(Player p) {
+    if (!available(p)) return false;
+    List<String> labels = Arrays.asList(text(p, "menu.sort-catalog", "Catalog order"),
+        text(p, "menu.sort-name", "Name"), text(p, "menu.sort-price", "Buy price"), text(p, "menu.back", "Back"));
+    return send(p, text(p, "menu.sort-title", "UniversalShop | Sort"), "", labels,
+        Arrays.<Action>asList(() -> plugin.menus.setSort(p, "catalog"), () -> plugin.menus.setSort(p, "name"),
+            () -> plugin.menus.setSort(p, "price"), () -> plugin.menus.back(p)));
   }
 
   boolean market(Player p, int requested) throws Exception {
+    return market(p, "", "newest", false, requested);
+  }
+
+  boolean market(Player p, String filter, String sort, boolean mine, int requested) throws Exception {
     if (!available(p)) return false;
     org.bukkit.configuration.ConfigurationSection section =
         plugin.store.state().getConfigurationSection("market");
-    List<String> ids =
-        section == null ? new ArrayList<String>() : new ArrayList<String>(section.getKeys(false));
-    Collections.sort(ids);
+    List<String> ids = plugin.service.marketEntries(p, filter, sort, mine);
     int page = Math.max(0, Math.min(requested, Math.max(0, (ids.size() - 1) / 12)));
     List<String> labels = new ArrayList<String>();
     List<Action> actions = new ArrayList<Action>();
     for (int i = page * 12; i < Math.min(ids.size(), page * 12 + 12); i++) {
       String id = ids.get(i);
+      org.bukkit.inventory.ItemStack item = section.getItemStack(id + ".item");
+      String name = item.hasItemMeta() && item.getItemMeta().hasDisplayName() ? item.getItemMeta().getDisplayName() : item.getType().name();
       labels.add(
-          id
-              + " | "
-              + section.getItemStack(id + ".item").getType()
+          name
               + " x"
               + section.getInt(id + ".quantity")
               + "\n"
-              + plugin.money(section.getLong(id + ".price")));
+              + plugin.money(section.getLong(id + ".price"))
+              + " | " + section.getString(id + ".seller")
+              + (section.getLong(id + ".expires") <= System.currentTimeMillis() ? " | " + text(p, "bedrock.expired", "Expired") : ""));
       actions.add(() -> listing(p, id));
     }
     if (page > 0) {
-      labels.add("Previous page");
+      labels.add(text(p, "menu.previous", "Previous page"));
       actions.add(() -> plugin.menus.market(p, page - 1));
     }
     if ((page + 1) * 12 < ids.size()) {
-      labels.add("Next page");
+      labels.add(text(p, "menu.next", "Next page"));
       actions.add(() -> plugin.menus.market(p, page + 1));
     }
-    labels.add("Server shop");
-    actions.add(() -> plugin.menus.browse(p, "", 0));
+    add(p, labels, actions, "market", text(p, "menu.market-mine", "My listings"), () -> plugin.menus.market(p, "", "newest", true, 0));
+    add(p, labels, actions, "market", text(p, "menu.market-expired-button", "Expired items"), () -> plugin.menus.market(p, "@expired", "newest", true, 0));
+    add(p, labels, actions, "market", text(p, "menu.search", "Search"), () -> plugin.menus.marketSearch(p));
+    add(p, labels, actions, "market", text(p, "menu.market-sort", "Sort: {sort}", "sort", plugin.menus.sortName(p, sort)), () -> plugin.menus.marketSort(p));
+    add(p, labels, actions, "market", text(p, "menu.market-all", "All active listings"), () -> plugin.menus.market(p, "", "newest", false, 0));
+    add(p, labels, actions, "market.list", text(p, "menu.market-list", "List held item"), () -> plugin.menus.createListing(p));
+    add(p, labels, actions, "market.claim", text(p, "menu.market-claim", "Recover items and earnings"), () -> plugin.menus.claim(p));
+    add(p, labels, actions, "market.notices", text(p, "menu.market-notices", "Sale notifications: {count}", "count", String.valueOf(plugin.service.notificationCount(p))), () -> plugin.menus.notifications(p));
+    labels.add(text(p, "menu.server-shop", "Server shop"));
+    actions.add(() -> plugin.menus.back(p));
     return send(
         p,
-        "UniversalShop | Player market",
-        "List held items with /shop market list <amount> <total price>.",
+        text(p, "menu.market-title", "UniversalShop | Player Market"),
+        text(p, "bedrock.market-help", "Review listings or list your held item. Expired items remain safely stored.")
+            + "\n" + text(p, "menu.market-credit", "Unclaimed earnings: {price}", "price", plugin.money(plugin.service.pendingMarketCredit(p))),
         labels,
         actions);
   }
@@ -423,30 +518,45 @@ final class BedrockForms {
     boolean own = p.getUniqueId().toString().equals(state.getString(path + ".owner"));
     List<String> labels = new ArrayList<String>();
     List<Action> actions = new ArrayList<Action>();
-    add(
+    if (own || state.getLong(path + ".expires") > System.currentTimeMillis()) add(
         p,
         labels,
         actions,
         own ? "market.cancel" : "market.buy",
-        own ? "Reclaim items" : "Confirm purchase",
+        text(p, own ? "menu.market-reclaim" : "bedrock.confirm-buy", own ? "Reclaim items" : "Confirm purchase"),
         () -> {
           plugin.service.marketTake(p, id, own);
-          plugin.tell(p, "&aMarket transaction complete.");
+          plugin.tell(p, text(p, "menu.market-complete", "&aMarket transaction complete."));
+          plugin.menus.marketBack(p);
         });
-    labels.add("Cancel");
-    actions.add(() -> plugin.menus.market(p, 0));
+    labels.add(text(p, "menu.cancel", "Cancel"));
+    actions.add(() -> plugin.menus.marketBack(p));
+    org.bukkit.inventory.ItemStack sample = state.getItemStack(path + ".item");
+    String name = sample.hasItemMeta() && sample.getItemMeta().hasDisplayName() ? sample.getItemMeta().getDisplayName() : sample.getType().name();
+    List<String> detail = sample.hasItemMeta() && sample.getItemMeta().hasLore() ? sample.getItemMeta().getLore() : Collections.<String>emptyList();
     send(
         p,
-        "UniversalShop | Listing " + id,
-        "Seller: "
-            + state.getString(path + ".seller")
-            + "\nQuantity: "
-            + state.getInt(path + ".quantity")
-            + "\nTotal: "
-            + plugin.money(state.getLong(path + ".price"))
-            + "\nExpires: "
-            + java.time.Instant.ofEpochMilli(state.getLong(path + ".expires")),
+        text(p, "menu.listing-title", "UniversalShop | Market Confirm"),
+        name + " #" + id + (detail.isEmpty() ? "" : "\n" + String.join("\n", detail))
+            + "\n" + text(p, "menu.market-seller", "Seller: {seller}", "seller", state.getString(path + ".seller"))
+            + "\n" + text(p, "menu.quantity", "{quantity} items", "quantity", String.valueOf(state.getInt(path + ".quantity")))
+            + "\n" + text(p, "menu.total", "Total: {price}", "price", plugin.money(state.getLong(path + ".price")))
+            + "\n" + text(p, "menu.market-expiry", "Expires: {time}", "time", java.time.Instant.ofEpochMilli(state.getLong(path + ".expires")).toString()),
         labels,
         actions);
+  }
+
+  boolean listConfirm(Player p, org.bukkit.inventory.ItemStack sample, int count, long price) {
+    if (!available(p)) return false;
+    long expires = System.currentTimeMillis() + 30000;
+    String name = sample.hasItemMeta() && sample.getItemMeta().hasDisplayName() ? sample.getItemMeta().getDisplayName() : sample.getType().name();
+    return send(p, text(p, "menu.list-title", "UniversalShop | Create Listing"),
+        name + "\n" + text(p, "menu.quantity", "{quantity} items", "quantity", String.valueOf(count))
+            + "\n" + text(p, "menu.total", "Total: {price}", "price", plugin.money(price)),
+        Arrays.asList(text(p, "menu.market-publish", "Publish listing"), text(p, "menu.cancel", "Cancel")),
+        Arrays.<Action>asList(() -> {
+          if (System.currentTimeMillis() > expires) throw new IllegalArgumentException("This preview expired. Create a fresh listing.");
+          plugin.menus.publishListing(p, sample, count, price);
+        }, () -> plugin.menus.marketBack(p)));
   }
 }

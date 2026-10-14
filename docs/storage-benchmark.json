@@ -1,0 +1,19 @@
+{
+  "fixture": "synthetic, single-process, no player effects",
+  "measuredAt": "2026-10-14T11:11:56.031142900Z",
+  "operatingSystem": "Windows 11 10.0",
+  "jvm": "OpenJDK 64-Bit Server VM 17.0.20.1",
+  "scope": "copy + prepare + durable commit; legacy full snapshots versus delta audit; sequential local filesystem; not a Minecraft TPS/load test",
+  "wallets": 20000,
+  "products": 500,
+  "measuredTrades": 12,
+  "ledgerBytes": 874259,
+  "legacyMedianMs": 481.702,
+  "legacyP95Ms": 503.614,
+  "deltaMedianMs": 19.938,
+  "deltaP95Ms": 27.527,
+  "legacyMeanBytesWritten": 2711653,
+  "deltaMeanBytesWritten": 1805,
+  "checkpointMs": 76.336,
+  "checkpointRestartMs": 91.112
+}

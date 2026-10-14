@@ -2,6 +2,10 @@
 economy: INTERNAL # INTERNAL or VAULT; VAULT fails closed if no provider is available.
 starting-balance: 100.00
 currency: '$'
+language: en # en or fr; edit languages/en.yml and languages/fr.yml to customize text.
+player-language: true # /shop language en|fr|auto, preferences persist independently of the ledger.
+menu-background: '' # Optional Material aliases for unoccupied menu slots (empty = no filler).
+menu-icons: {} # Optional action -> Material aliases; e.g. search: 'SPYGLASS|COMPASS'.
 max-transaction-items: 2304
 cooldown-milliseconds: 350
 disabled-worlds: []
@@ -29,6 +33,9 @@ promotion:
   discount-percent: 10
 market:
   enabled: true
+  allow-vault: true # Seller earnings are held as journaled credits and collected with /shop market claim.
+  max-total-listings: 10000
+  min-price: 0.01 # Minimum total listing price.
   max-listings-per-player: 10
   tax-percent: 2
   listing-hours: 168

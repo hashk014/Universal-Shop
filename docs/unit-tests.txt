@@ -1,19 +1,84 @@
+UniversalShop 2.0.0 unit reports
+
+-------------------------------------------------------------------------------
+Test set: fr.hash014.universalshop.AdminPermissionsTest
+-------------------------------------------------------------------------------
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.024 s -- in fr.hash014.universalshop.AdminPermissionsTest
+
+
+-------------------------------------------------------------------------------
+Test set: fr.hash014.universalshop.CatalogEditorTest
+-------------------------------------------------------------------------------
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.009 s -- in fr.hash014.universalshop.CatalogEditorTest
+
+
 -------------------------------------------------------------------------------
 Test set: fr.hash014.universalshop.CommandPolicyTest
 -------------------------------------------------------------------------------
-Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.025 s -- in fr.hash014.universalshop.CommandPolicyTest
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 s -- in fr.hash014.universalshop.CommandPolicyTest
+
 
 -------------------------------------------------------------------------------
 Test set: fr.hash014.universalshop.CoreTest
 -------------------------------------------------------------------------------
-Tests run: 18, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.082 s -- in fr.hash014.universalshop.CoreTest
+Tests run: 18, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.151 s -- in fr.hash014.universalshop.CoreTest
+
+
+-------------------------------------------------------------------------------
+Test set: fr.hash014.universalshop.DemandTest
+-------------------------------------------------------------------------------
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 s -- in fr.hash014.universalshop.DemandTest
+
 
 -------------------------------------------------------------------------------
 Test set: fr.hash014.universalshop.FormSessionsTest
 -------------------------------------------------------------------------------
-Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in fr.hash014.universalshop.FormSessionsTest
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in fr.hash014.universalshop.FormSessionsTest
+
+
+-------------------------------------------------------------------------------
+Test set: fr.hash014.universalshop.LedgerLeaseTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s -- in fr.hash014.universalshop.LedgerLeaseTest
+
 
 -------------------------------------------------------------------------------
 Test set: fr.hash014.universalshop.ManagementPolicyTest
 -------------------------------------------------------------------------------
-Tests run: 17, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.067 s -- in fr.hash014.universalshop.ManagementPolicyTest
+Tests run: 17, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.094 s -- in fr.hash014.universalshop.ManagementPolicyTest
+
+
+-------------------------------------------------------------------------------
+Test set: fr.hash014.universalshop.MenuTitlesTest
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.033 s -- in fr.hash014.universalshop.MenuTitlesTest
+
+
+-------------------------------------------------------------------------------
+Test set: fr.hash014.universalshop.PlayerInputsTest
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in fr.hash014.universalshop.PlayerInputsTest
+
+
+-------------------------------------------------------------------------------
+Test set: fr.hash014.universalshop.SafeYamlTest
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.016 s -- in fr.hash014.universalshop.SafeYamlTest
+
+
+-------------------------------------------------------------------------------
+Test set: fr.hash014.universalshop.StoreBenchmarkTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.550 s -- in fr.hash014.universalshop.StoreBenchmarkTest
+
+
+-------------------------------------------------------------------------------
+Test set: fr.hash014.universalshop.StoreTest
+-------------------------------------------------------------------------------
+Tests run: 28, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.684 s -- in fr.hash014.universalshop.StoreTest
+
+
+-------------------------------------------------------------------------------
+Test set: fr.hash014.universalshop.TextsTest
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.012 s -- in fr.hash014.universalshop.TextsTest

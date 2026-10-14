@@ -1,10 +1,10 @@
 # Optional shop management
 
-UniversalShop 1.2 adds nine independent modules and catalog administration tools. **All nine modules default to OFF.** Existing shops keep their previous behavior until an administrator enables a module. Everything works with the same server-shop transaction service for Java and Bedrock players.
+UniversalShop adds nine independent management modules. **All nine modules default to OFF.** Existing shops keep their previous behavior until an administrator enables a module. Everything works with the same server-shop transaction service for Java and Bedrock players. UniversalShop 2.0 additionally provides a full catalog editor, granular staff permissions, permanent audit search, diagnostics and backups.
 
 ## Start with only what you need
 
-Run `/shop admin panel` in Survival mode to open the management dashboard. Java players receive an inventory menu; detected Bedrock players receive native forms. Click a module to switch it on or off. The dashboard also provides maintenance controls, stock overview, statistics and CSV export. Results for reports appear in chat. Only administrators can open it or execute its actions.
+Run `/shop admin panel` to open the management dashboard. Java players receive an inventory menu; detected Bedrock players receive native forms. Click a module to switch it on or off. The dashboard also provides the catalog editor, maintenance controls, stock overview, statistics, audit search, diagnostics and backups. Results for reports appear in chat. Buttons are filtered according to delegated administrator permissions, and commands recheck permissions on execution.
 
 For a small SMP, these three commands are enough to add favorites, sales reports and stock warnings:
 
@@ -155,6 +155,12 @@ Protected templates are omitted from bulk-sale previews; direct sales are reject
 | `/shop admin duplicate diamond rare_diamond` | Copy catalog settings under a new ID |
 | `/shop admin rename rare_diamond Rare Diamond` | Change its displayed name |
 | `/shop admin category rare_diamond Premium Resources` | Move it to a category |
+| `/shop admin editor` | Create and edit complete products with unpublished drafts and review screens |
+| `/shop admin history diamond 50` | Most recent 50 durable audit records matching diamond |
+| `/shop admin history <uuid> 100` | Search a player's durable transaction records |
+| `/shop admin history csv diamond` | Export filtered audit records to CSV |
+| `/shop admin diagnose` | Inspect catalog overlaps, recipe leads and ledger/recovery state |
+| `/shop admin backup` | Create a coordinated plugin-data archive including configuration and audit |
 
 Restocking/demand resets retain balances, player limits and configured base prices. They invalidate open quotes. Unlimited-stock products are skipped by restocking. Duplicate copies catalog settings, including nested dynamic pricing and custom item metadata, but starts with a fresh ID: runtime stock/demand, limits, statistics and ID-specific management rules are not copied. Catalog writes retain `shops.yml.bak` and validate before replacing the file.
 
@@ -179,6 +185,10 @@ Favorites and recents still filter permissions, worlds and rotating-product avai
 
 ## Permissions, switches and upgrading
 
-Administration requires `universalshop.admin`; normal shop permissions still apply to player tools and transactions. Disable `admin.panel`, `admin.manage`, `admin.duplicate`, `admin.rename`, `admin.category`, `favorite`, `favorites`, `recent`, `sort` or `stats` through the existing command policy when needed. `admin` disables all its children. Module switches supplement permissions; they do not grant permissions.
+The legacy `universalshop.admin` node retains full administrator access. Limited staff scopes are `universalshop.admin.catalog`, `.commands`, `.stock`, `.balance`, `.history`, `.recovery`, `.manage`, `.backup` and `.reload`. All scoped nodes default to false; an operator's legacy node must be explicitly denied for scope restrictions to apply. Opening the dashboard requires any administration scope; actions recheck their own scopes. Management stock/restock/reset-demand require `.stock`; stats/reports require `.history`; maintenance, module and command switches require `.manage`. Console delivery editing additionally requires `.commands` and catalog access.
 
-Stop the server and replace the old JAR with 1.2.0. Existing configuration, products and ledger are retained. Missing new settings use resource defaults without overwriting user values. No new module starts collecting data or changing trading rules until enabled. These modules are local to this backend and are not a cross-server database or a land-claim integration.
+Normal shop permissions still apply to player tools and transactions. Disable `admin.panel`, `admin.editor`, `admin.diagnose`, `admin.backup`, `admin.manage`, `admin.duplicate`, `admin.rename`, `admin.category`, `favorite`, `favorites`, `recent`, `sort` or `stats` through the existing command policy when needed. `admin` disables all its children. Module switches supplement permissions; they do not grant permissions.
+
+Stop the server and replace the old JAR with 2.0.0. Existing configuration, products and ledger are retained. Missing new settings use resource defaults without overwriting user values. No new optional management module starts changing trading rules until enabled. The durable storage upgrade imports the retained legacy history and then records future transactions in a separate append-only audit; this is independent of optional analytics. These modules are local to this backend and are not a cross-server database or a land-claim integration.
+
+Plugin backups cover plugin configuration, ledger, audit and pending recovery files. World/playerdata and an external economy provider require coordinated backups of their own. A diagnostic warning about overlapping templates or recipe profitability is a review lead, not automatic proof that a configured economy can be exploited. Follow [OPERATIONS.md](OPERATIONS.md) before committing or aborting an ambiguous external transaction.

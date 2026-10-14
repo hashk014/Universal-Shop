@@ -1,48 +1,45 @@
-# UniversalShop 1.2.0
+# UniversalShop 2.0.0
 
-Manage a small shop with a few switches, or enable advanced survival-economy controls as needed. This release adds nine independent management modules, all OFF by default, with a Java inventory dashboard and native Bedrock administrator forms. All plugin content remains in English.
+Create catalog products directly in game, complete player purchases without losing browsing context, and run the marketplace with the internal economy or Vault. Existing wallets, escrow, settings and legacy pending journals are retained.
 
-## Optional modules
+## In-game catalog editor
 
-- Access: maintenance, opening days/hours, named timezones, overnight windows and a custom closure message.
-- Product rules: pause products/categories, switch buying/selling separately, set order bounds, per-player product cooldowns and server-wide daily quotas.
-- Budgets: daily player spending and sale-earnings caps, including atomic bulk-sale enforcement.
-- Campaigns: multiple timed, targeted promotions with optional permissions.
-- Loyalty: configurable discount tiers based on completed purchase spending.
-- Sale protection: named, lore-bearing, enchanted, damaged or selected material templates.
-- Analytics: product/player totals, top products by revenue and CSV exports.
-- Personal tools: persistent favorites, recent trades and catalog/name/base-price sorting.
-- Stock alerts: configurable low-stock console warnings with throttling.
+`/shop admin editor` opens a guided editor. Create a product from the exact held item, adjust its name/category, prices, stock capacity/restocking, daily limits, worlds, permission, dynamic bounds/idle half-life, featured availability and console commands. Drafts stay private until reviewed and published; stale drafts cannot overwrite another administrator's edits. Template replacement, command edits and deletion require confirmation. Publication validates the complete catalog and preserves the previous file atomically.
 
-Additional admin tools duplicate, rename and recategorize products, restore stock and reset supply/demand offsets. New rules run through the existing transaction journal and respect command switches, permissions and the resale price floor. They cover the server shop; player-market escrow and payments remain independently configurable.
+Granular administrator permissions separate catalog, console commands, stock, balances, history, management, recovery, backup and reload. The existing `universalshop.admin` node remains compatible. English/French packs, personal language preferences and editable menu icons/background are included.
 
-## Quick start
+## Player experience
 
-```text
-/shop admin panel
-/shop admin manage enable personal
-/shop admin manage enable analytics
-/shop admin manage stats
-```
+Java search, custom quantities and listing creation use private, expiring chat inputs from menu actions. Bedrock players receive native text forms. Maximum quantities respect money, inventory space/matching metadata, stock, quotas, cooldowns, order bounds and daily budgets. Previews retain item metadata, remaining quotas are visible, and confirmations return to the previous category/page. Bulk sales have a review/confirmation menu. Inputs and confirmation callbacks are consumed once.
 
-Open the panel in Survival mode with `universalshop.admin`. Enable only the modules you need. The [management guide](https://github.com/hashk014/Universal-Shop/blob/codex/universal-shop/docs/MANAGEMENT.md) contains all commands, examples, defaults and exact rule semantics.
+Marketplace browsing adds search, newest/price/name/seller ordering, personal listings and expired-item views. Expired offers are hidden publicly and do not consume the active seller quota. `/shop market claim` recovers whole expired listings that fit, keeping the remainder escrowed. Sale notices survive offline periods.
 
-## Validation
+Vault buyers are debited through their provider. Net seller proceeds become durable liabilities until explicitly collected. Uncertain provider effects quarantine trading; interrupted deposits are never blindly repeated. Outstanding credits are bound to the original provider name.
 
-- 43 JUnit tests passed, including schedules, quotas, cooldowns, budgets, campaigns, loyalty, analytics and upgrade defaults.
-- 55 Paper versions from 1.7.10 through 26.3 passed with two connected Java protocol clients and a full restart. Each case includes optional-module scenarios and a server-driven dashboard click, plus statistics/favorites persistence.
-- Vault 1.7.3 with EssentialsX 2.22.0 passed on Paper 1.21.11 and 26.3, including budget rejection before debit and managed-transaction accounting.
-- A real offline Bedrock protocol client on Paper 26.2 with Geyser/Floodgate received 12 native forms and passed 23 checks, including favorites and an administrator module toggle.
-- Every integration report records the exact release JAR SHA-256. Full logs and unit reports are included in the evidence ZIP.
+## Storage and operations
 
-No rendered Minecraft/mobile/console UI, Microsoft authentication or high-concurrency load test is claimed. The Java matrix is not a Geyser backend compatibility matrix. This remains a Java backend plugin, not a native Bedrock Dedicated Server or land-claim plugin. See compatibility and operations documentation for platform boundaries.
+The durable commit point publishes sparse state changes and a checksummed audit record together. Checkpoints retain ordinary YAML with exact-byte integrity verification. Durable history survives beyond the legacy 200-entry cache. Legacy YAML/prepared journals migrate on startup. A process lease prevents two servers writing the same directory.
 
-## Upgrade and assets
+Legacy YAML writers previously turned supplementary Unicode text into binary and discarded custom item metadata on reload. The serializer now escapes only affected String scalars, retaining emoji names/lore, enchantments, damage and genuine binary data through journal/checkpoint reload. This is separately verified on actual Paper 1.7.10 and 1.8.8 with the production JAR.
 
-Stop the server, back up its plugin data, replace the previous UniversalShop JAR with 1.2.0 and restart. Configuration, catalog and ledger are preserved. Missing management settings use defaults without overwriting user settings. No new module changes trading or collects activity until enabled.
+`/shop admin history` filters UUID/product/UTC date/outcome/text and exports CSV. `/shop admin backup` captures configuration, catalog, checkpoint, audit and pending evidence in a plugin-data ZIP. `/shop admin diagnose` exposes recovery status and advisory duplicate/base-crafting price problems. Plugin backups require separate Minecraft playerdata and external economy backups.
 
-- `UniversalShop-1.2.0.jar`: install in `plugins/`.
-- `UniversalShop-1.2.0-Install.zip`: JAR, example configuration and documentation.
-- `UniversalShop-1.2.0-sources.jar`: source archive.
-- `UniversalShop-1.2.0-Evidence.zip`: integration logs and unit reports.
-- `SHA256SUMS.txt` and `manifest.json`: checksums and release metadata.
+The included offline migration tool checks the process lease, checksum and outstanding escrow/credits, creates a complete plugin backup and receipt, then changes only economy/provider bindings. Interrupted changes keep startup blocked. Provider balances must be transferred separately; the tool never moves money itself.
+
+Dynamic prices optionally recover after inactivity: demand halves toward zero per complete configured idle interval. Active trades refresh the timer; rapid splitting cannot erase demand through rounding. Diagnostics remain advisory for farms, recipes and other plugins.
+
+## Validation and limits
+
+See [COMPATIBILITY.md](COMPATIBILITY.md) and machine-readable Paper/Vault/Bedrock reports for the exact JAR hash and final counts. Unit coverage includes corruption, crash/restart boundaries, legacy migration, backups, filters, permissions, input validation, money and policies. Connected-player integration drives editor draft/input/review/publish/cancel/stale flows, confirmation duplication, metadata previews, market accounting and full restarts.
+
+The [storage benchmark](storage-benchmark.json) compares old full snapshots with the new journal on a synthetic 20,000-wallet/500-product ledger. It measures storage costs, not Minecraft TPS or multiplayer stress. Writes, copy/diff work, reports, backups and checkpoints remain synchronous. Physical power loss, rendered desktop/mobile/console UI, Microsoft authentication, other Vault providers and network-wide consistency are not certified.
+
+## Install or upgrade
+
+Stop the server and preserve a full backup, replace the binary with `UniversalShop-2.0.0.jar`, then restart. Run `/shop admin editor`, `/shop admin diagnose` and optionally `/shop language fr`. Existing modules retain their settings; missing keys use defaults without replacing customized catalogs.
+
+- `UniversalShop-2.0.0.jar`: install in `plugins/`.
+- `UniversalShop-2.0.0-Install.zip`: JAR, example language/configuration files and documentation.
+- `UniversalShop-2.0.0-sources.jar`: Java source archive.
+- `UniversalShop-2.0.0-Evidence.zip`: integration and unit evidence.
+- `SHA256SUMS.txt` and `manifest.json`: exact release metadata.

@@ -36,6 +36,10 @@ def run(args):
         matches=[i for i,b in enumerate(packet['form']['buttons']) if b['text'].startswith(prefix)]
         assert matches, f'Missing {prefix}: {packet}'
         text=f"{packet['id']} {matches[0]}\n";client.stdin.write(text*(2 if duplicate else 1));client.stdin.flush()
+    def input_response(packet,value,duplicate=False):
+        assert packet['form']['type']=='custom_form', f'Expected native CustomForm: {packet}'
+        assert len(packet['form']['content'])==1 and packet['form']['content'][0]['type']=='input', packet
+        text=f"{packet['id']} {json.dumps([value])}\n";client.stdin.write(text*(2 if duplicate else 1));client.stdin.flush()
     started=time.monotonic();start_due=None;pending=None
     try:
         while time.monotonic()-started<180:
@@ -57,13 +61,26 @@ def run(args):
                 if stage=='browse':click(packet,'Stone');stage='select'
                 elif stage=='select':click(packet,'Toggle favorite');stage='favorite-select'
                 elif stage=='favorite-select':click(packet,'Back');stage='home'
-                elif stage=='home':click(packet,'Favorites');stage='favorites'
+                elif stage=='home':click(packet,'Search');stage='search-input'
+                elif stage=='search-input':input_response(packet,'Stone',True);checks+=1;stage='search-results'
+                elif stage=='search-results':
+                    products={b['text'].split('\n')[0] for b in packet['form']['buttons'] if '\n' in b['text']}
+                    assert products=={'Stone','Cobblestone','Redstone'}, f'Native substring search returned wrong products: {products}'
+                    checks+=1;click(packet,'Favorites');stage='favorites'
                 elif stage=='favorites':
                     assert sum(b['text'].endswith('\nBuilding') for b in packet['form']['buttons'])==1, 'Favorites filter contains unrelated products'
                     checks+=1;click(packet,'Stone');stage='favorite-product'
                 elif stage=='favorite-product':click(packet,'Buy');stage='buy'
-                elif stage=='buy':click(packet,'Confirm purchase',True);stage='sell';pending=(time.monotonic()+2,'bought')
-                elif stage=='sell':click(packet,'Confirm sale',True);stage='disabled-browse';pending=(time.monotonic()+2,'sold')
+                elif stage=='buy':click(packet,'Custom quantity');stage='quantity-input'
+                elif stage=='quantity-input':input_response(packet,'1',True);checks+=1;stage='quantity-confirm'
+                elif stage=='quantity-confirm':click(packet,'Confirm purchase',True);stage='buy-return';pending=(time.monotonic()+2,'bought')
+                elif stage=='buy-return':
+                    assert sum(b['text'].endswith('\nBuilding') for b in packet['form']['buttons'])==1, 'Purchase did not return to the favorites view'
+                    checks+=1;stage='sell'
+                elif stage=='sell':click(packet,'Confirm sale',True);stage='sell-return';pending=(time.monotonic()+2,'sold')
+                elif stage=='sell-return':
+                    assert sum(b['text'].endswith('\nBuilding') for b in packet['form']['buttons'])==1, 'Sale did not return to the favorites view'
+                    checks+=1;stage='disabled-browse'
                 elif stage=='disabled-browse':click(packet,'Stone');stage='disabled-select'
                 elif stage=='disabled-select':
                     assert not any(b['text'].startswith('Buy') for b in packet['form']['buttons']), 'Disabled buy button visible'
@@ -82,7 +99,7 @@ def run(args):
             except subprocess.TimeoutExpired:server.kill();server.wait()
         (folder/'universalshop-test.log').write_text(''.join(logs),encoding='utf-8')
         (folder/'bedrock-client.log').write_text(''.join(clientlogs),encoding='utf-8')
-    report={'tested_at':datetime.now(timezone.utc).isoformat(),'jar_sha256':hashlib.sha256(JAR.read_bytes()).hexdigest(),'status':status,'errors':errors,'paper':'26.2','bedrock_protocol':'1.26.51','client':'bedrock-protocol 3.60.1','checks':checks,'forms_received':forms,'bridge_sha256':{n:hashlib.sha256((fixtures/n).read_bytes()).hexdigest() for n in ('Geyser-Spigot.jar','floodgate-spigot.jar')},'scope':'Real offline loopback Bedrock protocol client via Geyser and Floodgate (offline identity); native form responses including duplicate submission, buy/sell delivery and balances, disabled buy rejection, hidden button, favorite persistence/filtering, recent trades, analytics and administrator module toggle. No Microsoft authentication or rendered mobile/console UI test.','log':'test-servers/26.2-bedrock/universalshop-test.log','client_log':'test-servers/26.2-bedrock/bedrock-client.log'}
+    report={'tested_at':datetime.now(timezone.utc).isoformat(),'jar_sha256':hashlib.sha256(JAR.read_bytes()).hexdigest(),'status':status,'errors':errors,'paper':'26.2','bedrock_protocol':'1.26.51','client':'bedrock-protocol 3.60.1','checks':checks,'forms_received':forms,'bridge_sha256':{n:hashlib.sha256((fixtures/n).read_bytes()).hexdigest() for n in ('Geyser-Spigot.jar','floodgate-spigot.jar')},'scope':'Real offline loopback Bedrock protocol client via Geyser and Floodgate (offline identity); native CustomForm search and quantity inputs, duplicate input/button responses, favorite-view return after purchase/sale, buy/sell delivery and balances, disabled buy rejection, hidden button, favorite persistence/filtering, recent trades, analytics and administrator module toggle. No Microsoft authentication or rendered mobile/console UI test.','log':'test-servers/26.2-bedrock/universalshop-test.log','client_log':'test-servers/26.2-bedrock/bedrock-client.log'}
     (ROOT/'docs/bedrock-results.json').write_text(json.dumps(report,indent=2));print(json.dumps(report),flush=True)
     return status=='passed'
 

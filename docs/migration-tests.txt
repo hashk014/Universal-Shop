@@ -1,0 +1,25 @@
+test_backup_excludes_previous_backups_lock_and_temporary_files (test_migrate_economy.MigrationTests.test_backup_excludes_previous_backups_lock_and_temporary_files) ... ok
+test_checksum_damage_and_missing_or_truncated_footer_refused (test_migrate_economy.MigrationTests.test_checksum_damage_and_missing_or_truncated_footer_refused) ... ok
+test_cli_dry_run_returns_reviewable_plan (test_migrate_economy.MigrationTests.test_cli_dry_run_returns_reviewable_plan) ... ok
+test_crash_after_state_publication_keeps_guard_even_for_provider_only_change (test_migrate_economy.MigrationTests.test_crash_after_state_publication_keeps_guard_even_for_provider_only_change) ... ok
+test_credits_positive_negative_or_unknown_structure_refused (test_migrate_economy.MigrationTests.test_credits_positive_negative_or_unknown_structure_refused) ... ok
+test_dry_run_requires_no_acknowledgement_and_writes_no_backup_receipt (test_migrate_economy.MigrationTests.test_dry_run_requires_no_acknowledgement_and_writes_no_backup_receipt) ... ok
+test_duplicate_keys_aliases_and_unknown_scalar_syntax_refused (test_migrate_economy.MigrationTests.test_duplicate_keys_aliases_and_unknown_scalar_syntax_refused) ... ok
+test_exact_metadata_wallet_and_comments_survive_with_restorable_backup (test_migrate_economy.MigrationTests.test_exact_metadata_wallet_and_comments_survive_with_restorable_backup) ... ok
+test_other_process_lease_refuses_live_data (test_migrate_economy.MigrationTests.test_other_process_lease_refuses_live_data) ... ok
+test_pending_and_any_marketplace_escrow_refused (test_migrate_economy.MigrationTests.test_pending_and_any_marketplace_escrow_refused) ... ok
+test_provider_required_and_noop_rejected (test_migrate_economy.MigrationTests.test_provider_required_and_noop_rejected) ... ok
+test_quoted_provider_names_with_hash_and_apostrophe_roundtrip (test_migrate_economy.MigrationTests.test_quoted_provider_names_with_hash_and_apostrophe_roundtrip) ... ok
+test_real_java_nio_whole_file_lock_overlaps_python_byte_zero (test_migrate_economy.MigrationTests.test_real_java_nio_whole_file_lock_overlaps_python_byte_zero) ... ok
+test_requires_explicit_completed_external_balance_transfer (test_migrate_economy.MigrationTests.test_requires_explicit_completed_external_balance_transfer) ... ok
+test_source_mode_and_config_must_match (test_migrate_economy.MigrationTests.test_source_mode_and_config_must_match) ... ok
+test_uncheckpointed_audit_and_missing_checkpoint_boundary_refused (test_migrate_economy.MigrationTests.test_uncheckpointed_audit_and_missing_checkpoint_boundary_refused) ... ok
+test_vault_to_internal_removes_only_provider_binding (test_migrate_economy.MigrationTests.test_vault_to_internal_removes_only_provider_binding) ... ok
+test_vault_to_vault_can_rebind_distinct_provider (test_migrate_economy.MigrationTests.test_vault_to_vault_can_rebind_distinct_provider) ... ok
+test_write_failure_keeps_invalid_economy_guard_and_backup (test_migrate_economy.MigrationTests.test_write_failure_keeps_invalid_economy_guard_and_backup) ... ok
+test_zero_credits_and_empty_escrow_are_accepted (test_migrate_economy.MigrationTests.test_zero_credits_and_empty_escrow_are_accepted) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 1.349s
+
+OK
