@@ -12,18 +12,24 @@
     "modrinth": {
       "project_id": "I8f5J8IQ",
       "url": "https://modrinth.com/plugin/universalshop",
-      "status": "uploaded_project_draft",
+      "status": "processing",
       "version_id": "nYSLsvts",
       "version_url": "https://modrinth.com/plugin/universalshop/version/nYSLsvts",
       "declared_ai": [
         "code",
         "text"
-      ]
+      ],
+      "requested_status": "unlisted",
+      "ai_policy_url": "https://support.modrinth.com/en/articles/16551575-disclosure-and-usage-of-ai",
+      "version_sha512_verified": true,
+      "version_environment_api": "unknown",
+      "legacy_project_client_side": "unsupported",
+      "legacy_project_server_side": "required"
     },
     "curseforge": {
       "project_id": 1744641,
       "url": "https://www.curseforge.com/minecraft/bukkit-plugins/universalshop",
-      "status": "scanning_for_malware_project_pending",
+      "status": "scanning_for_malware",
       "file_id": 9172777,
       "file_url": "https://www.curseforge.com/minecraft/bukkit-plugins/universalshop/files/9172777",
       "game_version_ids": [
@@ -97,6 +103,14 @@
         "26.1.2",
         "26.2",
         "26.3"
+      ],
+      "project_status": "new_project_pending_moderation",
+      "download_sha256_verified": true,
+      "optional_dependencies": [
+        {
+          "project_id": 33184,
+          "slug": "vault"
+        }
       ]
     }
   },
@@ -165,5 +179,11 @@
     "26.2",
     "26.3"
   ],
-  "evidence": "manifest.json"
+  "evidence": "manifest.json",
+  "updated_at": "2026-10-14T12:57:33.869390+00:00",
+  "github": {
+    "url": "https://github.com/hashk014/Universal-Shop/releases/tag/v2.1.0",
+    "code_commit": "ce5133adc3f455e0410424caab2824bd309cb27f",
+    "ci": "https://github.com/hashk014/Universal-Shop/actions/runs/38567395783"
+  }
 }

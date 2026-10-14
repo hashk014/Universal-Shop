@@ -4,6 +4,10 @@ A configurable survival shop for Minecraft Java servers, built by **hash014**. O
 
 **Download:** [GitHub releases](https://github.com/hashk014/Universal-Shop/releases). See the [tested compatibility matrix](docs/COMPATIBILITY.md) before choosing a server version.
 
+Platform submissions: [CurseForge](https://www.curseforge.com/minecraft/bukkit-plugins/universalshop)
+and [Modrinth](https://modrinth.com/plugin/universalshop). New project approval is
+pending; Modrinth submission requests unlisted visibility under its AI-content policy.
+
 ## Features
 
 - Guided in-game catalog editor: exact held-item templates, price/category/name editing, stock, limits, worlds, permissions, dynamic prices and reviewed command products. Drafts are published only after review, with conflict detection and an atomic catalog backup.
