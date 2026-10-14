@@ -50,7 +50,9 @@ public final class ShopMenus implements Listener {
     plugin.requireAdmin(player, "panel");
     if (plugin.bedrock.adminPanel(player)) return;
     Menu menu = new Menu(player);
-    menu.inventory = Bukkit.createInventory(menu, 54, title(player, "menu.admin.title", "UniversalShop | Management"));
+    menu.layout = "admin";
+    menu.title = title(player, "menu.admin.title", "UniversalShop | Management");
+    menu.inventory = Bukkit.createInventory(menu, 54, menu.title);
     int slot = 10;
     for (String module : ManagementPolicy.MODULES) {
       boolean enabled = plugin.management.enabled(module);
@@ -78,6 +80,7 @@ public final class ShopMenus implements Listener {
 
   static final class Menu implements InventoryHolder {
     Inventory inventory;
+    String layout, title;
     final UUID owner;
     final Map<Integer, String> actions = new HashMap<Integer, String>();
     String filter = "";
@@ -132,10 +135,8 @@ public final class ShopMenus implements Listener {
     menu.actions.put(slot, action);
   }
   private void open(Player player, Menu menu) {
-    Material background = Product.material(plugin.getConfig().getString("menu-background", ""));
-    if (background != null && background != Material.AIR)
-      for (int slot = 0; slot < menu.inventory.getSize(); slot++)
-        if (menu.inventory.getItem(slot) == null) menu.inventory.setItem(slot, icon(background, " "));
+    menu.inventory = plugin.layouts.apply(menu.layout, menu.inventory, menu, menu.actions,
+        menu.page, menu.title, plugin.getConfig().getString("menu-background", ""));
     player.openInventory(menu.inventory);
   }
   private static int page(int requested, int count, int size) {
@@ -147,16 +148,18 @@ public final class ShopMenus implements Listener {
     plugin.service.allowed(p);
     if (filter.equalsIgnoreCase("deals")) plugin.requireAction(p, "deals");
     List<Product> matches = plugin.management.catalog(p, filter);
-    int selected = page(requested, matches.size(), plugin.bedrock.available(p) ? 12 : 36);
+    int capacity = plugin.layouts.get("browse").capacity();
+    int selected = page(requested, matches.size(), plugin.bedrock.available(p) ? 12 : capacity);
     browsing.put(p.getUniqueId(), new BrowseContext(filter, selected));
     if (plugin.bedrock.browse(p, filter, selected)) return;
-    selected = page(requested, matches.size(), 36);
+    selected = page(requested, matches.size(), capacity);
     browsing.put(p.getUniqueId(), new BrowseContext(filter, selected));
     Menu menu = new Menu(p); menu.filter = filter; menu.page = selected;
-    menu.inventory = Bukkit.createInventory(menu, 54,
-        title(p, "menu.browse.title", "&8UniversalShop &6| &8{page}", "page", String.valueOf(selected + 1)));
+    menu.layout = "browse";
+    menu.title = title(p, "menu.browse.title", "&8UniversalShop &6| &8{page}", "page", String.valueOf(selected + 1));
+    menu.inventory = Bukkit.createInventory(menu, 54, menu.title);
     Set<String> deals = plugin.service.deals();
-    for (int i = selected * 36; i < Math.min(matches.size(), (selected + 1) * 36); i++) {
+    for (int i = selected * capacity; i < Math.min(matches.size(), (selected + 1) * capacity); i++) {
       Product product = matches.get(i); List<String> lore = new ArrayList<String>();
       lore.add("&8" + product.category + " / " + product.id);
       if (product.buy >= 0 && plugin.actionEnabled(p, "buy")) lore.add(text(p, "menu.product.buy",
@@ -174,11 +177,11 @@ public final class ShopMenus implements Listener {
         lore.add(text(p, "menu.product.buy-paused", "&cPurchases are paused for this product."));
       if (!plugin.management.policy.direction(product.id, product.category, false))
         lore.add(text(p, "menu.product.sell-paused", "&cSales are paused for this product."));
-      int slot = i % 36;
+      int slot = i % capacity;
       menu.inventory.setItem(slot, preview(product.item, "&f" + product.name, lore.toArray(new String[0])));
       menu.actions.put(slot, "product:" + product.id);
     }
-    if (matches.isEmpty()) menu.inventory.setItem(22, icon(Material.PAPER,
+    if (matches.isEmpty()) menu.inventory.setItem(0, icon(Material.PAPER,
         text(p, "menu.empty", "&eNo matching products"), text(p, "menu.empty-help", "&7Try another search or category.")));
     if (plugin.management.enabled("personal")) {
       button(menu, 37, Material.GOLD_INGOT, text(p, "menu.favorites", "&eFavorites"), "favorites");
@@ -200,7 +203,7 @@ public final class ShopMenus implements Listener {
     button(menu, 51, Material.HOPPER, text(p, "menu.sellall", "&eSell inventory"), "sellall",
         text(p, "menu.sellall-help", "&7Review matching items before selling."));
     button(menu, 52, Material.REDSTONE, text(p, "menu.close", "&cClose"), "close");
-    if ((selected + 1) * 36 < matches.size()) button(menu, 53, Material.ARROW, text(p, "menu.next", "&eNext page"), "next");
+    if ((selected + 1) * capacity < matches.size()) button(menu, 53, Material.ARROW, text(p, "menu.next", "&eNext page"), "next");
     open(p, menu);
   }
   String stockText(Player p, Product product) {
@@ -235,7 +238,9 @@ public final class ShopMenus implements Listener {
     plugin.requireAction(p, "sort");
     if (plugin.bedrock.sorting(p)) return;
     Menu menu = new Menu(p);
-    menu.inventory = Bukkit.createInventory(menu, 27, title(p, "menu.sort-title", "UniversalShop | Sort"));
+    menu.layout = "sort";
+    menu.title = title(p, "menu.sort-title", "UniversalShop | Sort");
+    menu.inventory = Bukkit.createInventory(menu, 27, menu.title);
     button(menu, 10, Material.CHEST, text(p, "menu.sort-catalog", "&eCatalog order"), "sort:catalog");
     button(menu, 13, Material.PAPER, text(p, "menu.sort-name", "&eName"), "sort:name");
     button(menu, 16, Material.GOLD_INGOT, text(p, "menu.sort-price", "&eBuy price"), "sort:price");
@@ -259,13 +264,16 @@ public final class ShopMenus implements Listener {
     Set<String> set = new TreeSet<String>();
     for (Product product : plugin.products.values()) if (plugin.service.visible(p, product)) set.add(product.category);
     List<String> names = new ArrayList<String>(set);
-    Menu menu = new Menu(p); menu.page = page(requested, names.size(), 45);
-    menu.inventory = Bukkit.createInventory(menu, 54, title(p, "menu.categories-title", "UniversalShop | Categories"));
-    for (int i = menu.page * 45; i < Math.min(names.size(), (menu.page + 1) * 45); i++)
-      button(menu, i % 45, Material.CHEST, "&6" + names.get(i), "category:" + names.get(i));
+    int capacity = plugin.layouts.get("categories").capacity();
+    Menu menu = new Menu(p); menu.page = page(requested, names.size(), capacity);
+    menu.layout = "categories";
+    menu.title = title(p, "menu.categories-title", "UniversalShop | Categories");
+    menu.inventory = Bukkit.createInventory(menu, 54, menu.title);
+    for (int i = menu.page * capacity; i < Math.min(names.size(), (menu.page + 1) * capacity); i++)
+      button(menu, i % capacity, Material.CHEST, "&6" + names.get(i), "category:" + names.get(i));
     if (menu.page > 0) button(menu, 45, Material.ARROW, text(p, "menu.previous", "&ePrevious page"), "catprev");
     button(menu, 49, Material.CHEST, text(p, "menu.all", "&eAll products"), "home");
-    if ((menu.page + 1) * 45 < names.size()) button(menu, 53, Material.ARROW, text(p, "menu.next", "&eNext page"), "catnext");
+    if ((menu.page + 1) * capacity < names.size()) button(menu, 53, Material.ARROW, text(p, "menu.next", "&eNext page"), "catnext");
     open(p, menu);
   }
   public void confirm(Player p, Product product, int quantity, boolean buying) throws Exception {
@@ -276,7 +284,9 @@ public final class ShopMenus implements Listener {
     if (plugin.bedrock.confirm(p, product, quantity, buying)) return;
     Menu menu = new Menu(p); menu.product = product; menu.quantity = quantity; menu.buying = buying;
     menu.price = plugin.service.quote(p, product, quantity, buying); menu.expires = System.currentTimeMillis() + 30000;
-    menu.inventory = Bukkit.createInventory(menu, 36, title(p, "menu.confirm-title", "UniversalShop | Confirm"));
+    menu.layout = "confirm";
+    menu.title = title(p, "menu.confirm-title", "UniversalShop | Confirm");
+    menu.inventory = Bukkit.createInventory(menu, 36, menu.title);
     menu.inventory.setItem(13, preview(product.item, "&f" + product.name,
         text(p, buying ? "menu.confirm-buy" : "menu.confirm-sell", buying ? "&7Buy {quantity}" : "&7Sell {quantity}", "quantity", String.valueOf(quantity)),
         text(p, "menu.total", "&6Total: {price}", "price", plugin.money(menu.price)), limitText(p, product, buying),
@@ -303,11 +313,13 @@ public final class ShopMenus implements Listener {
     Menu menu = new Menu(p);
     menu.basket = new LinkedHashMap<String, Integer>(basket);
     menu.price = quote; menu.expires = System.currentTimeMillis() + 30000; menu.revision = plugin.catalogRevision();
-    menu.inventory = Bukkit.createInventory(menu, 54, title(p, "bedrock.sellall-title", "UniversalShop | Sell inventory"));
-    int slot = 18;
+    menu.layout = "sellall";
+    menu.title = title(p, "bedrock.sellall-title", "UniversalShop | Sell inventory");
+    menu.inventory = Bukkit.createInventory(menu, 54, menu.title);
+    int slot = 18, end = 18 + plugin.layouts.get("sellall").capacity();
     for (Map.Entry<String, Integer> entry : basket.entrySet()) {
       Product product = plugin.product(entry.getKey());
-      if (slot < 45) menu.inventory.setItem(slot++, preview(product.item, "&f" + product.name,
+      if (slot < end) menu.inventory.setItem(slot++, preview(product.item, "&f" + product.name,
           text(p, "menu.quantity", "&e{quantity} items", "quantity", String.valueOf(entry.getValue())),
           text(p, "menu.total", "&6Total: {price}", "price", plugin.money(plugin.service.quote(p, product, entry.getValue(), false)))));
     }
@@ -327,28 +339,31 @@ public final class ShopMenus implements Listener {
     plugin.inputs.cancel(p.getUniqueId());
     plugin.requireAction(p, "market"); plugin.service.allowed(p);
     List<String> ids = plugin.service.marketEntries(p, filter, sort, mine);
-    int selected = page(requested, ids.size(), plugin.bedrock.available(p) ? 12 : 36);
+    int capacity = plugin.layouts.get("market").capacity();
+    int selected = page(requested, ids.size(), plugin.bedrock.available(p) ? 12 : capacity);
     markets.put(p.getUniqueId(), new MarketContext(filter, sort, mine, selected));
     if (plugin.bedrock.market(p, filter, sort, mine, selected)) return;
-    Menu menu = new Menu(p); menu.page = page(requested, ids.size(), 36);
+    Menu menu = new Menu(p); menu.page = page(requested, ids.size(), capacity);
     menu.market = new MarketContext(filter, sort, mine, menu.page); markets.put(p.getUniqueId(), menu.market);
-    menu.inventory = Bukkit.createInventory(menu, 54, title(p, "menu.market-title", "UniversalShop | Player Market"));
+    menu.layout = "market";
+    menu.title = title(p, "menu.market-title", "UniversalShop | Player Market");
+    menu.inventory = Bukkit.createInventory(menu, 54, menu.title);
     org.bukkit.configuration.file.YamlConfiguration state = plugin.store.state();
-    for (int i = menu.page * 36; i < Math.min(ids.size(), (menu.page + 1) * 36); i++) {
+    for (int i = menu.page * capacity; i < Math.min(ids.size(), (menu.page + 1) * capacity); i++) {
       String id = ids.get(i), path = "market." + id; ItemStack sample = state.getItemStack(path + ".item");
       if (sample == null) continue;
       boolean own = p.getUniqueId().toString().equals(state.getString(path + ".owner"));
       boolean expired = state.getLong(path + ".expires") <= System.currentTimeMillis();
-      menu.inventory.setItem(i % 36, preview(sample, null, "&8#" + id,
+      menu.inventory.setItem(i % capacity, preview(sample, null, "&8#" + id,
           text(p, "menu.market-seller", "&7Seller: {seller}", "seller", state.getString(path + ".seller")),
           text(p, "menu.quantity", "&e{quantity} items", "quantity", String.valueOf(state.getInt(path + ".quantity"))),
           text(p, "menu.total", "&6Total: {price}", "price", plugin.money(state.getLong(path + ".price"))),
           expired ? text(p, "menu.market-expired", "&cExpired - safely stored for recovery") :
               text(p, "menu.market-expiry", "&7Expires: {time}", "time", java.time.Instant.ofEpochMilli(state.getLong(path + ".expires")).toString()),
           own ? text(p, "menu.market-reclaim-help", "&eClick to reclaim") : text(p, "menu.market-buy-help", "&eClick to review purchase")));
-      menu.actions.put(i % 36, "listing:" + id);
+      menu.actions.put(i % capacity, "listing:" + id);
     }
-    if (ids.isEmpty()) menu.inventory.setItem(22, icon(Material.PAPER, text(p, "menu.market-empty", "&eNo matching listings")));
+    if (ids.isEmpty()) menu.inventory.setItem(0, icon(Material.PAPER, text(p, "menu.market-empty", "&eNo matching listings")));
     button(menu, 36, Material.CHEST, text(p, "menu.market-mine", "&eMy listings"), "marketmine");
     button(menu, 37, Product.material("CLOCK|WATCH"), text(p, "menu.market-expired-button", "&eExpired items"), "marketexpired");
     button(menu, 38, Material.PAPER, text(p, "menu.search", "&eSearch"), "marketsearch");
@@ -362,7 +377,7 @@ public final class ShopMenus implements Listener {
     if (menu.page > 0) button(menu, 45, Material.ARROW, text(p, "menu.previous", "&ePrevious page"), "marketprev");
     button(menu, 49, Material.CHEST, text(p, "menu.server-shop", "&eServer shop"), "back");
     button(menu, 52, Material.REDSTONE, text(p, "menu.close", "&cClose"), "close");
-    if ((menu.page + 1) * 36 < ids.size()) button(menu, 53, Material.ARROW, text(p, "menu.next", "&eNext page"), "marketnext");
+    if ((menu.page + 1) * capacity < ids.size()) button(menu, 53, Material.ARROW, text(p, "menu.next", "&eNext page"), "marketnext");
     open(p, menu);
   }
   void marketBack(Player p) throws Exception {
@@ -411,7 +426,9 @@ public final class ShopMenus implements Listener {
     if (price < 1) throw new IllegalArgumentException("The listing price must be positive.");
     if (plugin.bedrock.listConfirm(p, sample, count, price)) return;
     Menu menu = new Menu(p); menu.sample = sample; menu.quantity = count; menu.price = price; menu.expires = System.currentTimeMillis() + 30000;
-    menu.inventory = Bukkit.createInventory(menu, 27, title(p, "menu.list-title", "UniversalShop | Create Listing"));
+    menu.layout = "market-create";
+    menu.title = title(p, "menu.list-title", "UniversalShop | Create Listing");
+    menu.inventory = Bukkit.createInventory(menu, 27, menu.title);
     menu.inventory.setItem(13, preview(sample, null, text(p, "menu.quantity", "&e{quantity} items", "quantity", String.valueOf(count)),
         text(p, "menu.total", "&6Total: {price}", "price", plugin.money(price))));
     button(menu, 11, Material.EMERALD, text(p, "menu.market-publish", "&aPublish listing"), "create-listing");
@@ -429,7 +446,9 @@ public final class ShopMenus implements Listener {
     if (!state.contains(path)) throw new IllegalArgumentException("This listing is no longer available.");
     boolean own = p.getUniqueId().toString().equals(state.getString(path + ".owner"));
     Menu menu = new Menu(p);
-    menu.inventory = Bukkit.createInventory(menu, 27, title(p, "menu.listing-title", "UniversalShop | Market Confirm"));
+    menu.layout = "market-confirm";
+    menu.title = title(p, "menu.listing-title", "UniversalShop | Market Confirm");
+    menu.inventory = Bukkit.createInventory(menu, 27, menu.title);
     menu.inventory.setItem(13, preview(state.getItemStack(path + ".item"), null,
         text(p, "menu.quantity", "&e{quantity} items", "quantity", String.valueOf(state.getInt(path + ".quantity"))),
         text(p, "menu.total", "&6Total: {price}", "price", plugin.money(state.getLong(path + ".price")))));

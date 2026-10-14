@@ -23,6 +23,7 @@ public final class CatalogEditor implements Listener {
 
   static final class Menu implements InventoryHolder {
     Inventory inventory;
+    String layout, title;
     final UUID owner;
     final Map<Integer, String> actions = new HashMap<Integer, String>();
     String filter = "";
@@ -87,9 +88,12 @@ public final class CatalogEditor implements Listener {
     String term = filter.toLowerCase(Locale.ROOT);
     for (Product product : plugin.products.values())
       if ((product.name + " " + product.category + " " + product.id).toLowerCase(Locale.ROOT).contains(term)) products.add(product);
-    menu.page = Math.max(0, Math.min(page, Math.max(0, (products.size() - 1) / 45)));
-    menu.inventory = Bukkit.createInventory(menu, 54, title(player, "list-title", "&8Catalog editor | {page}", "page", String.valueOf(menu.page + 1)));
-    for (int i = menu.page * 45; i < Math.min(products.size(), (menu.page + 1) * 45); i++) {
+    int capacity = plugin.layouts.get("editor-list").capacity();
+    menu.page = Math.max(0, Math.min(page, Math.max(0, (products.size() - 1) / capacity)));
+    menu.layout = "editor-list";
+    menu.title = title(player, "list-title", "&8Catalog editor | {page}", "page", String.valueOf(menu.page + 1));
+    menu.inventory = Bukkit.createInventory(menu, 54, menu.title);
+    for (int i = menu.page * capacity; i < Math.min(products.size(), (menu.page + 1) * capacity); i++) {
       Product product = products.get(i);
       ItemStack item = product.item.clone();
       ItemMeta meta = item.getItemMeta();
@@ -100,8 +104,8 @@ public final class CatalogEditor implements Listener {
       lore.add(UniversalShop.color(text(player, "list-edit", "&eClick to edit this product.")));
       meta.setLore(lore);
       item.setItemMeta(meta);
-      menu.inventory.setItem(i % 45, item);
-      menu.actions.put(i % 45, "edit:" + product.id);
+      menu.inventory.setItem(i % capacity, item);
+      menu.actions.put(i % capacity, "edit:" + product.id);
     }
     button(player, menu, 45, Material.ARROW, "previous", "&ePrevious page", "previous");
     button(player, menu, 46, Material.PAPER, "search", "&eSearch products", "search");
@@ -109,6 +113,7 @@ public final class CatalogEditor implements Listener {
     button(player, menu, 50, Material.BOOK, "diagnose", "&eCatalog diagnostics", "diagnose");
     button(player, menu, 52, Material.CHEST, "dashboard", "&eAdministration dashboard", "dashboard");
     button(player, menu, 53, Material.ARROW, "next", "&eNext page", "next");
+    menu.inventory = plugin.layouts.apply(menu.layout, menu.inventory, menu, menu.actions, menu.page, menu.title, plugin.getConfig().getString("menu-background", ""));
     player.openInventory(menu.inventory);
   }
 
@@ -145,7 +150,9 @@ public final class CatalogEditor implements Listener {
   private void edit(Player player, Draft draft) throws Exception {
     check(player, draft);
     Menu menu = new Menu(player);
-    menu.inventory = Bukkit.createInventory(menu, 54, title(player, "edit-title", "&8Edit: {id}", "id", shortId(draft.id)));
+    menu.layout = "editor-product";
+    menu.title = title(player, "edit-title", "&8Edit: {id}", "id", shortId(draft.id));
+    menu.inventory = Bukkit.createInventory(menu, 54, menu.title);
     ItemStack item = draft.section().getItemStack("item");
     if (item == null) {
       Material material = Product.material(draft.section().getString("material", "STONE"));
@@ -178,6 +185,7 @@ public final class CatalogEditor implements Listener {
     if (!draft.created) button(player, menu, 47, Material.REDSTONE, "delete", "&cDelete product", "delete");
     button(player, menu, 49, Material.EMERALD, "save", "&aReview and save", "review", text(player, "changes", "&7Unsaved fields: {fields}", "fields", draft.changes.toString()));
     button(player, menu, 53, Material.BOOK, "close", "&eClose (keep draft)", "close", text(player, "resume", "&7Reopen with /shop admin editor."));
+    menu.inventory = plugin.layouts.apply(menu.layout, menu.inventory, menu, menu.actions, menu.page, menu.title, plugin.getConfig().getString("menu-background", ""));
     player.openInventory(menu.inventory);
   }
 
@@ -339,17 +347,22 @@ public final class CatalogEditor implements Listener {
 
   private void confirm(Player player, String titleKey, String title, String action, int step, String... details) {
     Menu menu = new Menu(player);
-    menu.inventory = Bukkit.createInventory(menu, 27, title(player, titleKey, title));
+    menu.layout = "editor-confirm";
+    menu.title = title(player, titleKey, title);
+    menu.inventory = Bukkit.createInventory(menu, 27, menu.title);
     button(player, menu, step == 1 ? 11 : 13, step == 1 ? Material.REDSTONE : Material.EMERALD,
         step == 1 ? "confirm-first" : "confirm-final", step == 1 ? "&cConfirm this change" : "&aConfirm and publish", action, details);
     button(player, menu, 15, Material.ARROW, "cancel", "&eCancel", "cancel");
+    menu.inventory = plugin.layouts.apply(menu.layout, menu.inventory, menu, menu.actions, menu.page, menu.title, plugin.getConfig().getString("menu-background", ""));
     player.openInventory(menu.inventory);
   }
 
   private void preview(Player player, Draft draft) throws Exception {
     Product product = new Product(draft.id, draft.section());
     Menu menu = new Menu(player);
-    menu.inventory = Bukkit.createInventory(menu, 27, title(player, "preview-title", "&8Product preview"));
+    menu.layout = "editor-preview";
+    menu.title = title(player, "preview-title", "&8Product preview");
+    menu.inventory = Bukkit.createInventory(menu, 27, menu.title);
     ItemStack item = product.item.clone();
     ItemMeta meta = item.getItemMeta();
     meta.setDisplayName(UniversalShop.color(product.name));
@@ -361,6 +374,7 @@ public final class CatalogEditor implements Listener {
     item.setItemMeta(meta);
     menu.inventory.setItem(13, item);
     button(player, menu, 22, Material.ARROW, "return", "&eReturn to editor", "cancel");
+    menu.inventory = plugin.layouts.apply(menu.layout, menu.inventory, menu, menu.actions, menu.page, menu.title, plugin.getConfig().getString("menu-background", ""));
     player.openInventory(menu.inventory);
   }
 

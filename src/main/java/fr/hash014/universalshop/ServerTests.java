@@ -354,7 +354,15 @@ final class ServerTests {
             0);
     p.menus.click(swap);
     check(swap.isCancelled(), "Hotbar swap blocked");
+    final MenuLayouts originalLayouts = p.layouts;
+    YamlConfiguration geometry = new YamlConfiguration();
+    geometry.loadFromString("confirm:\n  rows: 5\n  slots:\n    '11': 15\n    '15': 11\n  decorations:\n    - material: GLASS\n      slots: [0]\n      name: '&6Test border'\n");
+    p.layouts = new MenuLayouts(geometry);
     p.menus.confirm(player, stone, 1, true);
+    check(player.getOpenInventory().getTopInventory().getSize() == 45, "Custom chest row count");
+    ShopMenus.Menu remapped = (ShopMenus.Menu) player.getOpenInventory().getTopInventory().getHolder();
+    check("confirm".equals(remapped.actions.get(15)) && "back".equals(remapped.actions.get(11)), "Remapped controls retain exact actions");
+    check(!remapped.actions.containsKey(0) && player.getOpenInventory().getTopInventory().getItem(0).getType() == Material.GLASS, "Decoration has no transaction action");
     final long beforeGui = p.service.balance(player);
     final int itemsBefore = Inventories.count(Inventories.snapshot(player), stone.item);
     final long guiPrice = p.service.quote(player, stone, 1, true);
@@ -362,7 +370,7 @@ final class ServerTests {
         new InventoryClickEvent(
             player.getOpenInventory(),
             InventoryType.SlotType.CONTAINER,
-            11,
+            15,
             ClickType.LEFT,
             InventoryAction.PICKUP_ALL);
     p.menus.click(click);
@@ -381,8 +389,10 @@ final class ServerTests {
                       Inventories.count(Inventories.snapshot(player), stone.item)
                           == itemsBefore + 1,
                       "Double confirm delivers once");
+                  p.layouts = originalLayouts;
                   panel(player);
                 } catch (Throwable e) {
+                  p.layouts = originalLayouts;
                   p.getLogger().log(java.util.logging.Level.SEVERE, "TEST FAIL", e);
                 }
               }
@@ -451,6 +461,27 @@ final class ServerTests {
           && Inventories.count(Inventories.snapshot(player), new ItemStack(Material.EMERALD)) == 6,
           "Cancelled market event leaves inventory and ledger unchanged");
       org.bukkit.event.HandlerList.unregisterAll(guard);
+      MenuLayouts savedLayouts = p.layouts;
+      YamlConfiguration compact = new YamlConfiguration();
+      compact.loadFromString("categories:\n  rows: 3\n  content-slots: [10]\n  slots:\n    '45': 18\n    '49': 22\n    '53': 26\neditor-list:\n  content-slots: [9, 10]\n");
+      p.layouts = new MenuLayouts(compact);
+      p.menus.categories(player, 0);
+      check(player.getOpenInventory().getTopInventory().getSize() == 27, "Compact categories chest");
+      ShopMenus.Menu categoryMenu = (ShopMenus.Menu) player.getOpenInventory().getTopInventory().getHolder();
+      check(categoryMenu.actions.get(10).startsWith("category:") && "catnext".equals(categoryMenu.actions.get(26)), "Custom content capacity keeps category next page reachable");
+      p.menus.categories(player, 1);
+      check("catprev".equals(((ShopMenus.Menu) player.getOpenInventory().getTopInventory().getHolder()).actions.get(18)), "Custom category previous page");
+      p.editor.open(player);
+      CatalogEditor.Menu editorMenu = (CatalogEditor.Menu) player.getOpenInventory().getTopInventory().getHolder();
+      check(editorMenu.actions.get(9).startsWith("edit:") && editorMenu.actions.get(10).startsWith("edit:") && !editorMenu.actions.containsKey(0), "Editor product actions move with custom content slots");
+      p.layouts = savedLayouts; player.closeInventory();
+      java.nio.file.Path layoutFile = p.getDataFolder().toPath().resolve("menus.yml");
+      byte[] savedFile = java.nio.file.Files.readAllBytes(layoutFile);
+      try {
+        java.nio.file.Files.write(layoutFile, "confirm:\n  slots:\n    '11': 13\n".getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        p.onCommand(Bukkit.getConsoleSender(), p.getCommand("shop"), "shop", new String[] {"admin", "reload"});
+        check(p.layouts == savedLayouts && !p.store.blocked(), "Invalid chest layout reload preserves active layouts and ledger");
+      } finally { java.nio.file.Files.write(layoutFile, savedFile); }
       p.menus.browse(player, "stone", 0);
       check(player.getOpenInventory().getTopInventory().getSize() == 54, "Refined browse remains a normal inventory");
       p.menus.browse(buyer, "stone", 0);

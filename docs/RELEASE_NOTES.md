@@ -1,4 +1,28 @@
-# UniversalShop 2.0.0
+# UniversalShop 2.1.0
+
+Customize Java chest menus through the new `menus.yml`: choose 1–6 rows, ordered
+content slots/page sizes, control positions, title overrides, backgrounds and
+passive decorations. The feature covers all 13 shop, market, administration and
+catalog editor menu types. Existing installations receive the default file
+without overwriting their catalogs or other configuration.
+
+Controls keep their actions when moved, including confirmation buttons. Content
+pagination uses the configured capacity. Layout validation rejects collisions,
+out-of-range slots, unknown settings and invalid materials. Invalid reloads retain
+the previous active layout; successful reloads close open chest menus.
+
+See [menu configuration and examples](MENUS.md). Native Bedrock forms retain their
+own presentation. Automated runtime checks cover custom sizes, moved confirmation
+with duplicate-click protection, passive decorations, compact category pagination,
+editor content mapping and rejection of invalid layout reloads. The complete
+Paper, Vault, Bedrock and legacy Unicode suites were rerun against this release.
+
+Install `UniversalShop-2.1.0.jar` after stopping the server and backing up its data.
+No balance migration is required when keeping the same economy. Menus are
+configured in YAML; the catalog editor still edits products rather than layout
+geometry.
+
+## Previous release: UniversalShop 2.0.0
 
 Create catalog products directly in game, complete player purchases without losing browsing context, and run the marketplace with the internal economy or Vault. Existing wallets, escrow, settings and legacy pending journals are retained.
 

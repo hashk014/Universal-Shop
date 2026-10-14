@@ -1,6 +1,6 @@
 {
-  "tested_at": "2026-10-14T11:15:31.476176+00:00",
-  "jar_sha256": "b92ceeb625346b5858bbb1edfab7cd76e3a15f63932b0fd66b020a7caa39fe72",
+  "tested_at": "2026-10-14T12:42:24.719774+00:00",
+  "jar_sha256": "10699fe30245806497ec3f8457270a17b4814554a19ecbbfead0e121007dde60",
   "results": [
     {
       "version": "1.21.11",
@@ -11,7 +11,7 @@
         "player": 29,
         "restart": 7
       },
-      "seconds": 34.6,
+      "seconds": 35.5,
       "java": 21,
       "paper_build": 132,
       "paper_channel": "STABLE",
@@ -27,7 +27,7 @@
         "player": 29,
         "restart": 7
       },
-      "seconds": 27.9,
+      "seconds": 28.6,
       "java": 25,
       "paper_build": 181,
       "paper_channel": "STABLE",

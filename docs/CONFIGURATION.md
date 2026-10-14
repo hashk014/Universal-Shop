@@ -1,5 +1,9 @@
 # Configuration
 
+UniversalShop 2.1 adds `menus.yml` for chest rows, ordered content slots, control
+positions, titles and decorations. See [menu layouts](MENUS.md). Validate and apply
+changes with `/shop admin reload`; invalid layouts preserve the previous layout.
+
 The generated `config.yml` controls the economy, taxes, rotation, promotion and marketplace. `shops.yml` holds all products. Validate changes with `/shop admin reload`; invalid reloads preserve the last working configuration in memory. Admin item/price edits validate the catalog and save `shops.yml.bak` before replacing the file. UniversalShop 2.0 adds a complete in-game editor: `/shop admin editor`.
 
 ## Edit without YAML

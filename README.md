@@ -23,6 +23,7 @@ A configurable survival shop for Minecraft Java servers, built by **hash014**. O
 - Deterministic rotating deals: weekly by default, configurable to daily or another hourly interval. Products can be permanently available or exclusive to their featured period.
 - Scheduled promotions, permission-based discounts, buy/sell taxes, and a no-immediate-resale-profit price floor.
 - Built-in wallets with exact integer cents, player payments, administrator balance management and transaction history.
+- Configurable chest rows, content slots, control positions, titles and decorations in menus.yml; see [menu layouts](docs/MENUS.md).
 - Optional Vault connection for the server shop. Missing economy providers fail closed.
 - Player marketplace with item escrow, offline seller credits, listing expiry, sale tax and safe cancellation, in internal or Vault mode.
 - Clickable shop signs, command completion, reload validation, catalog backups, ledger exports and a cancellable API event.
@@ -36,7 +37,7 @@ A configurable survival shop for Minecraft Java servers, built by **hash014**. O
 ## Install
 
 1. Stop your Bukkit-compatible Minecraft Java server.
-2. Put `UniversalShop-2.0.0.jar` in `plugins/` and start the server with the Java version required by that server.
+2. Put `UniversalShop-2.1.0.jar` in `plugins/` and start the server with the Java version required by that server.
 3. Run `/shop`. The internal economy starts each player with `$100.00` by default.
 4. Edit `plugins/UniversalShop/config.yml` and `shops.yml`, then run `/shop admin reload`.
 

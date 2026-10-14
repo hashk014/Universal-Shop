@@ -1,70 +1,70 @@
 # Compatibility and validation
 
-Tested on 2026-10-14T11:21:06.928964+00:00. **55/55 Paper versions passed** the internal-economy suite.
+Tested on 2026-10-14T12:47:37.046161+00:00. **55/55 Paper versions passed** the internal-economy suite.
 
-Exact tested plugin SHA-256: `b92ceeb625346b5858bbb1edfab7cd76e3a15f63932b0fd66b020a7caa39fe72`.
+Exact tested plugin SHA-256: `10699fe30245806497ec3f8457270a17b4814554a19ecbbfead0e121007dde60`.
 
-Every passing version completed server startup, durable-store checks, two real loopback client logins, player transactions, server-driven GUI event checks, a full server restart, both client reconnections and inventory/wallet persistence checks. The release has also passed 96 JUnit tests.
+Every passing version completed server startup, durable-store checks, two real loopback client logins, player transactions, server-driven GUI event checks, a full server restart, both client reconnections and inventory/wallet persistence checks. The release has also passed 101 JUnit tests.
 
 ## Tested versions
 
 | Minecraft | Paper build | Channel | Java | Store / player / restart checks | Result |
 | --- | --- | --- | --- | --- | --- |
-| 1.7.10 | 2025 | STABLE | 8 | 10 / 114 / 7 | passed |
-| 1.8.8 | 445 | STABLE | 8 | 10 / 114 / 7 | passed |
-| 1.9.4 | 775 | STABLE | 8 | 10 / 114 / 7 | passed |
-| 1.10.2 | 918 | STABLE | 8 | 10 / 114 / 7 | passed |
-| 1.11.2 | 1106 | STABLE | 8 | 10 / 114 / 7 | passed |
-| 1.12 | 1169 | STABLE | 8 | 10 / 114 / 7 | passed |
-| 1.12.1 | 1204 | STABLE | 8 | 10 / 114 / 7 | passed |
-| 1.12.2 | 1620 | STABLE | 8 | 10 / 114 / 7 | passed |
-| 1.13 | 173 | STABLE | 8 | 10 / 114 / 7 | passed |
-| 1.13.1 | 386 | STABLE | 8 | 10 / 114 / 7 | passed |
-| 1.13.2 | 657 | STABLE | 8 | 10 / 114 / 7 | passed |
-| 1.14 | 17 | STABLE | 8 | 10 / 114 / 7 | passed |
-| 1.14.1 | 50 | STABLE | 8 | 10 / 114 / 7 | passed |
-| 1.14.2 | 107 | STABLE | 8 | 10 / 114 / 7 | passed |
-| 1.14.3 | 134 | STABLE | 8 | 10 / 114 / 7 | passed |
-| 1.14.4 | 245 | STABLE | 8 | 10 / 114 / 7 | passed |
-| 1.15 | 21 | STABLE | 8 | 10 / 114 / 7 | passed |
-| 1.15.1 | 62 | STABLE | 8 | 10 / 114 / 7 | passed |
-| 1.15.2 | 393 | STABLE | 8 | 10 / 114 / 7 | passed |
-| 1.16.1 | 138 | STABLE | 8 | 10 / 114 / 7 | passed |
-| 1.16.2 | 189 | STABLE | 8 | 10 / 114 / 7 | passed |
-| 1.16.3 | 253 | STABLE | 8 | 10 / 114 / 7 | passed |
-| 1.16.4 | 416 | STABLE | 8 | 10 / 114 / 7 | passed |
-| 1.16.5 | 794 | STABLE | 8 | 10 / 114 / 7 | passed |
-| 1.17 | 79 | STABLE | 16 | 10 / 114 / 7 | passed |
-| 1.17.1 | 411 | STABLE | 17 | 10 / 114 / 7 | passed |
-| 1.18 | 66 | ALPHA | 17 | 10 / 114 / 7 | passed |
-| 1.18.1 | 216 | STABLE | 17 | 10 / 114 / 7 | passed |
-| 1.18.2 | 388 | STABLE | 17 | 10 / 114 / 7 | passed |
-| 1.19 | 81 | STABLE | 17 | 10 / 114 / 7 | passed |
-| 1.19.1 | 111 | STABLE | 17 | 10 / 114 / 7 | passed |
-| 1.19.2 | 307 | STABLE | 17 | 10 / 114 / 7 | passed |
-| 1.19.3 | 448 | STABLE | 17 | 10 / 114 / 7 | passed |
-| 1.19.4 | 550 | STABLE | 17 | 10 / 114 / 7 | passed |
-| 1.20 | 17 | STABLE | 17 | 10 / 114 / 7 | passed |
-| 1.20.1 | 196 | STABLE | 17 | 10 / 114 / 7 | passed |
-| 1.20.2 | 318 | STABLE | 17 | 10 / 114 / 7 | passed |
-| 1.20.4 | 499 | STABLE | 17 | 10 / 114 / 7 | passed |
-| 1.20.5 | 22 | ALPHA | 21 | 10 / 114 / 7 | passed |
-| 1.20.6 | 151 | STABLE | 21 | 10 / 114 / 7 | passed |
-| 1.21 | 130 | STABLE | 21 | 10 / 114 / 7 | passed |
-| 1.21.1 | 133 | STABLE | 21 | 10 / 114 / 7 | passed |
-| 1.21.3 | 83 | STABLE | 21 | 10 / 114 / 7 | passed |
-| 1.21.4 | 232 | STABLE | 21 | 10 / 114 / 7 | passed |
-| 1.21.5 | 114 | ALPHA | 21 | 10 / 114 / 7 | passed |
-| 1.21.6 | 48 | STABLE | 21 | 10 / 114 / 7 | passed |
-| 1.21.7 | 32 | STABLE | 21 | 10 / 114 / 7 | passed |
-| 1.21.8 | 60 | STABLE | 21 | 10 / 114 / 7 | passed |
-| 1.21.9 | 59 | ALPHA | 21 | 10 / 114 / 7 | passed |
-| 1.21.10 | 130 | STABLE | 21 | 10 / 114 / 7 | passed |
-| 1.21.11 | 132 | STABLE | 21 | 10 / 114 / 7 | passed |
-| 26.1.1 | 29 | ALPHA | 25 | 10 / 114 / 7 | passed |
-| 26.1.2 | 74 | STABLE | 25 | 10 / 114 / 7 | passed |
-| 26.2 | 133 | STABLE | 25 | 10 / 114 / 7 | passed |
-| 26.3 | 181 | STABLE | 25 | 10 / 114 / 7 | passed |
+| 1.7.10 | 2025 | STABLE | 8 | 10 / 122 / 7 | passed |
+| 1.8.8 | 445 | STABLE | 8 | 10 / 122 / 7 | passed |
+| 1.9.4 | 775 | STABLE | 8 | 10 / 122 / 7 | passed |
+| 1.10.2 | 918 | STABLE | 8 | 10 / 122 / 7 | passed |
+| 1.11.2 | 1106 | STABLE | 8 | 10 / 122 / 7 | passed |
+| 1.12 | 1169 | STABLE | 8 | 10 / 122 / 7 | passed |
+| 1.12.1 | 1204 | STABLE | 8 | 10 / 122 / 7 | passed |
+| 1.12.2 | 1620 | STABLE | 8 | 10 / 122 / 7 | passed |
+| 1.13 | 173 | STABLE | 8 | 10 / 122 / 7 | passed |
+| 1.13.1 | 386 | STABLE | 8 | 10 / 122 / 7 | passed |
+| 1.13.2 | 657 | STABLE | 8 | 10 / 122 / 7 | passed |
+| 1.14 | 17 | STABLE | 8 | 10 / 122 / 7 | passed |
+| 1.14.1 | 50 | STABLE | 8 | 10 / 122 / 7 | passed |
+| 1.14.2 | 107 | STABLE | 8 | 10 / 122 / 7 | passed |
+| 1.14.3 | 134 | STABLE | 8 | 10 / 122 / 7 | passed |
+| 1.14.4 | 245 | STABLE | 8 | 10 / 122 / 7 | passed |
+| 1.15 | 21 | STABLE | 8 | 10 / 122 / 7 | passed |
+| 1.15.1 | 62 | STABLE | 8 | 10 / 122 / 7 | passed |
+| 1.15.2 | 393 | STABLE | 8 | 10 / 122 / 7 | passed |
+| 1.16.1 | 138 | STABLE | 8 | 10 / 122 / 7 | passed |
+| 1.16.2 | 189 | STABLE | 8 | 10 / 122 / 7 | passed |
+| 1.16.3 | 253 | STABLE | 8 | 10 / 122 / 7 | passed |
+| 1.16.4 | 416 | STABLE | 8 | 10 / 122 / 7 | passed |
+| 1.16.5 | 794 | STABLE | 8 | 10 / 122 / 7 | passed |
+| 1.17 | 79 | STABLE | 16 | 10 / 122 / 7 | passed |
+| 1.17.1 | 411 | STABLE | 17 | 10 / 122 / 7 | passed |
+| 1.18 | 66 | ALPHA | 17 | 10 / 122 / 7 | passed |
+| 1.18.1 | 216 | STABLE | 17 | 10 / 122 / 7 | passed |
+| 1.18.2 | 388 | STABLE | 17 | 10 / 122 / 7 | passed |
+| 1.19 | 81 | STABLE | 17 | 10 / 122 / 7 | passed |
+| 1.19.1 | 111 | STABLE | 17 | 10 / 122 / 7 | passed |
+| 1.19.2 | 307 | STABLE | 17 | 10 / 122 / 7 | passed |
+| 1.19.3 | 448 | STABLE | 17 | 10 / 122 / 7 | passed |
+| 1.19.4 | 550 | STABLE | 17 | 10 / 122 / 7 | passed |
+| 1.20 | 17 | STABLE | 17 | 10 / 122 / 7 | passed |
+| 1.20.1 | 196 | STABLE | 17 | 10 / 122 / 7 | passed |
+| 1.20.2 | 318 | STABLE | 17 | 10 / 122 / 7 | passed |
+| 1.20.4 | 499 | STABLE | 17 | 10 / 122 / 7 | passed |
+| 1.20.5 | 22 | ALPHA | 21 | 10 / 122 / 7 | passed |
+| 1.20.6 | 151 | STABLE | 21 | 10 / 122 / 7 | passed |
+| 1.21 | 130 | STABLE | 21 | 10 / 122 / 7 | passed |
+| 1.21.1 | 133 | STABLE | 21 | 10 / 122 / 7 | passed |
+| 1.21.3 | 83 | STABLE | 21 | 10 / 122 / 7 | passed |
+| 1.21.4 | 232 | STABLE | 21 | 10 / 122 / 7 | passed |
+| 1.21.5 | 114 | ALPHA | 21 | 10 / 122 / 7 | passed |
+| 1.21.6 | 48 | STABLE | 21 | 10 / 122 / 7 | passed |
+| 1.21.7 | 32 | STABLE | 21 | 10 / 122 / 7 | passed |
+| 1.21.8 | 60 | STABLE | 21 | 10 / 122 / 7 | passed |
+| 1.21.9 | 59 | ALPHA | 21 | 10 / 122 / 7 | passed |
+| 1.21.10 | 130 | STABLE | 21 | 10 / 122 / 7 | passed |
+| 1.21.11 | 132 | STABLE | 21 | 10 / 122 / 7 | passed |
+| 26.1.1 | 29 | ALPHA | 25 | 10 / 122 / 7 | passed |
+| 26.1.2 | 74 | STABLE | 25 | 10 / 122 / 7 | passed |
+| 26.2 | 133 | STABLE | 25 | 10 / 122 / 7 | passed |
+| 26.3 | 181 | STABLE | 25 | 10 / 122 / 7 | passed |
 
 ## Vault integration
 

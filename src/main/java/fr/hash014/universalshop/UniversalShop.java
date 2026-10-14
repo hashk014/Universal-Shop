@@ -26,6 +26,7 @@ public final class UniversalShop extends JavaPlugin
   PlayerInputs inputs;
   CatalogEditor editor;
   Texts texts;
+  MenuLayouts layouts;
   private LedgerLease lease;
   private CommandPolicy commandPolicy = new CommandPolicy(Collections.<String>emptyList());
   long startingBalance;
@@ -51,6 +52,8 @@ public final class UniversalShop extends JavaPlugin
       lease = new LedgerLease(getDataFolder().toPath());
       saveDefaultConfig();
       saveResourceIfMissing("shops.yml");
+      saveResourceIfMissing("menus.yml");
+      layouts = MenuLayouts.load(new File(getDataFolder(), "menus.yml"));
       validateConfig();
       texts = new Texts(this);
       loadCatalog();
@@ -531,6 +534,7 @@ public final class UniversalShop extends JavaPlugin
           .equalsIgnoreCase(getConfig().getString("economy", "INTERNAL")))
         throw new IllegalArgumentException(
             "Changing economy requires a server restart and a planned balance migration.");
+      MenuLayouts nextLayouts = MenuLayouts.load(new File(getDataFolder(), "menus.yml"));
       String previous = SafeYaml.write(getConfig());
       long previousBalance = startingBalance;
       try {
@@ -545,8 +549,10 @@ public final class UniversalShop extends JavaPlugin
         management = new ShopManagement(this);
         throw e;
       }
+      layouts = nextLayouts;
       for (Player p : onlinePlayers())
-        if (p.getOpenInventory().getTopInventory().getHolder() instanceof ShopMenus.Menu)
+        if (p.getOpenInventory().getTopInventory().getHolder() instanceof ShopMenus.Menu
+            || p.getOpenInventory().getTopInventory().getHolder() instanceof CatalogEditor.Menu)
           p.closeInventory();
       tell(sender, "&aConfiguration and catalog reloaded.");
       bedrock.sessions.clear();
