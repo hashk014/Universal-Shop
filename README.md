@@ -1,5 +1,9 @@
 # UniversalShop
 
+![UniversalShop — by hash014](docs/media/banner.png)
+
+*AI-generated branding artwork; this is not an in-game screenshot.*
+
 A configurable survival shop for Minecraft Java servers, built by **hash014**. One plugin JAR, editable English/French interfaces, and an internal economy that works without dependencies.
 
 **Download:** [GitHub releases](https://github.com/hashk014/Universal-Shop/releases). See the [tested compatibility matrix](docs/COMPATIBILITY.md) before choosing a server version.
